@@ -132,9 +132,9 @@ function catOf(it){if(it.type==='fill')return '穴埋め・実戦';var x=it.tag;
 var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','ターン','スポット','穴埋め・実戦'];
 function mastery(){var m={};CATORDER.forEach(function(c){m[c]={s:0,n:0};});ALL.forEach(function(it){var c=catOf(it);if(!m[c])return;var r=prog[it.id];m[c].s+=(r?r.box:0);m[c].n++;});var out=[];CATORDER.forEach(function(c){if(m[c].n)out.push({k:c,v:Math.round(m[c].s/(m[c].n*5)*100)});});return out;}
 function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.slice();if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
-var view='home',queue=[],idx=0,flipped=false,fsi=0,fsh=false;
+var view='home',queue=[],idx=0,flipped=false,fsi=0,fRevealed=false,fInputs={},fGrades={};
 var root=document.getElementById('root');
-function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;fsi=0;fsh=false;}
+function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;fsi=0;fRevealed=false;fInputs={};fGrades={};}
 function setMode(m){mode=m;localStorage.setItem('pokerMode',m);renderHome();}
 var sessAgain=[];
 function grade(it,good){var r=prog[it.id]||{box:1};var box=r.box||1;box=good?Math.min(box+1,5):1;prog[it.id]={box:box,due:addD(IV[box]),seen:(r.seen||0)+1,again:(r.again||0)+(good?0:1)};save(prog);if(!good)sessAgain.push(it);}
@@ -162,9 +162,9 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  home:function(){view='home';renderHome();},
  flip:function(){flipped=true;renderSession();},
  swipe:function(good){var it=queue[idx];grade(it,good);idx++;flipped=false;next();},
- freveal:function(){fsh=true;renderSession();},
- fnext:function(){fsi++;fsh=false;renderSession();},
- fdone:function(good){var it=queue[idx];grade(it,good);idx++;fsi=0;fsh=false;next();},
+ fcheck:function(){var ta=document.getElementById('fin');fInputs[fsi]=ta?ta.value.trim():'';fRevealed=true;renderSession();},
+ fgrade:function(g){fGrades[fsi]=g;fsi++;fRevealed=false;renderSession();},
+ fdone:function(good){var it=queue[idx];grade(it,good);prog[it.id].last=it.steps.map(function(s,i){return {q:s.q,input:fInputs[i]||'',a:s.a,g:fGrades[i]||''};});save(prog);idx++;fsi=0;fRevealed=false;fInputs={};fGrades={};next();},
  reset:function(){if(confirm('進捗をリセットしますか？')){prog={};save(prog);renderHome();}},
  exportData:function(){var d={at:tstr(),progress:prog,cards:ALL.map(function(it){return {id:it.id,cat:catOf(it),q:it.type==='fill'?it.sc:it.q};})};var s=JSON.stringify(d);var ta=document.createElement('textarea');ta.value=s;ta.style.cssText='position:absolute;left:-9999px;';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);alert('分析データをコピーしました。Claudeのチャットに貼り付けて「これ分析して」と送ってください。');}};
 function next(){if(idx>=queue.length){justDone=true;view='home';renderHome();}else{renderSession();}}
@@ -207,18 +207,24 @@ function bindSwipe(it){
 }
 function renderFill(it){
  var done=fsi>=it.steps.length;
- var filledHtml=it.steps.slice(0,fsi).map(function(s,i){return '<div style="border-left:2px solid var(--gold);padding:2px 0 2px 12px;margin-bottom:11px;"><div style="font-size:11.5px;color:#85888f;margin-bottom:3px;">'+(i+1)+'. '+s.q+'</div><div style="font-size:13.5px;line-height:1.5;color:var(--gold);">'+s.a+'</div></div>';}).join('');
+ var filledHtml=it.steps.slice(0,fsi).map(function(s,i){var g=fGrades[i]||'';var gc=g==='◎'?'#5fc3a8':(g==='△'?'#d8b54a':'#e8917a');return '<div style="border-left:2px solid '+gc+';padding:2px 0 2px 12px;margin-bottom:12px;"><div style="font-size:11.5px;color:#85888f;margin-bottom:3px;">'+(i+1)+'. '+s.q+' <span style="color:'+gc+';font-weight:500;">'+g+'</span></div><div style="font-size:12px;line-height:1.45;color:#8b8e97;">あなた: '+(fInputs[i]||'（空欄）')+'</div><div style="font-size:13px;line-height:1.45;color:var(--gold);">正解: '+s.a+'</div></div>';}).join('');
  var body;
  if(done){
-  body='<div style="text-align:center;padding:6px 0;"><div style="font-size:15px;color:var(--text);font-weight:500;margin-bottom:3px;">読み切ったな</div><div style="font-size:12px;color:var(--muted);margin-bottom:16px;">これを毎回やれ。養分は途中で考えるのをやめる。</div><div style="display:flex;gap:8px;"><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(217,96,63,.12);color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fdone(false)">また</button><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(58,160,136,.12);color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fdone(true)">覚えた</button></div></div>';
+  var bad=0,ok=0;it.steps.forEach(function(s,i){if(fGrades[i]==='✗')bad++;if(fGrades[i]==='◎')ok++;});
+  var head=bad===0?'全部読めた。お前、本当にカモだったのか?':(bad<=1?'惜しい。ほぼ読めてる':'まだ穴だらけだ。そこが財布の穴だ');
+  body='<div style="text-align:center;padding:6px 0;"><div style="font-size:15px;color:var(--text);font-weight:500;margin-bottom:3px;">'+head+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:16px;">◎ '+ok+' ／ ✗ '+bad+' ・ この手順を毎回やれ</div><div style="display:flex;gap:8px;"><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(217,96,63,.12);color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fdone(false)">また鍛える</button><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(58,160,136,.12);color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fdone('+(bad===0)+')">次へ</button></div></div>';
  }else{
   var s=it.steps[fsi];
-  if(!fsh){body='<div style="background:var(--surf);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:20px 16px;"><div style="font-size:16px;line-height:1.6;margin-bottom:16px;">'+(fsi+1)+'. '+s.q+'</div><button class="btn" style="width:100%;padding:13px;font-size:14px;color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.freveal()">答えを開く</button><div style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;">まず自分で埋めてから</div></div>';}
-  else{body='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.25);border-radius:14px;padding:20px 16px;"><div style="font-size:13px;line-height:1.5;color:var(--muted);margin-bottom:10px;">'+(fsi+1)+'. '+s.q+'</div><div style="font-size:16px;line-height:1.6;color:var(--gold);font-weight:500;margin-bottom:16px;">'+s.a+'</div><button class="btn" style="width:100%;padding:13px;font-size:14px;background:rgba(201,162,39,.14);color:#d8b54a;border-color:rgba(201,162,39,.4);" onclick="OWN.fnext()">'+(fsi+1>=it.steps.length?'推定を完了':'次の穴へ')+'</button></div>';}
+  if(!fRevealed){
+   body='<div style="background:var(--surf);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 16px;"><div style="font-size:16px;line-height:1.6;margin-bottom:12px;">'+(fsi+1)+'. '+s.q+'</div><textarea id="fin" placeholder="自分の推定を書く…" style="width:100%;min-height:60px;background:#14171e;color:var(--text);border:.5px solid rgba(255,255,255,.14);border-radius:10px;padding:10px;font-family:inherit;font-size:14px;line-height:1.5;resize:none;"></textarea><button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:14px;color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.fcheck()">答え合わせ</button></div>';
+  }else{
+   body='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.25);border-radius:14px;padding:18px 16px;"><div style="font-size:13px;color:var(--muted);margin-bottom:12px;">'+(fsi+1)+'. '+s.q+'</div><div style="font-size:10px;letter-spacing:1px;color:#85888f;text-transform:uppercase;margin-bottom:4px;">あなたの推定</div><div style="font-size:14px;line-height:1.5;color:#c7c9cf;margin-bottom:12px;background:#14171e;border-radius:8px;padding:9px 11px;">'+(fInputs[fsi]||'（空欄）')+'</div><div style="font-size:10px;letter-spacing:1px;color:#85888f;text-transform:uppercase;margin-bottom:4px;">正解</div><div style="font-size:15px;line-height:1.6;color:var(--gold);font-weight:500;margin-bottom:14px;">'+s.a+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">どれくらい合ってた?</div><div style="display:flex;gap:7px;"><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fgrade(\'◎\')">◎ ほぼ</button><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#d8b54a;border-color:rgba(201,162,39,.3);" onclick="OWN.fgrade(\'△\')">△ 半分</button><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fgrade(\'✗\')">✗ ズレ</button></div></div>';
+  }
  }
  root.innerHTML=sessHead()
   +'<div style="background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.28);border-radius:12px;padding:12px 14px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;">レンジ推定</div><div style="font-size:13px;line-height:1.55;color:#dcdee3;">'+it.sc+'</div></div>'
-  +'<div style="flex:1;overflow:auto;">'+filledHtml+body+'</div>';
+  +'<div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">'+filledHtml+body+'</div>';
+ var ta=document.getElementById('fin');if(ta){ta.value=fInputs[fsi]||'';}
 }
 renderHome();
 })();
