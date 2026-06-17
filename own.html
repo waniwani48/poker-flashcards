@@ -91,7 +91,7 @@ var CARDS=[
 {q:"状況で混ぜる（境界の）3betハンドは？",a:"KJo+/JTs+/Axs/ローポケット（バランス・キャップ回避用）",tag:"境界"},
 {q:"SBオープンレンジの特徴は？",a:"≒BTN（リンプ頻度あり）。後ろ1人OOPと後ろ2人IPの長短が相殺",tag:"境界"},
 {q:"BTN vs BB、フロップ A72r。あなたBTN、c-betする？",a:"★争点。GTO/ドラマ=レンジベット肯定。HHP=相手のスロープレイを読んでチェックバック",tag:"スポット"},
-{q:"BTN vs BB、King94に33%CB被弾、AJo（BDFD付き）。守る？",a:"守る。33%CBの適正フォールドは下位30%。AJoはエースハイで下位30%に入らない",tag:"スポット"},
+{q:"BTN vs BB、K94に33%CB被弾、AJo（BDFD付き）。守る？",a:"守る。33%CBの適正フォールドは下位30%。AJoはエースハイで下位30%に入らない",tag:"スポット"},
 {q:"BTN vs BB、AK5、あなたBTNで5ヒット。リバーまでブラフに使う？",a:"使う。5を持つと相手のツーペア/トリップスのコンボが減る＝ブロッカーが優秀",tag:"スポット"},
 {q:"CO vs BTN 3betポット、K43ツートーン、33%CB、8ポケ（色なし）。コール？",a:"フォールド。色なしポケットはセット時にフラッシュ被りで濁る。色あり優先",tag:"スポット"},
 {q:"BTN vs BB、KJ4r、フロップchk-chk、ターン3c。あなたBB、どうする？",a:"オーバーベットプローブ。IPのチェックレンジがキャップ。セットがナッツの未完成ボード",tag:"スポット"},
@@ -100,18 +100,18 @@ var CARDS=[
 {q:"マルチウェイ（3人）で A5s。参加する？",a:"控えめに。FD無しのAxsはドミネートされやすい。ポケットペアの方が向く",tag:"スポット"}
 ];
 var FILLS=[
-{sc:"CO vs BTN 3betポット・King94 → BTN 33%CB → CO コール → ターン 10s。COの残存レンジを推定。",steps:[
+{board:"Kh9c4dTs",sc:"CO vs BTN 3betポット・K94 → BTN 33%CB → CO コール → ターン 10s。COの残存レンジを推定。",steps:[
 {q:"プリフロップで CO がコールしているポケットは？",a:"10s以下を等頻度でコール"},
 {q:"2broadway オフスートは？",a:"ほぼ全てフォールド済み"},
 {q:"2broadway スーテッドは？",a:"AQs・AJs・KQs がメイン体"},
 {q:"フロップ 33%CB に何%フォールド？",a:"約40%（エクイティ差で標準30%より多め）"},
 {q:"ターン 10s で進展した手は？",a:"KTs・T9s＝2ペア / QTs・JTs＝10ヒット+ストレートドロー"}]},
-{sc:"BTN vs BB SRP・Q94r → BTN 50%CB → BB コール → ターン 2c。BBの残存レンジを推定。",steps:[
+{board:"Qs9h4d2c",sc:"BTN vs BB SRP・Q94r → BTN 50%CB → BB コール → ターン 2c。BBの残存レンジを推定。",steps:[
 {q:"50%CB に何%フォールド？",a:"約40%。残るのは下限のポケット付近"},
 {q:"残るペア系は？",a:"4ヒット / 9ヒット / Qヒット"},
 {q:"残るドローは？",a:"KJ/KT/JT（Q-9間のSD）+ バックドアFD付きAハイ"},
 {q:"ターン 2c の影響は？",a:"ブランク。大きな変化なし（Q2sが2ペア化する程度）"}]},
-{sc:"UTG vs BB・A73ツートーン → UTG 33%CB → BB コール → ターン 5h。BBの残存レンジを推定。",steps:[
+{board:"As7h3h5h",sc:"UTG vs BB・A73ツートーン → UTG 33%CB → BB コール → ターン 5h。BBの残存レンジを推定。",steps:[
 {q:"33%CB に何%フォールド？",a:"約45%（UTGが強くエクイティ差大）"},
 {q:"壊滅する手は？",a:"ハーツ無しのKハイ以下はほぼ全フォールド"},
 {q:"残るペアは？",a:"ハーツ持ちポケット / 3ヒット / 7ヒット / Aヒット"},
@@ -128,10 +128,10 @@ var FILLS=[
 {tag:"プリフロ暗記",sc:"UTGオープン vs 3bet のディフェンス",steps:[{q:"残すハンドとポケットの扱いは？（EP）",a:"AQs/KQs/一部ポケット。EP同士はローポケも均等コール（相手3betが10s+に寄るため）"}]},
 {tag:"プリフロ暗記",sc:"BTNオープン vs SB 3bet のディフェンス",steps:[{q:"ポケットの扱いは？（LP）",a:"強い順にコール、ローポケはフォールド（相手3betが広い）。3betへのローポケコールしすぎ注意"}]},
 {tag:"フロップCB暗記",sc:"BTN vs BB SRP・Aハイボード",steps:[{q:"c-bet戦略は？",a:"小サイズ高頻度（レンジベット寄り）。Aハイはレンジ優位。※細かい内訳はWizardで要確認"}]},
-{tag:"フロップCB暗記",sc:"BTN vs BB SRP・Kハイボード（K84r等）",steps:[{q:"c-bet戦略は？",a:"33%をレンジ全体に（レンジベット）"}]},
-{tag:"フロップCB暗記",sc:"BTN vs BB SRP・ローコネクト（976r等）",steps:[{q:"c-bet戦略は？",a:"レンジベット不成立。チェック約50%（BBが絡みやすくレンジ優位が薄い）"}]},
+{tag:"フロップCB暗記",board:"Kh8c4d",sc:"BTN vs BB SRP・Kハイボード（K84r等）",steps:[{q:"c-bet戦略は？",a:"33%をレンジ全体に（レンジベット）"}]},
+{tag:"フロップCB暗記",board:"9h7c6d",sc:"BTN vs BB SRP・ローコネクト（976r等）",steps:[{q:"c-bet戦略は？",a:"レンジベット不成立。チェック約50%（BBが絡みやすくレンジ優位が薄い）"}]},
 {tag:"フロップCB暗記",sc:"BTN vs BB SRP・ドライ vs ウェット（実測）",steps:[{q:"ドライとウェットでサイズ傾向は？",a:"ドライ＝ポラー化（オーバーベット増）/ ウェット＝チェック多め・控えめ・中間サイズ"}]},
-{tag:"フロップCB暗記",sc:"3betポット・Aハイボード",steps:[{q:"c-bet戦略は？",a:"20%を広く（A73等セカンドが低いとチェック半分）"}]},
+{tag:"フロップCB暗記",board:"As7h3d",sc:"3betポット・Aハイボード（A73等）",steps:[{q:"c-bet戦略は？",a:"20%を広く（A73等セカンドが低いとチェック半分）"}]},
 {tag:"フロップCB暗記",sc:"3betポット・Kハイボード",steps:[{q:"c-bet戦略は？",a:"33%をレンジ全体"}]},
 {tag:"フロップCB暗記",sc:"3betポット・10ハイ以下（ダイナミック）",steps:[{q:"c-bet戦略は？",a:"75%をポラーで＋チェック半分"}]},
 {tag:"フロップCB暗記",sc:"ナッツ優位ボード（AK5等）",steps:[{q:"c-bet戦略は？",a:"ポラー大サイズ（125%、ジオメトリック）。ブラフはブロッカー重視"}]}
@@ -175,6 +175,14 @@ function praiseHTML(){
  if(n===0){msg=pick(PRAISE);col='var(--gold)';}
  else{var sc={};sessAgain.forEach(function(it){var c=catOf(it);sc[c]=(sc[c]||0)+1;});var top=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];})[0];msg=n<=2?('悪くない。'+top+'以外はな。'):('まだ穴だらけだ。'+top+'、そこから金が漏れてる。');col='#e8917a';}
  return '<div style="background:rgba(201,162,39,.08);border:.5px solid rgba(201,162,39,.3);border-radius:12px;padding:14px 16px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:'+col+';text-transform:uppercase;margin-bottom:6px;">Hungry Horse</div><div style="font-size:14px;line-height:1.6;color:#ECEAE3;font-family:var(--serif);">'+msg+'</div></div>';
+}
+function miniCards(b){if(!b)return '';var sm={s:['♠','#1a1a18'],h:['♥','#d23b3b'],d:['♦','#3a86d4'],c:['♣','#3a9b54']};var o='';for(var i=0;i+1<b.length;i+=2){var r=b[i],s=b[i+1].toLowerCase();var m=sm[s]||['?','#888'];o+='<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:32px;height:44px;background:#f6f4ee;border-radius:5px;margin-right:5px;line-height:1.05;">'+'<span style="font-size:16px;font-weight:600;color:'+m[1]+';">'+r+'</span><span style="font-size:13px;color:'+m[1]+';">'+m[0]+'</span></span>';}return '<div style="display:flex;margin:2px 0 14px;">'+o+'</div>';}
+function hintFor(q){
+ if(/%|何割|フォールド|頻度/.test(q))return {ph:"例: 約40%",g:"数字（％）で答える。「約40%」のように。"};
+ if(/戦略|c-?bet|CB|サイズ/i.test(q))return {ph:"例: 33%を高頻度 / チェック多め",g:"サイズ＋頻度で答える。「33%を高頻度」「チェック寄り」など。"};
+ if(/完成|進展|影響|2ペア|ストレート|フラッシュ/.test(q))return {ph:"例: KTs=2ペア, T9s=ストレート",g:"具体的な手＝役で答える。「KTs=2ペア」のように。"};
+ if(/構成|バリュー|ブラフ|ポラー/.test(q))return {ph:"例: バリュー=QQ+/ATo、ブラフ=Jローs",g:"バリューとブラフに分けてハンドを書く。"};
+ return {ph:"例: ATo+, KJs+, 88+, AQs",g:"ハンドで答える。「ATo+」「KJs+」「88+」のように。+は「以上」。"};
 }
 window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}sessAgain=[];view='session';renderSession();},
  home:function(){view='home';renderHome();},
@@ -234,13 +242,14 @@ function renderFill(it){
  }else{
   var s=it.steps[fsi];
   if(!fRevealed){
-   body='<div style="background:var(--surf);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 16px;"><div style="font-size:16px;line-height:1.6;margin-bottom:12px;">'+(fsi+1)+'. '+s.q+'</div><textarea id="fin" placeholder="自分の推定を書く…" style="width:100%;min-height:60px;background:#14171e;color:var(--text);border:.5px solid rgba(255,255,255,.14);border-radius:10px;padding:10px;font-family:inherit;font-size:14px;line-height:1.5;resize:none;"></textarea><button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:14px;color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.fcheck()">答え合わせ</button></div>';
+   var hint=hintFor(s.q);
+   body='<div style="background:var(--surf);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 16px;"><div style="font-size:16px;line-height:1.6;margin-bottom:8px;">'+(fsi+1)+'. '+s.q+'</div><div style="font-size:11.5px;line-height:1.5;color:#8b8e97;margin-bottom:10px;background:rgba(255,255,255,.03);border-radius:8px;padding:7px 10px;">✍️ '+hint.g+'</div><textarea id="fin" placeholder="'+hint.ph+'" style="width:100%;min-height:60px;background:#14171e;color:var(--text);border:.5px solid rgba(255,255,255,.14);border-radius:10px;padding:10px;font-family:inherit;font-size:14px;line-height:1.5;resize:none;"></textarea><button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:14px;color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.fcheck()">答え合わせ</button></div>';
   }else{
    body='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.25);border-radius:14px;padding:18px 16px;"><div style="font-size:13px;color:var(--muted);margin-bottom:12px;">'+(fsi+1)+'. '+s.q+'</div><div style="font-size:10px;letter-spacing:1px;color:#85888f;text-transform:uppercase;margin-bottom:4px;">あなたの推定</div><div style="font-size:14px;line-height:1.5;color:#c7c9cf;margin-bottom:12px;background:#14171e;border-radius:8px;padding:9px 11px;">'+(fInputs[fsi]||'（空欄）')+'</div><div style="font-size:10px;letter-spacing:1px;color:#85888f;text-transform:uppercase;margin-bottom:4px;">正解</div><div style="font-size:15px;line-height:1.6;color:var(--gold);font-weight:500;margin-bottom:14px;">'+s.a+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">どれくらい合ってた?</div><div style="display:flex;gap:7px;"><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fgrade(\'◎\')">◎ ほぼ</button><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#d8b54a;border-color:rgba(201,162,39,.3);" onclick="OWN.fgrade(\'△\')">△ 半分</button><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fgrade(\'✗\')">✗ ズレ</button></div></div>';
   }
  }
  root.innerHTML=sessHead()
-  +'<div style="background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.28);border-radius:12px;padding:12px 14px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;">レンジ推定</div><div style="font-size:13px;line-height:1.55;color:#dcdee3;">'+it.sc+'</div></div>'
+  +'<div style="background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.28);border-radius:12px;padding:12px 14px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;">レンジ推定</div><div style="font-size:13px;line-height:1.55;color:#dcdee3;">'+it.sc+'</div>'+miniCards(it.board)+'</div>'
   +'<div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">'+filledHtml+body+'</div>';
  var ta=document.getElementById('fin');if(ta){ta.value=fInputs[fsi]||'';}
 }
