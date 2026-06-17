@@ -2,51 +2,39 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Own">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0c0c0b">
-<link rel="apple-touch-icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%230c0c0b"/><text x="50" y="70" font-size="46" text-anchor="middle" fill="%2336d39e" font-family="Georgia,serif">O</text></svg>'>
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%230c0c0b"/><text x="50" y="70" font-size="46" text-anchor="middle" fill="%2336d39e" font-family="Georgia,serif">O</text></svg>'>
+<meta name="theme-color" content="#14171e">
+<link rel="apple-touch-icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%2314171e"/><text x="50" y="69" font-size="44" text-anchor="middle" fill="%23C9A227" font-family="Georgia,serif">O</text></svg>'>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%2314171e"/><text x="50" y="69" font-size="44" text-anchor="middle" fill="%23C9A227" font-family="Georgia,serif">O</text></svg>'>
 <title>Own</title>
 <style>
+:root{--ink:#14171e;--surf:#1d212b;--text:#ECEAE3;--muted:#8b8e97;--dim:#5a5d65;--gold:#C9A227;--teal:#3AA088;--coral:#D9603F;--mono:ui-monospace,Menlo,monospace;--serif:Georgia,"Hiragino Mincho ProN",serif;}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{margin:0;height:100%;background:#0c0c0b;}
-body{font-family:-apple-system,BlinkMacSystemFont,system-ui,"Hiragino Sans",sans-serif;color:#ECEAE3;-webkit-font-smoothing:antialiased;}
-.wrap{max-width:420px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom));min-height:100%;display:flex;flex-direction:column;}
-.bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.08);overflow:hidden;margin:4px 2px 16px;}
-.bar > div{height:100%;background:#36d39e;width:0;transition:width .3s;}
-.head{display:flex;justify-content:space-between;align-items:center;padding:0 2px;margin-bottom:14px;}
-.wm{font-size:15px;letter-spacing:3px;font-weight:500;color:#ECEAE3;}
-.count{font-size:12px;color:#7a7a73;}
-.modes{display:flex;gap:6px;margin-bottom:16px;}
-.mb{flex:1;padding:7px 4px;font-size:12px;letter-spacing:1px;border:0.5px solid rgba(255,255,255,0.1);border-radius:9px;background:transparent;color:#7a7a73;font-family:inherit;}
-.mb.on{background:rgba(54,211,158,0.1);border-color:rgba(54,211,158,0.4);color:#36d39e;}
-.stage{flex:1;position:relative;touch-action:pan-y;display:flex;}
-.fcard{flex:1;background:#191916;border:0.5px solid rgba(255,255,255,0.07);border-radius:20px;padding:26px 22px;display:flex;flex-direction:column;cursor:pointer;will-change:transform;}
-.tagk{font-size:11px;letter-spacing:2px;color:#7a7a73;text-transform:uppercase;}
-.hint{display:flex;justify-content:space-between;align-items:center;padding:14px 6px 2px;font-size:12px;color:#5f5f59;}
-.reset{margin-top:10px;text-align:center;}
-.reset button{font-size:11px;color:#46463f;background:none;border:none;font-family:inherit;}
+html,body{margin:0;height:100%;background:var(--ink);overscroll-behavior:none;}
+body{font-family:-apple-system,BlinkMacSystemFont,system-ui,"Hiragino Sans",sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;}
+#root{max-width:440px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));}
+.wm{font-size:13px;letter-spacing:4px;font-weight:500;color:var(--text);}
+.mono{font-family:var(--mono);}
+.btn{font-family:inherit;cursor:pointer;border-radius:12px;border:0.5px solid rgba(255,255,255,.12);background:transparent;color:var(--text);}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+.chip{flex:1;padding:9px 4px;font-size:12px;letter-spacing:1px;border-radius:10px;border:0.5px solid rgba(255,255,255,.1);background:transparent;color:var(--muted);font-family:inherit;}
+.chip.on{background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.4);color:var(--gold);}
+.fcard{background:var(--surf);border:0.5px solid rgba(255,255,255,.07);border-radius:20px;padding:26px 22px;display:flex;flex-direction:column;cursor:pointer;will-change:transform;}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<div class="bar"><div id="prog"></div></div>
-<div class="head"><span class="wm">OWN</span><span class="count" id="count"></span></div>
-<div class="modes" id="modes"></div>
-<div class="stage" id="stage"><div class="fcard" id="card"></div></div>
-<div class="hint" id="hint"><span id="hL">&#8592; また</span><span style="color:#46463f;">タップでめくる</span><span id="hR">覚えた &#8594;</span></div>
-<div class="reset"><button onclick="ownReset()">進捗をリセット</button></div>
-</div>
+<div id="root"></div>
 <script>
 (function(){
 var CARDS=[
 {q:"オーバーペア vs アンダーペアのEQ（AA vs KK）は？",a:"約 80 : 20",tag:"EQ"},
 {q:"2オーバー vs アンダーペア（AK vs 22）のEQは？ 通称は？",a:"約 50 : 50（フリップ）",tag:"EQ"},
-{q:"2オーバー vs 2アンダーのスーテッドコネクター（AK vs 54s）のEQは？",a:"約 60 : 40",tag:"EQ"},
+{q:"2オーバー vs 2アンダーのSC（AK vs 54s）のEQは？",a:"約 60 : 40",tag:"EQ"},
 {q:"ドミネート（AK vs AQ）のEQは？",a:"約 75 : 25",tag:"EQ"},
 {q:"2倍4倍の法則とは？",a:"リバーのみ＝アウツ×2 / ターン+リバー＝アウツ×4",tag:"EQ"},
 {q:"NLHの全スターティングコンボ数は？",a:"1326",tag:"コンボ"},
@@ -95,61 +83,132 @@ var CARDS=[
 {q:"ハンドの強さは何で決まる？",a:"相手のレンジ次第（絶対値でなく相対価値）",tag:"原則"},
 {q:"AKQゲームが証明した「ポラーが強い」結論は？",a:"EQ互角でもEVは3倍。ポラー対コンデンスではポジション有利も消滅",tag:"原則"},
 {q:"GTOとエクスプロイトの関係は？",a:"GTOは搾取されない盾。リークが見えたら捨ててエクスプロイト",tag:"原則"},
-{q:"UTGオープンの境界（下限）ハンドは？",a:"ATo/KJo/QJo（2broadway下限）、ポケ5以下は低頻度、Kxs=K5sまで、A3s=indifferent",tag:"境界"},
+{q:"UTGオープンの境界（下限）ハンドは？",a:"ATo/KJo/QJo、ポケ5以下は低頻度、Kxs=K5sまで、A3s=indifferent",tag:"境界"},
 {q:"HJオープンの境界ハンドは？",a:"A9o、KT/QT/JT=indifferent、ポケ4から、suited下限8xs",tag:"境界"},
 {q:"COオープンの境界ハンドは？",a:"Axo=A9/A8/A5（A5は飛び地）、2broadwayピュア、suited下限7xs、Q5s",tag:"境界"},
 {q:"BTNオープンの境界ハンドは？",a:"A3o+、オフ下限9xo、ポケ全ピュア、suited下限6xs、Qxロー全/J5・J4s",tag:"境界"},
 {q:"A5が飛び地でオープンされる理由は？",a:"ホイール（A2345）で最高キッカー。A6/A7より価値が高い瞬間がある",tag:"境界"},
 {q:"状況で混ぜる（境界の）3betハンドは？",a:"KJo+/JTs+/Axs/ローポケット（バランス・キャップ回避用）",tag:"境界"},
 {q:"SBオープンレンジの特徴は？",a:"≒BTN（リンプ頻度あり）。後ろ1人OOPと後ろ2人IPの長短が相殺",tag:"境界"},
-{q:"BTN vs BB、フロップ A72r（ドライAハイ）。あなたBTN、c-betする？",a:"★争点。GTO/ドラマ=レンジベット肯定。HHP=相手がスロープレイするのでチェックバックして情報を取る",tag:"スポット"},
-{q:"BTN vs BB、King94に33%CB被弾、AJo（バックドアFD付き）。守る？",a:"守る。33%CBの適正フォールドは下位30%。AJoはエースハイで下位30%に入らない。BDFD付きなら優先度↑",tag:"スポット"},
-{q:"BTN vs BB、AK5、あなたBTNで5ヒット（ボトムペア）。リバーまでブラフに使う？",a:"使う。5を持つと相手のツーペア/トリップスのコンボが減る＝ブロッカーが優秀",tag:"スポット"},
-{q:"CO vs BTN 3betポット、K43ツートーン、33%CB被弾、8ポケ（色なし）。コール？",a:"フォールド。色なしポケットはセット時にフラッシュ被りで濁る。色あり優先",tag:"スポット"},
-{q:"BTN vs BB、KJ4r、フロップchk-chk、ターン3c。あなたBB、どうする？",a:"オーバーベットプローブ（250%等）。IPのチェックレンジがキャップ。セットがナッツの未完成ボード",tag:"スポット"},
-{q:"後ろにバリ型おじいちゃん（超タイト・3betはAKsのみ）。自分のオープンは？",a:"広げてスチール（降りやすい）。ただし3betされたらオーバーフォールド。limpレイズは降りる",tag:"スポット"},
+{q:"BTN vs BB、フロップ A72r。あなたBTN、c-betする？",a:"★争点。GTO/ドラマ=レンジベット肯定。HHP=相手のスロープレイを読んでチェックバック",tag:"スポット"},
+{q:"BTN vs BB、King94に33%CB被弾、AJo（BDFD付き）。守る？",a:"守る。33%CBの適正フォールドは下位30%。AJoはエースハイで下位30%に入らない",tag:"スポット"},
+{q:"BTN vs BB、AK5、あなたBTNで5ヒット。リバーまでブラフに使う？",a:"使う。5を持つと相手のツーペア/トリップスのコンボが減る＝ブロッカーが優秀",tag:"スポット"},
+{q:"CO vs BTN 3betポット、K43ツートーン、33%CB、8ポケ（色なし）。コール？",a:"フォールド。色なしポケットはセット時にフラッシュ被りで濁る。色あり優先",tag:"スポット"},
+{q:"BTN vs BB、KJ4r、フロップchk-chk、ターン3c。あなたBB、どうする？",a:"オーバーベットプローブ。IPのチェックレンジがキャップ。セットがナッツの未完成ボード",tag:"スポット"},
+{q:"後ろにバリ型おじいちゃん（超タイト・3bet=AKsのみ）。自分のオープンは？",a:"広げてスチール。ただし3betされたらオーバーフォールド。limpレイズは降りる",tag:"スポット"},
 {q:"AK vs 22、プリフロでオールイン。EQは？",a:"約50:50（フリップ）。2オーバー vs アンダーペア",tag:"スポット"},
-{q:"マルチウェイ（3人）で A5s。参加する？",a:"控えめに。FD無しのAxsはキッカー上のAxsにドミネートされやすい。ポケットペアの方が向く",tag:"スポット"},
-{q:"レンジ推定：CO vs BTN 3betポット、King94→33%CB→COコール→ターン10s。COのレンジは？",a:"ポケ=10s以下を等頻度コール / 2broadwayオフ=ほぼ全フォールド / 2broadways=AQs・AJs・KQsがメイン / フロップ約40%フォールド / ターン10sで KTs・T9s=2ペア、QTs・JTs=10ヒット+SD",tag:"穴埋め"},
-{q:"レンジ推定：BTN vs BB、Q94r→50%CB→BBコール→ターン2c。BBの残存レンジは？",a:"50%CBに約40%フォールド→残るのは下限ポケ付近。ペア=4/9/Qヒット、ドロー=KJ/KT/JT+BDありAハイ。2cはブランクで大きな変化なし",tag:"穴埋め"},
-{q:"レンジ推定：UTG vs BB、A73ツートーン→33%CB→BBコール→ターン5h。BBのレンジは？",a:"エクイティ差で約45%フォールド。残る=ハーツ持ちポケット/3/7/Aヒット、ドロー=45s/56s/46s（ターン5hで進展）。KThh等はフラッシュ完成",tag:"穴埋め"}
+{q:"マルチウェイ（3人）で A5s。参加する？",a:"控えめに。FD無しのAxsはドミネートされやすい。ポケットペアの方が向く",tag:"スポット"}
 ];
+var FILLS=[
+{sc:"CO vs BTN 3betポット・King94 → BTN 33%CB → CO コール → ターン 10s。COの残存レンジを推定。",steps:[
+{q:"プリフロップで CO がコールしているポケットは？",a:"10s以下を等頻度でコール"},
+{q:"2broadway オフスートは？",a:"ほぼ全てフォールド済み"},
+{q:"2broadway スーテッドは？",a:"AQs・AJs・KQs がメイン体"},
+{q:"フロップ 33%CB に何%フォールド？",a:"約40%（エクイティ差で標準30%より多め）"},
+{q:"ターン 10s で進展した手は？",a:"KTs・T9s＝2ペア / QTs・JTs＝10ヒット+ストレートドロー"}]},
+{sc:"BTN vs BB SRP・Q94r → BTN 50%CB → BB コール → ターン 2c。BBの残存レンジを推定。",steps:[
+{q:"50%CB に何%フォールド？",a:"約40%。残るのは下限のポケット付近"},
+{q:"残るペア系は？",a:"4ヒット / 9ヒット / Qヒット"},
+{q:"残るドローは？",a:"KJ/KT/JT（Q-9間のSD）+ バックドアFD付きAハイ"},
+{q:"ターン 2c の影響は？",a:"ブランク。大きな変化なし（Q2sが2ペア化する程度）"}]},
+{sc:"UTG vs BB・A73ツートーン → UTG 33%CB → BB コール → ターン 5h。BBの残存レンジを推定。",steps:[
+{q:"33%CB に何%フォールド？",a:"約45%（UTGが強くエクイティ差大）"},
+{q:"壊滅する手は？",a:"ハーツ無しのKハイ以下はほぼ全フォールド"},
+{q:"残るペアは？",a:"ハーツ持ちポケット / 3ヒット / 7ヒット / Aヒット"},
+{q:"残るドローは？",a:"45s/56s/46s（ガッショ→ターン5hで進展）"},
+{q:"ターン 5h で完成した手は？",a:"KThh等のフラッシュ"}]}
+];
+function cid(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return 'c'+(h>>>0).toString(36);}
+CARDS.forEach(function(c){c.type='card';c.id=cid(c.q);});
+FILLS.forEach(function(f){f.type='fill';f.tag='穴埋め';f.id=cid(f.sc);});
+var ALL=CARDS.concat(FILLS);
 var KEY='pokerSRS_v1',IV={1:1,2:2,3:4,4:8,5:16};
-function cid(q){var h=0;for(var i=0;i<q.length;i++)h=(h*31+q.charCodeAt(i))|0;return 'c'+(h>>>0).toString(36);}
-CARDS.forEach(function(c){c.id=cid(c.q);});
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
 function tstr(){return new Date().toISOString().slice(0,10);}
 function addD(n){var d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
 var prog=load(),t=tstr(),mode=localStorage.getItem('pokerMode')||'all';
-function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return CARDS.filter(function(c){return c.tag==='穴埋め';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット'&&c.tag!=='穴埋め';});return CARDS;}
-var queue=[],idx=0,flipped=false,total=0;
-function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;total=queue.length;}
-var card=document.getElementById('card'),stageEl=document.getElementById('stage'),cnt=document.getElementById('count'),pg=document.getElementById('prog'),hint=document.getElementById('hint'),hL=document.getElementById('hL'),hR=document.getElementById('hR');
-function renderModes(){var ms=[['all','すべて'],['memo','暗記'],['spot','スポット'],['fill','穴埋め']];document.getElementById('modes').innerHTML=ms.map(function(m){return '<button class="mb'+(mode===m[0]?' on':'')+'" onclick="ownMode(\''+m[0]+'\')">'+m[1]+'</button>';}).join('');}
-window.ownMode=function(m){mode=m;localStorage.setItem('pokerMode',m);build();renderModes();render();};
-window.ownReset=function(){if(confirm('進捗をリセットしますか？')){prog={};save(prog);build();render();}};
-function render(){
- cnt.textContent=total?Math.min(idx+1,total)+' / '+total:'';
- pg.style.width=total?Math.round(idx/total*100)+'%':'0%';
- if(idx>=queue.length){hint.style.visibility='hidden';pg.style.width='100%';cnt.textContent='';
-  stageEl.innerHTML='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;"><div style="font-size:30px;color:#36d39e;margin-bottom:10px;">&#10003;</div><div style="font-size:17px;font-weight:500;letter-spacing:1px;">今日のぶん、Own した</div><div style="font-size:13px;color:#7a7a73;margin-top:6px;">また明日、静かに積み上げよう</div></div>';return;}
- hint.style.visibility='visible';
- if(!stageEl.contains(card))stageEl.innerHTML='',stageEl.appendChild(card);
- var c=queue[idx];card.style.transition='';card.style.transform='';card.style.opacity='1';
- if(!flipped){card.innerHTML='<div class="tagk" style="margin-bottom:auto;">'+c.tag+'</div><div style="font-size:21px;line-height:1.55;margin:auto 0;">'+c.q+'</div><div style="margin-top:auto;font-size:12px;color:#46463f;">タップで答え</div>';}
- else{card.innerHTML='<div class="tagk" style="margin-bottom:14px;">'+c.tag+'</div><div style="font-size:14px;line-height:1.5;color:#8a8a82;margin-bottom:14px;">'+c.q+'</div><div style="height:0.5px;background:rgba(255,255,255,0.09);margin-bottom:14px;"></div><div style="font-size:18px;line-height:1.6;color:#36d39e;font-weight:500;">'+c.a+'</div>';}
- card.style.transition='opacity .16s';card.style.opacity='0';setTimeout(function(){card.style.opacity='1';},20);
+function catOf(it){if(it.type==='fill')return '穴埋め・実戦';var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='スポット')return 'スポット';return 'その他';}
+var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','ターン','スポット','穴埋め・実戦'];
+function mastery(){var m={};CATORDER.forEach(function(c){m[c]={s:0,n:0};});ALL.forEach(function(it){var c=catOf(it);if(!m[c])return;var r=prog[it.id];m[c].s+=(r?r.box:0);m[c].n++;});var out=[];CATORDER.forEach(function(c){if(m[c].n)out.push({k:c,v:Math.round(m[c].s/(m[c].n*5)*100)});});return out;}
+function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.slice();if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
+var view='home',queue=[],idx=0,flipped=false,fsi=0,fsh=false;
+var root=document.getElementById('root');
+function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;fsi=0;fsh=false;}
+function setMode(m){mode=m;localStorage.setItem('pokerMode',m);renderHome();}
+var sessAgain=[];
+function grade(it,good){var r=prog[it.id]||{box:1};var box=r.box||1;box=good?Math.min(box+1,5):1;prog[it.id]={box:box,due:addD(IV[box]),seen:(r.seen||0)+1,again:(r.again||0)+(good?0:1)};save(prog);if(!good)sessAgain.push(it);}
+function leakHTML(){
+ var leaks=ALL.filter(function(it){var r=prog[it.id];return r&&r.again>0;}).map(function(it){return {it:it,again:prog[it.id].again,cat:catOf(it)};}).sort(function(a,b){return b.again-a.again;});
+ if(!sessAgain.length&&!leaks.length)return '';
+ var h='<div style="background:rgba(217,96,63,.06);border:.5px solid rgba(217,96,63,.22);border-radius:12px;padding:13px 14px;margin:18px 0 4px;">';
+ if(sessAgain.length){var sc={};sessAgain.forEach(function(it){var c=catOf(it);sc[c]=(sc[c]||0)+1;});var top=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];})[0];h+='<div style="font-size:10px;letter-spacing:2px;color:#e8917a;text-transform:uppercase;margin-bottom:6px;">このセッションのリーク</div><div style="font-size:13px;color:#dcdee3;margin-bottom:'+(leaks.length?'12px':'0')+';">'+sessAgain.length+'回つまずいた。特に <b style="color:#e8917a;font-weight:500;">'+top+'</b>。</div>';}
+ if(leaks.length){var cl={};leaks.forEach(function(l){cl[l.cat]=(cl[l.cat]||0)+l.again;});var tc=Object.keys(cl).sort(function(a,b){return cl[b]-cl[a];})[0];var t3=leaks.slice(0,3).map(function(l){return l.it.type==='fill'?'レンジ推定':(l.it.q.length>20?l.it.q.slice(0,20)+'…':l.it.q);});h+='<div style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">通しのリーク傾向</div><div style="font-size:13px;color:#dcdee3;line-height:1.55;">弱点＝<b style="color:var(--gold);font-weight:500;">'+tc+'</b><br><span style="font-size:11.5px;color:var(--muted);">繰り返しミス: '+t3.join(' / ')+'</span></div>';}
+ h+='<button class="btn" style="width:100%;margin-top:12px;padding:9px;font-size:12px;color:var(--muted);" onclick="OWN.exportData()">分析データを書き出す（Claudeで深掘り）</button></div>';
+ return h;
 }
-function grade(good){var c=queue[idx];var r=prog[c.id]||{box:1};var box=r.box||1;box=good?Math.min(box+1,5):1;prog[c.id]={box:box,due:addD(IV[box])};save(prog);
- card.style.transition='transform .25s,opacity .25s';card.style.transform='translateX('+(good?440:-440)+'px) rotate('+(good?12:-12)+'deg)';card.style.opacity='0';
- setTimeout(function(){idx++;flipped=false;render();},230);}
-var dragging=false,sx=0,dx=0;
-card.addEventListener('pointerdown',function(e){if(!flipped||idx>=queue.length)return;dragging=true;sx=e.clientX;card.style.transition='';try{card.setPointerCapture(e.pointerId);}catch(x){}});
-card.addEventListener('pointermove',function(e){if(!dragging)return;dx=e.clientX-sx;card.style.transform='translateX('+dx+'px) rotate('+(dx*0.04)+'deg)';hL.style.color=dx<-30?'#e07a5a':'#5f5f59';hR.style.color=dx>30?'#36d39e':'#5f5f59';});
-card.addEventListener('pointerup',function(e){if(!dragging)return;dragging=false;hL.style.color='#5f5f59';hR.style.color='#5f5f59';if(Math.abs(dx)>85){grade(dx>0);}else{card.style.transition='transform .2s';card.style.transform='';}dx=0;});
-card.addEventListener('click',function(){if(dragging||Math.abs(dx)>5||idx>=queue.length)return;if(!flipped){flipped=true;render();}});
-renderModes();build();render();
+window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}sessAgain=[];view='session';renderSession();},
+ home:function(){view='home';renderHome();},
+ flip:function(){flipped=true;renderSession();},
+ swipe:function(good){var it=queue[idx];grade(it,good);idx++;flipped=false;next();},
+ freveal:function(){fsh=true;renderSession();},
+ fnext:function(){fsi++;fsh=false;renderSession();},
+ fdone:function(good){var it=queue[idx];grade(it,good);idx++;fsi=0;fsh=false;next();},
+ reset:function(){if(confirm('進捗をリセットしますか？')){prog={};save(prog);renderHome();}},
+ exportData:function(){var d={at:tstr(),progress:prog,cards:ALL.map(function(it){return {id:it.id,cat:catOf(it),q:it.type==='fill'?it.sc:it.q};})};var s=JSON.stringify(d);var ta=document.createElement('textarea');ta.value=s;ta.style.cssText='position:absolute;left:-9999px;';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);alert('分析データをコピーしました。Claudeのチャットに貼り付けて「これ分析して」と送ってください。');}};
+function next(){if(idx>=queue.length){view='home';renderHome();}else{renderSession();}}
+function renderHome(){
+ var ms=mastery();var avg=ms.length?Math.round(ms.reduce(function(s,d){return s+d.v;},0)/ms.length):0;
+ var modes=[['all','すべて'],['memo','暗記'],['spot','スポット'],['fill','穴埋め']];
+ var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">'
+  +'<span class="wm">OWN</span><span class="mono" style="font-size:11px;color:var(--muted);letter-spacing:1px;">SKILL MAP</span></div>'
+  +'<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px;"><span class="mono" style="font-size:46px;font-weight:500;color:var(--gold);line-height:1;">'+avg+'%</span><span style="font-size:13px;color:var(--muted);">今日の到達</span></div>'
+  +'<p style="font-size:12.5px;color:var(--dim);margin:6px 0 20px;font-family:var(--serif);font-style:italic;">知識が、層になって積み上がっている。</p>'
+  +'<div style="flex:1;">';
+ ms.forEach(function(d){html+='<div style="display:flex;align-items:center;gap:11px;margin-bottom:10px;"><span style="flex:0 0 112px;font-size:12px;color:#c7c9cf;line-height:1.3;">'+d.k+'</span><span style="flex:1;height:12px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;"><span style="display:block;height:100%;width:'+d.v+'%;background:var(--gold);border-radius:4px;transition:width .8s;"></span></span><span class="mono" style="flex:0 0 32px;text-align:right;font-size:11px;color:var(--muted);">'+d.v+'%</span></div>';});
+ html+='</div>'+leakHTML()+'<div style="display:flex;gap:6px;margin:18px 0 12px;">';
+ modes.forEach(function(m){html+='<button class="chip'+(mode===m[0]?' on':'')+'" onclick="OWN.setMode(\''+m[0]+'\')">'+m[1]+'</button>';});
+ html+='</div><button class="btn" style="padding:16px;font-size:15px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.start()">今日のセッションを始める</button>'
+  +'<div style="text-align:center;margin-top:12px;"><button onclick="OWN.reset()" style="font-size:11px;color:var(--dim);background:none;border:none;">進捗をリセット</button></div>';
+ root.innerHTML=html;
+}
+function sessHead(){return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><button class="btn" style="padding:6px 12px;font-size:12px;border-radius:9px;" onclick="OWN.home()">&#8592; マップ</button><span class="mono" style="font-size:11px;color:var(--muted);">'+(idx+1)+' / '+queue.length+'</span></div>';}
+function renderSession(){
+ if(idx>=queue.length){view='home';renderHome();return;}
+ var it=queue[idx];
+ if(it.type==='fill')return renderFill(it);
+ var inner;
+ if(!flipped){inner='<div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:auto;">'+it.tag+'</div><div style="font-size:21px;line-height:1.55;margin:auto 0;">'+it.q+'</div><div style="margin-top:auto;font-size:12px;color:var(--dim);">タップで答え</div>';}
+ else{inner='<div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">'+it.tag+'</div><div style="font-size:14px;line-height:1.5;color:var(--muted);margin-bottom:14px;">'+it.q+'</div><div style="height:.5px;background:rgba(255,255,255,.09);margin-bottom:14px;"></div><div style="font-size:18px;line-height:1.6;color:var(--gold);font-weight:500;">'+it.a+'</div>';}
+ root.innerHTML=sessHead()
+  +'<div style="flex:1;display:flex;" id="stage"><div class="fcard" id="card" style="flex:1;min-height:280px;">'+inner+'</div></div>'
+  +'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 6px 2px;font-size:12px;color:var(--dim);"><span id="hL">&#8592; また</span><span style="color:#46493f;">'+(flipped?'スワイプで採点':'タップでめくる')+'</span><span id="hR">覚えた &#8594;</span></div>';
+ bindSwipe(it);
+}
+function bindSwipe(it){
+ var card=document.getElementById('card');var hL=document.getElementById('hL'),hR=document.getElementById('hR');
+ var drag=false,sx=0,dx=0;
+ card.addEventListener('click',function(){if(drag||Math.abs(dx)>5)return;if(!flipped){OWN.flip();}});
+ card.addEventListener('pointerdown',function(e){if(!flipped)return;drag=true;sx=e.clientX;card.style.transition='';try{card.setPointerCapture(e.pointerId);}catch(x){}});
+ card.addEventListener('pointermove',function(e){if(!drag)return;dx=e.clientX-sx;card.style.transform='translateX('+dx+'px) rotate('+(dx*.04)+'deg)';if(hL)hL.style.color=dx<-30?'#e8917a':'#5a5d65';if(hR)hR.style.color=dx>30?'#5fc3a8':'#5a5d65';});
+ card.addEventListener('pointerup',function(e){if(!drag)return;drag=false;if(Math.abs(dx)>85){card.style.transition='transform .24s,opacity .24s';card.style.transform='translateX('+(dx>0?460:-460)+'px) rotate('+(dx>0?12:-12)+'deg)';card.style.opacity='0';var g=dx>0;setTimeout(function(){OWN.swipe(g);},220);}else{card.style.transition='transform .2s';card.style.transform='';}dx=0;});
+}
+function renderFill(it){
+ var done=fsi>=it.steps.length;
+ var filledHtml=it.steps.slice(0,fsi).map(function(s,i){return '<div style="border-left:2px solid var(--gold);padding:2px 0 2px 12px;margin-bottom:11px;"><div style="font-size:11.5px;color:#85888f;margin-bottom:3px;">'+(i+1)+'. '+s.q+'</div><div style="font-size:13.5px;line-height:1.5;color:var(--gold);">'+s.a+'</div></div>';}).join('');
+ var body;
+ if(done){
+  body='<div style="text-align:center;padding:6px 0;"><div style="font-size:15px;color:var(--text);font-weight:500;margin-bottom:3px;">レンジを推定しきった</div><div style="font-size:12px;color:var(--muted);margin-bottom:16px;">この手順を毎回たどるのが癖になる</div><div style="display:flex;gap:8px;"><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(217,96,63,.12);color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fdone(false)">また</button><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(58,160,136,.12);color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fdone(true)">覚えた</button></div></div>';
+ }else{
+  var s=it.steps[fsi];
+  if(!fsh){body='<div style="background:var(--surf);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:20px 16px;"><div style="font-size:16px;line-height:1.6;margin-bottom:16px;">'+(fsi+1)+'. '+s.q+'</div><button class="btn" style="width:100%;padding:13px;font-size:14px;color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.freveal()">答えを開く</button><div style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;">まず自分で埋めてから</div></div>';}
+  else{body='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.25);border-radius:14px;padding:20px 16px;"><div style="font-size:13px;line-height:1.5;color:var(--muted);margin-bottom:10px;">'+(fsi+1)+'. '+s.q+'</div><div style="font-size:16px;line-height:1.6;color:var(--gold);font-weight:500;margin-bottom:16px;">'+s.a+'</div><button class="btn" style="width:100%;padding:13px;font-size:14px;background:rgba(201,162,39,.14);color:#d8b54a;border-color:rgba(201,162,39,.4);" onclick="OWN.fnext()">'+(fsi+1>=it.steps.length?'推定を完了':'次の穴へ')+'</button></div>';}
+ }
+ root.innerHTML=sessHead()
+  +'<div style="background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.28);border-radius:12px;padding:12px 14px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;">レンジ推定</div><div style="font-size:13px;line-height:1.55;color:#dcdee3;">'+it.sc+'</div></div>'
+  +'<div style="flex:1;overflow:auto;">'+filledHtml+body+'</div>';
+}
+renderHome();
 })();
 </script>
 </body>
