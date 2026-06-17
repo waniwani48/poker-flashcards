@@ -166,14 +166,14 @@ function leakHTML(){
  return h;
 }
 var justDone=false;
-var SUBS=["ほとんどの奴はここで勉強をやめる。だから一生カモなんだ。","お前のリークは、自分で思ってるより目立ってる。","GTOを「知ってる」奴は多い。「やれる」奴は少ない。","養分はソルバーを開かない。お前は開いた。少しは見込みがある。","才能じゃない。これを毎日続けられるかどうかだ。","昨日のお前は、今日のお前のカモだ。"];
-var PRAISE=["完璧だ。お前、本当にカモだったのか?","ニヤッとしていいぞ。今日のお前は昨日のお前から金を巻き上げた。","一問も落とさない。雑魚はここまでやらない。","いいぞ。その調子なら、いつか俺の卓から金を持って帰れる。","これだよ。お前を養分と呼んだ奴に見せてやれ。"];
+var SUBS=["役の強さで打つ奴はカモだ。レンジで考えられる奴が勝つ。","相手のレンジが見えれば、手札は半分しか要らない。","GTOを「知ってる」奴は多い。卓で「出せる」奴は少ない。","上手い奴ほど、降りる場所をよく知っている。","強い手を待つな。レンジ全体で戦え。","ポジションとレンジ。この二つが分かれば景色が変わる。","毎日5分のレンジ筋トレが、半年後に効いてくる。","ソルバーは答えを教える。お前の仕事は、それを体に入れることだ。","迷ったら口に出せ。自分のレンジ、相手のレンジ。話はそれからだ。","昨日より一つ多くスポットが読めたなら、今日は勝ちだ。"];
+var PRAISE=["全問正解。レンジがちゃんと見えてる。この感覚を忘れるな。","完璧だ。役の強さじゃなく、レンジで読めてる証拠だ。","ノーミス。打つ手と降りる手の境界が、お前の中にできてきた。","見事だ。今日の卓なら、お前が一番レンジを読めてる側だ。","綺麗だった。相手のレンジを最後まで正しく追えてた。一番難しいことだぞ。","全部当てた。この精度が毎日続けば、エッジは勝手に積み上がる。"];
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
 function praiseHTML(){
  if(!justDone)return '';justDone=false;
  var n=sessAgain.length,msg,col;
  if(n===0){msg=pick(PRAISE);col='var(--gold)';}
- else{var sc={};sessAgain.forEach(function(it){var c=catOf(it);sc[c]=(sc[c]||0)+1;});var top=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];})[0];msg=n<=2?('悪くない。'+top+'以外はな。'):('まだ穴だらけだ。'+top+'、そこから金が漏れてる。');col='#e8917a';}
+ else{var sc={};sessAgain.forEach(function(it){var c=catOf(it);sc[c]=(sc[c]||0)+1;});var top=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];})[0];msg=n<=2?('悪くない。あと '+top+' のレンジだけ、もう一度詰めておけ。'):('まだ粗い。'+top+' のレンジがちゃんと見えてない。そこを重点的にやれ。');col='#e8917a';}
  return '<div style="background:rgba(201,162,39,.08);border:.5px solid rgba(201,162,39,.3);border-radius:12px;padding:14px 16px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:'+col+';text-transform:uppercase;margin-bottom:6px;">Hungry Horse</div><div style="font-size:14px;line-height:1.6;color:#ECEAE3;font-family:var(--serif);">'+msg+'</div></div>';
 }
 function miniCards(b){if(!b)return '';var sm={s:['♠','#1a1a18'],h:['♥','#d23b3b'],d:['♦','#3a86d4'],c:['♣','#3a9b54']};var o='';for(var i=0;i+1<b.length;i+=2){var r=b[i],s=b[i+1].toLowerCase();var m=sm[s]||['?','#888'];o+='<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:32px;height:44px;background:#f6f4ee;border-radius:5px;margin-right:5px;line-height:1.05;">'+'<span style="font-size:16px;font-weight:600;color:'+m[1]+';">'+r+'</span><span style="font-size:13px;color:'+m[1]+';">'+m[0]+'</span></span>';}return '<div style="display:flex;margin:2px 0 14px;">'+o+'</div>';}
@@ -237,7 +237,7 @@ function renderFill(it){
  var body;
  if(done){
   var bad=0,ok=0;it.steps.forEach(function(s,i){if(fGrades[i]==='✗')bad++;if(fGrades[i]==='◎')ok++;});
-  var head=bad===0?'全部読めた。お前、本当にカモだったのか?':(bad<=1?'惜しい。ほぼ読めてる':'まだ穴だらけだ。そこが財布の穴だ');
+  var head=bad===0?'全レンジ読み切った。この精度を体に残せ。':(bad<=1?'惜しい。あと一歩でレンジが見えてる。':'まだ粗い。ここのレンジを重点的に詰めろ。');
   body='<div style="text-align:center;padding:6px 0;"><div style="font-size:15px;color:var(--text);font-weight:500;margin-bottom:3px;">'+head+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:16px;">◎ '+ok+' ／ ✗ '+bad+' ・ この手順を毎回やれ</div><div style="display:flex;gap:8px;"><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(217,96,63,.12);color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fdone(false)">また鍛える</button><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(58,160,136,.12);color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fdone('+(bad===0)+')">次へ</button></div></div>';
  }else{
   var s=it.steps[fsi];
