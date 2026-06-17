@@ -142,10 +142,21 @@ function leakHTML(){
  var leaks=ALL.filter(function(it){var r=prog[it.id];return r&&r.again>0;}).map(function(it){return {it:it,again:prog[it.id].again,cat:catOf(it)};}).sort(function(a,b){return b.again-a.again;});
  if(!sessAgain.length&&!leaks.length)return '';
  var h='<div style="background:rgba(217,96,63,.06);border:.5px solid rgba(217,96,63,.22);border-radius:12px;padding:13px 14px;margin:18px 0 4px;">';
- if(sessAgain.length){var sc={};sessAgain.forEach(function(it){var c=catOf(it);sc[c]=(sc[c]||0)+1;});var top=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];})[0];h+='<div style="font-size:10px;letter-spacing:2px;color:#e8917a;text-transform:uppercase;margin-bottom:6px;">このセッションのリーク</div><div style="font-size:13px;color:#dcdee3;margin-bottom:'+(leaks.length?'12px':'0')+';">'+sessAgain.length+'回つまずいた。特に <b style="color:#e8917a;font-weight:500;">'+top+'</b>。</div>';}
- if(leaks.length){var cl={};leaks.forEach(function(l){cl[l.cat]=(cl[l.cat]||0)+l.again;});var tc=Object.keys(cl).sort(function(a,b){return cl[b]-cl[a];})[0];var t3=leaks.slice(0,3).map(function(l){return l.it.type==='fill'?'レンジ推定':(l.it.q.length>20?l.it.q.slice(0,20)+'…':l.it.q);});h+='<div style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">通しのリーク傾向</div><div style="font-size:13px;color:#dcdee3;line-height:1.55;">弱点＝<b style="color:var(--gold);font-weight:500;">'+tc+'</b><br><span style="font-size:11.5px;color:var(--muted);">繰り返しミス: '+t3.join(' / ')+'</span></div>';}
- h+='<button class="btn" style="width:100%;margin-top:12px;padding:9px;font-size:12px;color:var(--muted);" onclick="OWN.exportData()">分析データを書き出す（Claudeで深掘り）</button></div>';
+ if(sessAgain.length){var sc={};sessAgain.forEach(function(it){var c=catOf(it);sc[c]=(sc[c]||0)+1;});var top=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];})[0];h+='<div style="font-size:10px;letter-spacing:2px;color:#e8917a;text-transform:uppercase;margin-bottom:6px;">今日の献金</div><div style="font-size:13px;color:#dcdee3;margin-bottom:'+(leaks.length?'12px':'0')+';">'+sessAgain.length+'回も同じ穴に落ちた。漏れてるのは <b style="color:#e8917a;font-weight:500;">'+top+'</b> だ。</div>';}
+ if(leaks.length){var cl={};leaks.forEach(function(l){cl[l.cat]=(cl[l.cat]||0)+l.again;});var tc=Object.keys(cl).sort(function(a,b){return cl[b]-cl[a];})[0];var t3=leaks.slice(0,3).map(function(l){return l.it.type==='fill'?'レンジ推定':(l.it.q.length>20?l.it.q.slice(0,20)+'…':l.it.q);});h+='<div style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">お前の財布の穴</div><div style="font-size:13px;color:#dcdee3;line-height:1.55;">最大の漏れ＝<b style="color:var(--gold);font-weight:500;">'+tc+'</b><br><span style="font-size:11.5px;color:var(--muted);">何度も貢いでる手: '+t3.join(' / ')+'</span></div>';}
+ h+='<button class="btn" style="width:100%;margin-top:12px;padding:9px;font-size:12px;color:var(--muted);" onclick="OWN.exportData()">この財布の穴をClaudeに見せる</button></div>';
  return h;
+}
+var justDone=false;
+var SUBS=["ほとんどの奴はここで勉強をやめる。だから一生カモなんだ。","お前のリークは、自分で思ってるより目立ってる。","GTOを「知ってる」奴は多い。「やれる」奴は少ない。","養分はソルバーを開かない。お前は開いた。少しは見込みがある。","才能じゃない。これを毎日続けられるかどうかだ。","昨日のお前は、今日のお前のカモだ。"];
+var PRAISE=["完璧だ。お前、本当にカモだったのか?","ニヤッとしていいぞ。今日のお前は昨日のお前から金を巻き上げた。","一問も落とさない。雑魚はここまでやらない。","いいぞ。その調子なら、いつか俺の卓から金を持って帰れる。","これだよ。お前を養分と呼んだ奴に見せてやれ。"];
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function praiseHTML(){
+ if(!justDone)return '';justDone=false;
+ var n=sessAgain.length,msg,col;
+ if(n===0){msg=pick(PRAISE);col='var(--gold)';}
+ else{var sc={};sessAgain.forEach(function(it){var c=catOf(it);sc[c]=(sc[c]||0)+1;});var top=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];})[0];msg=n<=2?('悪くない。'+top+'以外はな。'):('まだ穴だらけだ。'+top+'、そこから金が漏れてる。');col='#e8917a';}
+ return '<div style="background:rgba(201,162,39,.08);border:.5px solid rgba(201,162,39,.3);border-radius:12px;padding:14px 16px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:'+col+';text-transform:uppercase;margin-bottom:6px;">Hungry Horse</div><div style="font-size:14px;line-height:1.6;color:#ECEAE3;font-family:var(--serif);">'+msg+'</div></div>';
 }
 window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}sessAgain=[];view='session';renderSession();},
  home:function(){view='home';renderHome();},
@@ -156,14 +167,15 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  fdone:function(good){var it=queue[idx];grade(it,good);idx++;fsi=0;fsh=false;next();},
  reset:function(){if(confirm('進捗をリセットしますか？')){prog={};save(prog);renderHome();}},
  exportData:function(){var d={at:tstr(),progress:prog,cards:ALL.map(function(it){return {id:it.id,cat:catOf(it),q:it.type==='fill'?it.sc:it.q};})};var s=JSON.stringify(d);var ta=document.createElement('textarea');ta.value=s;ta.style.cssText='position:absolute;left:-9999px;';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);alert('分析データをコピーしました。Claudeのチャットに貼り付けて「これ分析して」と送ってください。');}};
-function next(){if(idx>=queue.length){view='home';renderHome();}else{renderSession();}}
+function next(){if(idx>=queue.length){justDone=true;view='home';renderHome();}else{renderSession();}}
 function renderHome(){
  var ms=mastery();var avg=ms.length?Math.round(ms.reduce(function(s,d){return s+d.v;},0)/ms.length):0;
  var modes=[['all','すべて'],['memo','暗記'],['spot','スポット'],['fill','穴埋め']];
  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">'
   +'<span class="wm">OWN</span><span class="mono" style="font-size:11px;color:var(--muted);letter-spacing:1px;">SKILL MAP</span></div>'
+  +praiseHTML()
   +'<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px;"><span class="mono" style="font-size:46px;font-weight:500;color:var(--gold);line-height:1;">'+avg+'%</span><span style="font-size:13px;color:var(--muted);">今日の到達</span></div>'
-  +'<p style="font-size:12.5px;color:var(--dim);margin:6px 0 20px;font-family:var(--serif);font-style:italic;">知識が、層になって積み上がっている。</p>'
+  +'<p style="font-size:12.5px;color:var(--dim);margin:6px 0 20px;font-family:var(--serif);font-style:italic;">'+pick(SUBS)+'</p>'
   +'<div style="flex:1;">';
  ms.forEach(function(d){html+='<div style="display:flex;align-items:center;gap:11px;margin-bottom:10px;"><span style="flex:0 0 112px;font-size:12px;color:#c7c9cf;line-height:1.3;">'+d.k+'</span><span style="flex:1;height:12px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;"><span style="display:block;height:100%;width:'+d.v+'%;background:var(--gold);border-radius:4px;transition:width .8s;"></span></span><span class="mono" style="flex:0 0 32px;text-align:right;font-size:11px;color:var(--muted);">'+d.v+'%</span></div>';});
  html+='</div>'+leakHTML()+'<div style="display:flex;gap:6px;margin:18px 0 12px;">';
@@ -198,7 +210,7 @@ function renderFill(it){
  var filledHtml=it.steps.slice(0,fsi).map(function(s,i){return '<div style="border-left:2px solid var(--gold);padding:2px 0 2px 12px;margin-bottom:11px;"><div style="font-size:11.5px;color:#85888f;margin-bottom:3px;">'+(i+1)+'. '+s.q+'</div><div style="font-size:13.5px;line-height:1.5;color:var(--gold);">'+s.a+'</div></div>';}).join('');
  var body;
  if(done){
-  body='<div style="text-align:center;padding:6px 0;"><div style="font-size:15px;color:var(--text);font-weight:500;margin-bottom:3px;">レンジを推定しきった</div><div style="font-size:12px;color:var(--muted);margin-bottom:16px;">この手順を毎回たどるのが癖になる</div><div style="display:flex;gap:8px;"><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(217,96,63,.12);color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fdone(false)">また</button><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(58,160,136,.12);color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fdone(true)">覚えた</button></div></div>';
+  body='<div style="text-align:center;padding:6px 0;"><div style="font-size:15px;color:var(--text);font-weight:500;margin-bottom:3px;">読み切ったな</div><div style="font-size:12px;color:var(--muted);margin-bottom:16px;">これを毎回やれ。養分は途中で考えるのをやめる。</div><div style="display:flex;gap:8px;"><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(217,96,63,.12);color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fdone(false)">また</button><button class="btn" style="flex:1;padding:13px;font-size:13px;background:rgba(58,160,136,.12);color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fdone(true)">覚えた</button></div></div>';
  }else{
   var s=it.steps[fsi];
   if(!fsh){body='<div style="background:var(--surf);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:20px 16px;"><div style="font-size:16px;line-height:1.6;margin-bottom:16px;">'+(fsi+1)+'. '+s.q+'</div><button class="btn" style="width:100%;padding:13px;font-size:14px;color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.freveal()">答えを開く</button><div style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;">まず自分で埋めてから</div></div>';}
