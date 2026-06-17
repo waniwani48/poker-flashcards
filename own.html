@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Own">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0c0c0b">
+<link rel="apple-touch-icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%230c0c0b"/><text x="50" y="70" font-size="46" text-anchor="middle" fill="%2336d39e" font-family="Georgia,serif">O</text></svg>'>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%230c0c0b"/><text x="50" y="70" font-size="46" text-anchor="middle" fill="%2336d39e" font-family="Georgia,serif">O</text></svg>'>
+<title>Own</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;height:100%;background:#0c0c0b;}
+body{font-family:-apple-system,BlinkMacSystemFont,system-ui,"Hiragino Sans",sans-serif;color:#ECEAE3;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:420px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom));min-height:100%;display:flex;flex-direction:column;}
+.bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.08);overflow:hidden;margin:4px 2px 16px;}
+.bar > div{height:100%;background:#36d39e;width:0;transition:width .3s;}
+.head{display:flex;justify-content:space-between;align-items:center;padding:0 2px;margin-bottom:14px;}
+.wm{font-size:15px;letter-spacing:3px;font-weight:500;color:#ECEAE3;}
+.count{font-size:12px;color:#7a7a73;}
+.modes{display:flex;gap:6px;margin-bottom:16px;}
+.mb{flex:1;padding:7px 4px;font-size:12px;letter-spacing:1px;border:0.5px solid rgba(255,255,255,0.1);border-radius:9px;background:transparent;color:#7a7a73;font-family:inherit;}
+.mb.on{background:rgba(54,211,158,0.1);border-color:rgba(54,211,158,0.4);color:#36d39e;}
+.stage{flex:1;position:relative;touch-action:pan-y;display:flex;}
+.fcard{flex:1;background:#191916;border:0.5px solid rgba(255,255,255,0.07);border-radius:20px;padding:26px 22px;display:flex;flex-direction:column;cursor:pointer;will-change:transform;}
+.tagk{font-size:11px;letter-spacing:2px;color:#7a7a73;text-transform:uppercase;}
+.hint{display:flex;justify-content:space-between;align-items:center;padding:14px 6px 2px;font-size:12px;color:#5f5f59;}
+.reset{margin-top:10px;text-align:center;}
+.reset button{font-size:11px;color:#46463f;background:none;border:none;font-family:inherit;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="bar"><div id="prog"></div></div>
+<div class="head"><span class="wm">OWN</span><span class="count" id="count"></span></div>
+<div class="modes" id="modes"></div>
+<div class="stage" id="stage"><div class="fcard" id="card"></div></div>
+<div class="hint" id="hint"><span id="hL">&#8592; また</span><span style="color:#46463f;">タップでめくる</span><span id="hR">覚えた &#8594;</span></div>
+<div class="reset"><button onclick="ownReset()">進捗をリセット</button></div>
+</div>
+<script>
+(function(){
+var CARDS=[
+{q:"オーバーペア vs アンダーペアのEQ（AA vs KK）は？",a:"約 80 : 20",tag:"EQ"},
+{q:"2オーバー vs アンダーペア（AK vs 22）のEQは？ 通称は？",a:"約 50 : 50（フリップ）",tag:"EQ"},
+{q:"2オーバー vs 2アンダーのスーテッドコネクター（AK vs 54s）のEQは？",a:"約 60 : 40",tag:"EQ"},
+{q:"ドミネート（AK vs AQ）のEQは？",a:"約 75 : 25",tag:"EQ"},
+{q:"2倍4倍の法則とは？",a:"リバーのみ＝アウツ×2 / ターン+リバー＝アウツ×4",tag:"EQ"},
+{q:"NLHの全スターティングコンボ数は？",a:"1326",tag:"コンボ"},
+{q:"ポケットペア1種のコンボ数は？",a:"6",tag:"コンボ"},
+{q:"アンペアハンド1種のコンボ数は？（内訳も）",a:"16（スーテッド4 / オフ12）",tag:"コンボ"},
+{q:"ポケットペアのコンボはブロッカーでどう減る？",a:"6 → 1枚で3 → 2枚で1",tag:"コンボ"},
+{q:"33%ベットへの適正フォールド頻度は？",a:"約30%",tag:"フロップ"},
+{q:"50%ベットへの適正フォールド頻度は？",a:"約40%",tag:"フロップ"},
+{q:"75%ベットへの適正フォールド頻度は？",a:"約50%",tag:"フロップ"},
+{q:"125%ベットへの適正フォールド頻度は？",a:"約60%",tag:"フロップ"},
+{q:"ポット50%ベットの適正VB比は？（ブラフ割合も）",a:"3:1（ブラフ25%）",tag:"VB比"},
+{q:"フォールドのEVは？",a:"いかなるスポットでも常に0",tag:"理論"},
+{q:"α（必要ブラフ成功率）の式は？",a:"ベット ÷ トータルポット（＝1−MDF）",tag:"理論"},
+{q:"MDF（最低ディフェンス頻度）の式は？",a:"ポット ÷(ポット+ベット)＝ 1−α",tag:"理論"},
+{q:"ポラライズドレンジとは？",a:"強い手と弱い手の2極（中間はコールに残す）",tag:"レンジ"},
+{q:"リニアレンジとは？",a:"強い順に選んだレンジ（形を指す語、ナッツを含むとは限らない）",tag:"レンジ"},
+{q:"コンデンスドレンジとは？",a:"中程度だけ（キャップの一部で上下が欠ける）",tag:"レンジ"},
+{q:"マージドレンジとは？",a:"強・中・弱を全部（GTOの大部分はこれ）",tag:"レンジ"},
+{q:"キャップドレンジとは？",a:"強い手を持っていないレンジ（上限が限られる）",tag:"レンジ"},
+{q:"エクイティ（EQ）とは？",a:"その時点でオールインした場合のポットシェア率（≒勝率）",tag:"概念"},
+{q:"EQR（エクイティ実現性）とは？",a:"持つEQのうち実際どれだけ実現されるか。オールイン=100%が基準",tag:"概念"},
+{q:"インディファレントとは？",a:"複数アクションのEVが等しい状態（＝境界）",tag:"概念"},
+{q:"純粋戦略と混合戦略の違いは？",a:"純粋=1アクション100%（最高EV）/ 混合=複数を頻度で（全部同EV）",tag:"概念"},
+{q:"ブロッカーとは？",a:"特定のハンドのコンボ数を減らすカード",tag:"概念"},
+{q:"ドミネートとは？",a:"1枚共有しキッカーが上（AK vs AQ）。約75:25",tag:"概念"},
+{q:"最もアンダーリアライズされやすいハンドの強さは？",a:"中程度のハンド（強い手にペイオフ・弱い手に降りられる板挟み）",tag:"概念"},
+{q:"オープンレンジが狭くなる条件は？ なぜ？",a:"後ろの人数が多いほど狭い。強い手への放銃を避けるため",tag:"プリフロップ"},
+{q:"オープンサイズを上げると、レンジはどう変わる？",a:"狭くなり、A/Kブロッカー持ち（3bet耐性）に寄る",tag:"プリフロップ"},
+{q:"3betの2つの目的は？",a:"スチール（降ろして回収）と、強い手でバリュー",tag:"プリフロップ"},
+{q:"3betレンジの広さを決める2要因は？（影響の大小も）",a:"相手のオープン幅（大）と後ろの人数（小）",tag:"プリフロップ"},
+{q:"どのポジションからも3betできるハンドは？",a:"AQo+ / KTs+ / JJ+",tag:"プリフロップ"},
+{q:"バリュー4bet / ブラフ4betの代表は？",a:"バリュー=QQ+/A5o、ブラフ=AJs〜KTsの4マス（+A5s）",tag:"プリフロップ"},
+{q:"BBブラフ3betのスーテッド下限の暗記法は？",a:"UTG=K / HJ=K / CO=Q / BTN=Q / SB=J（〜T）のローs",tag:"プリフロップ"},
+{q:"高レイキ環境とアンティ環境、レンジはどう変わる？",a:"高レイキ→タイト・スチール寄り / アンティ→ワイド（特にBB）",tag:"プリフロップ"},
+{q:"マルチウェイで控えめ/積極にすべきハンドは？",a:"控えめ=Axs・SC（ドミネート）/ 積極=ポケットペア（セット）",tag:"プリフロップ"},
+{q:"CB戦略を予想する3変数は？",a:"①エクイティ/ナッツ優位 ②ダイナミック/スタティック ③ペイオフリスク",tag:"フロップ"},
+{q:"エクイティ優位とナッツ優位、それぞれどのCB戦略？",a:"エクイティ優位→レンジベット / ナッツ優位→ポラー（大サイズ）",tag:"フロップ"},
+{q:"レンジベットが成立する条件は？",a:"相手にトラッシュハンドが多い（Aハイ/Kハイで成立しやすい）",tag:"フロップ"},
+{q:"ポラーCBの発生条件と特徴的なサイズは？",a:"ナッツアドバンテージ。ジオメトリックサイズ（リバーオールインへ）",tag:"フロップ"},
+{q:"3betポットCBの型（Aハイ/Kハイ/Q-Jハイ/10以下）は？",a:"20%広く / 33%レンジ / 50%打ち分け / 75%ポラー",tag:"フロップ"},
+{q:"3betポットで色なしポケットをどう扱う？",a:"タフコールしない。色あり（セットがクリーン）を優先ディフェンス",tag:"フロップ"},
+{q:"ターンのレンジ推定3手順は？",a:"プリフロップレンジ→フロップのアクションで絞る→ターンカードで進展",tag:"ターン"},
+{q:"オーバーベットプローブの発生条件は？",a:"chk-chk後、ストレート/フラッシュ/ペア未完成（IPがキャップ）",tag:"ターン"},
+{q:"ターンのベットサイズは何を狙って決める？",a:"相手レンジの密度が高い帯をインディファレントにするサイズ",tag:"ターン"},
+{q:"「頻度より◯◯を覚える」。◯◯は？ なぜ？",a:"境界（indifferent）。混合戦略の頻度ミスは罰されにくい",tag:"原則"},
+{q:"ハンドの強さは何で決まる？",a:"相手のレンジ次第（絶対値でなく相対価値）",tag:"原則"},
+{q:"AKQゲームが証明した「ポラーが強い」結論は？",a:"EQ互角でもEVは3倍。ポラー対コンデンスではポジション有利も消滅",tag:"原則"},
+{q:"GTOとエクスプロイトの関係は？",a:"GTOは搾取されない盾。リークが見えたら捨ててエクスプロイト",tag:"原則"},
+{q:"UTGオープンの境界（下限）ハンドは？",a:"ATo/KJo/QJo（2broadway下限）、ポケ5以下は低頻度、Kxs=K5sまで、A3s=indifferent",tag:"境界"},
+{q:"HJオープンの境界ハンドは？",a:"A9o、KT/QT/JT=indifferent、ポケ4から、suited下限8xs",tag:"境界"},
+{q:"COオープンの境界ハンドは？",a:"Axo=A9/A8/A5（A5は飛び地）、2broadwayピュア、suited下限7xs、Q5s",tag:"境界"},
+{q:"BTNオープンの境界ハンドは？",a:"A3o+、オフ下限9xo、ポケ全ピュア、suited下限6xs、Qxロー全/J5・J4s",tag:"境界"},
+{q:"A5が飛び地でオープンされる理由は？",a:"ホイール（A2345）で最高キッカー。A6/A7より価値が高い瞬間がある",tag:"境界"},
+{q:"状況で混ぜる（境界の）3betハンドは？",a:"KJo+/JTs+/Axs/ローポケット（バランス・キャップ回避用）",tag:"境界"},
+{q:"SBオープンレンジの特徴は？",a:"≒BTN（リンプ頻度あり）。後ろ1人OOPと後ろ2人IPの長短が相殺",tag:"境界"},
+{q:"BTN vs BB、フロップ A72r（ドライAハイ）。あなたBTN、c-betする？",a:"★争点。GTO/ドラマ=レンジベット肯定。HHP=相手がスロープレイするのでチェックバックして情報を取る",tag:"スポット"},
+{q:"BTN vs BB、King94に33%CB被弾、AJo（バックドアFD付き）。守る？",a:"守る。33%CBの適正フォールドは下位30%。AJoはエースハイで下位30%に入らない。BDFD付きなら優先度↑",tag:"スポット"},
+{q:"BTN vs BB、AK5、あなたBTNで5ヒット（ボトムペア）。リバーまでブラフに使う？",a:"使う。5を持つと相手のツーペア/トリップスのコンボが減る＝ブロッカーが優秀",tag:"スポット"},
+{q:"CO vs BTN 3betポット、K43ツートーン、33%CB被弾、8ポケ（色なし）。コール？",a:"フォールド。色なしポケットはセット時にフラッシュ被りで濁る。色あり優先",tag:"スポット"},
+{q:"BTN vs BB、KJ4r、フロップchk-chk、ターン3c。あなたBB、どうする？",a:"オーバーベットプローブ（250%等）。IPのチェックレンジがキャップ。セットがナッツの未完成ボード",tag:"スポット"},
+{q:"後ろにバリ型おじいちゃん（超タイト・3betはAKsのみ）。自分のオープンは？",a:"広げてスチール（降りやすい）。ただし3betされたらオーバーフォールド。limpレイズは降りる",tag:"スポット"},
+{q:"AK vs 22、プリフロでオールイン。EQは？",a:"約50:50（フリップ）。2オーバー vs アンダーペア",tag:"スポット"},
+{q:"マルチウェイ（3人）で A5s。参加する？",a:"控えめに。FD無しのAxsはキッカー上のAxsにドミネートされやすい。ポケットペアの方が向く",tag:"スポット"},
+{q:"レンジ推定：CO vs BTN 3betポット、King94→33%CB→COコール→ターン10s。COのレンジは？",a:"ポケ=10s以下を等頻度コール / 2broadwayオフ=ほぼ全フォールド / 2broadways=AQs・AJs・KQsがメイン / フロップ約40%フォールド / ターン10sで KTs・T9s=2ペア、QTs・JTs=10ヒット+SD",tag:"穴埋め"},
+{q:"レンジ推定：BTN vs BB、Q94r→50%CB→BBコール→ターン2c。BBの残存レンジは？",a:"50%CBに約40%フォールド→残るのは下限ポケ付近。ペア=4/9/Qヒット、ドロー=KJ/KT/JT+BDありAハイ。2cはブランクで大きな変化なし",tag:"穴埋め"},
+{q:"レンジ推定：UTG vs BB、A73ツートーン→33%CB→BBコール→ターン5h。BBのレンジは？",a:"エクイティ差で約45%フォールド。残る=ハーツ持ちポケット/3/7/Aヒット、ドロー=45s/56s/46s（ターン5hで進展）。KThh等はフラッシュ完成",tag:"穴埋め"}
+];
+var KEY='pokerSRS_v1',IV={1:1,2:2,3:4,4:8,5:16};
+function cid(q){var h=0;for(var i=0;i<q.length;i++)h=(h*31+q.charCodeAt(i))|0;return 'c'+(h>>>0).toString(36);}
+CARDS.forEach(function(c){c.id=cid(c.q);});
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
+function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
+function tstr(){return new Date().toISOString().slice(0,10);}
+function addD(n){var d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+var prog=load(),t=tstr(),mode=localStorage.getItem('pokerMode')||'all';
+function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return CARDS.filter(function(c){return c.tag==='穴埋め';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット'&&c.tag!=='穴埋め';});return CARDS;}
+var queue=[],idx=0,flipped=false,total=0;
+function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;total=queue.length;}
+var card=document.getElementById('card'),stageEl=document.getElementById('stage'),cnt=document.getElementById('count'),pg=document.getElementById('prog'),hint=document.getElementById('hint'),hL=document.getElementById('hL'),hR=document.getElementById('hR');
+function renderModes(){var ms=[['all','すべて'],['memo','暗記'],['spot','スポット'],['fill','穴埋め']];document.getElementById('modes').innerHTML=ms.map(function(m){return '<button class="mb'+(mode===m[0]?' on':'')+'" onclick="ownMode(\''+m[0]+'\')">'+m[1]+'</button>';}).join('');}
+window.ownMode=function(m){mode=m;localStorage.setItem('pokerMode',m);build();renderModes();render();};
+window.ownReset=function(){if(confirm('進捗をリセットしますか？')){prog={};save(prog);build();render();}};
+function render(){
+ cnt.textContent=total?Math.min(idx+1,total)+' / '+total:'';
+ pg.style.width=total?Math.round(idx/total*100)+'%':'0%';
+ if(idx>=queue.length){hint.style.visibility='hidden';pg.style.width='100%';cnt.textContent='';
+  stageEl.innerHTML='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;"><div style="font-size:30px;color:#36d39e;margin-bottom:10px;">&#10003;</div><div style="font-size:17px;font-weight:500;letter-spacing:1px;">今日のぶん、Own した</div><div style="font-size:13px;color:#7a7a73;margin-top:6px;">また明日、静かに積み上げよう</div></div>';return;}
+ hint.style.visibility='visible';
+ if(!stageEl.contains(card))stageEl.innerHTML='',stageEl.appendChild(card);
+ var c=queue[idx];card.style.transition='';card.style.transform='';card.style.opacity='1';
+ if(!flipped){card.innerHTML='<div class="tagk" style="margin-bottom:auto;">'+c.tag+'</div><div style="font-size:21px;line-height:1.55;margin:auto 0;">'+c.q+'</div><div style="margin-top:auto;font-size:12px;color:#46463f;">タップで答え</div>';}
+ else{card.innerHTML='<div class="tagk" style="margin-bottom:14px;">'+c.tag+'</div><div style="font-size:14px;line-height:1.5;color:#8a8a82;margin-bottom:14px;">'+c.q+'</div><div style="height:0.5px;background:rgba(255,255,255,0.09);margin-bottom:14px;"></div><div style="font-size:18px;line-height:1.6;color:#36d39e;font-weight:500;">'+c.a+'</div>';}
+ card.style.transition='opacity .16s';card.style.opacity='0';setTimeout(function(){card.style.opacity='1';},20);
+}
+function grade(good){var c=queue[idx];var r=prog[c.id]||{box:1};var box=r.box||1;box=good?Math.min(box+1,5):1;prog[c.id]={box:box,due:addD(IV[box])};save(prog);
+ card.style.transition='transform .25s,opacity .25s';card.style.transform='translateX('+(good?440:-440)+'px) rotate('+(good?12:-12)+'deg)';card.style.opacity='0';
+ setTimeout(function(){idx++;flipped=false;render();},230);}
+var dragging=false,sx=0,dx=0;
+card.addEventListener('pointerdown',function(e){if(!flipped||idx>=queue.length)return;dragging=true;sx=e.clientX;card.style.transition='';try{card.setPointerCapture(e.pointerId);}catch(x){}});
+card.addEventListener('pointermove',function(e){if(!dragging)return;dx=e.clientX-sx;card.style.transform='translateX('+dx+'px) rotate('+(dx*0.04)+'deg)';hL.style.color=dx<-30?'#e07a5a':'#5f5f59';hR.style.color=dx>30?'#36d39e':'#5f5f59';});
+card.addEventListener('pointerup',function(e){if(!dragging)return;dragging=false;hL.style.color='#5f5f59';hR.style.color='#5f5f59';if(Math.abs(dx)>85){grade(dx>0);}else{card.style.transition='transform .2s';card.style.transform='';}dx=0;});
+card.addEventListener('click',function(){if(dragging||Math.abs(dx)>5||idx>=queue.length)return;if(!flipped){flipped=true;render();}});
+renderModes();build();render();
+})();
+</script>
+</body>
+</html>
