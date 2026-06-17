@@ -21,7 +21,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,system-ui,"Hiragino Sans",sans
 .mono{font-family:var(--mono);}
 .btn{font-family:inherit;cursor:pointer;border-radius:12px;border:0.5px solid rgba(255,255,255,.12);background:transparent;color:var(--text);}
 .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-.chip{flex:1;padding:9px 4px;font-size:12px;letter-spacing:1px;border-radius:10px;border:0.5px solid rgba(255,255,255,.1);background:transparent;color:var(--muted);font-family:inherit;}
+.chip{flex:1 1 28%;padding:9px 4px;font-size:12px;letter-spacing:.5px;border-radius:10px;border:0.5px solid rgba(255,255,255,.1);background:transparent;color:var(--muted);font-family:inherit;}
 .chip.on{background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.4);color:var(--gold);}
 .fcard{background:var(--surf);border:0.5px solid rgba(255,255,255,.07);border-radius:20px;padding:26px 22px;display:flex;flex-direction:column;cursor:pointer;will-change:transform;}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;}}
@@ -116,11 +116,29 @@ var FILLS=[
 {q:"壊滅する手は？",a:"ハーツ無しのKハイ以下はほぼ全フォールド"},
 {q:"残るペアは？",a:"ハーツ持ちポケット / 3ヒット / 7ヒット / Aヒット"},
 {q:"残るドローは？",a:"45s/56s/46s（ガッショ→ターン5hで進展）"},
-{q:"ターン 5h で完成した手は？",a:"KThh等のフラッシュ"}]}
+{q:"ターン 5h で完成した手は？",a:"KThh等のフラッシュ"}]},
+{tag:"プリフロ暗記",sc:"UTG（アーリー）のオープンレンジ",steps:[{q:"オープンの下限は？",a:"2broadway=ATo/KJo/QJo、ポケ5以下は低頻度、Kxs=K5sまで、A3s=indifferent"}]},
+{tag:"プリフロ暗記",sc:"HJ のオープンレンジ",steps:[{q:"オープンの下限は？",a:"A9o、KT/QT/JT=indifferent、ポケ4から、suited下限8xs"}]},
+{tag:"プリフロ暗記",sc:"CO のオープンレンジ",steps:[{q:"オープンの下限は？",a:"Axo=A9/A8/A5（A5は飛び地）、2broadwayピュア、suited下限7xs、Q5s"}]},
+{tag:"プリフロ暗記",sc:"BTN のオープンレンジ",steps:[{q:"オープンの下限は？",a:"A3o+、オフ下限9xo、ポケ全ピュア、suited下限6xs、Qxロー全/J5・J4s"}]},
+{tag:"プリフロ暗記",sc:"SB のオープンレンジ",steps:[{q:"下限と特徴は？",a:"≒BTN（リンプ頻度あり）。後ろ1人OOPと後ろ2人IPの長短が相殺"}]},
+{tag:"プリフロ暗記",sc:"どのポジションからも3betする最低ライン",steps:[{q:"バリュー3betの下限は？",a:"AQo+ / KTs+ / JJ+"}]},
+{tag:"プリフロ暗記",sc:"BB vs BTNオープン の3bet",steps:[{q:"構成は？（バリュー/ブラフ）",a:"ポラー。バリュー核=QQ+/ATo、ブラフのスーテッド下限=Jローs（BTN open）、SCやAxロー"}]},
+{tag:"プリフロ暗記",sc:"オープンして3betされた時の4bet",steps:[{q:"バリュー/ブラフ4betの構成は？",a:"ポラー。バリュー=QQ+/A5o、ブラフ=AJs〜KTsの4マス（+A5s）"}]},
+{tag:"プリフロ暗記",sc:"UTGオープン vs 3bet のディフェンス",steps:[{q:"残すハンドとポケットの扱いは？（EP）",a:"AQs/KQs/一部ポケット。EP同士はローポケも均等コール（相手3betが10s+に寄るため）"}]},
+{tag:"プリフロ暗記",sc:"BTNオープン vs SB 3bet のディフェンス",steps:[{q:"ポケットの扱いは？（LP）",a:"強い順にコール、ローポケはフォールド（相手3betが広い）。3betへのローポケコールしすぎ注意"}]},
+{tag:"フロップCB暗記",sc:"BTN vs BB SRP・Aハイボード",steps:[{q:"c-bet戦略は？",a:"小サイズ高頻度（レンジベット寄り）。Aハイはレンジ優位。※細かい内訳はWizardで要確認"}]},
+{tag:"フロップCB暗記",sc:"BTN vs BB SRP・Kハイボード（K84r等）",steps:[{q:"c-bet戦略は？",a:"33%をレンジ全体に（レンジベット）"}]},
+{tag:"フロップCB暗記",sc:"BTN vs BB SRP・ローコネクト（976r等）",steps:[{q:"c-bet戦略は？",a:"レンジベット不成立。チェック約50%（BBが絡みやすくレンジ優位が薄い）"}]},
+{tag:"フロップCB暗記",sc:"BTN vs BB SRP・ドライ vs ウェット（実測）",steps:[{q:"ドライとウェットでサイズ傾向は？",a:"ドライ＝ポラー化（オーバーベット増）/ ウェット＝チェック多め・控えめ・中間サイズ"}]},
+{tag:"フロップCB暗記",sc:"3betポット・Aハイボード",steps:[{q:"c-bet戦略は？",a:"20%を広く（A73等セカンドが低いとチェック半分）"}]},
+{tag:"フロップCB暗記",sc:"3betポット・Kハイボード",steps:[{q:"c-bet戦略は？",a:"33%をレンジ全体"}]},
+{tag:"フロップCB暗記",sc:"3betポット・10ハイ以下（ダイナミック）",steps:[{q:"c-bet戦略は？",a:"75%をポラーで＋チェック半分"}]},
+{tag:"フロップCB暗記",sc:"ナッツ優位ボード（AK5等）",steps:[{q:"c-bet戦略は？",a:"ポラー大サイズ（125%、ジオメトリック）。ブラフはブロッカー重視"}]}
 ];
 function cid(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return 'c'+(h>>>0).toString(36);}
 CARDS.forEach(function(c){c.type='card';c.id=cid(c.q);});
-FILLS.forEach(function(f){f.type='fill';f.tag='穴埋め';f.id=cid(f.sc);});
+FILLS.forEach(function(f){f.type='fill';f.tag=f.tag||'穴埋め';f.id=cid(f.sc);});
 var ALL=CARDS.concat(FILLS);
 var KEY='pokerSRS_v1',IV={1:1,2:2,3:4,4:8,5:16};
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
@@ -128,10 +146,10 @@ function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
 function tstr(){return new Date().toISOString().slice(0,10);}
 function addD(n){var d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
 var prog=load(),t=tstr(),mode=localStorage.getItem('pokerMode')||'all';
-function catOf(it){if(it.type==='fill')return '穴埋め・実戦';var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='スポット')return 'スポット';return 'その他';}
+function catOf(it){if(it.type==='fill'){if(it.tag==='プリフロ暗記')return 'プリフロップ';if(it.tag==='フロップCB暗記')return 'フロップ';return '穴埋め・実戦';}var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='スポット')return 'スポット';return 'その他';}
 var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','ターン','スポット','穴埋め・実戦'];
 function mastery(){var m={};CATORDER.forEach(function(c){m[c]={s:0,n:0};});ALL.forEach(function(it){var c=catOf(it);if(!m[c])return;var r=prog[it.id];m[c].s+=(r?r.box:0);m[c].n++;});var out=[];CATORDER.forEach(function(c){if(m[c].n)out.push({k:c,v:Math.round(m[c].s/(m[c].n*5)*100)});});return out;}
-function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.slice();if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
+function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.filter(function(f){return f.tag==='穴埋め';});if(mode==='pre')return FILLS.filter(function(f){return f.tag==='プリフロ暗記';});if(mode==='cb')return FILLS.filter(function(f){return f.tag==='フロップCB暗記';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
 var view='home',queue=[],idx=0,flipped=false,fsi=0,fRevealed=false,fInputs={},fGrades={};
 var root=document.getElementById('root');
 function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;fsi=0;fRevealed=false;fInputs={};fGrades={};}
@@ -170,7 +188,7 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
 function next(){if(idx>=queue.length){justDone=true;view='home';renderHome();}else{renderSession();}}
 function renderHome(){
  var ms=mastery();var avg=ms.length?Math.round(ms.reduce(function(s,d){return s+d.v;},0)/ms.length):0;
- var modes=[['all','すべて'],['memo','暗記'],['spot','スポット'],['fill','穴埋め']];
+ var modes=[['all','すべて'],['memo','暗記'],['pre','プリフロ'],['cb','フロップCB'],['fill','レンジ推定'],['spot','スポット']];
  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">'
   +'<span class="wm">OWN</span><span class="mono" style="font-size:11px;color:var(--muted);letter-spacing:1px;">SKILL MAP</span></div>'
   +praiseHTML()
@@ -178,7 +196,7 @@ function renderHome(){
   +'<p style="font-size:12.5px;color:var(--dim);margin:6px 0 20px;font-family:var(--serif);font-style:italic;">'+pick(SUBS)+'</p>'
   +'<div style="flex:1;">';
  ms.forEach(function(d){html+='<div style="display:flex;align-items:center;gap:11px;margin-bottom:10px;"><span style="flex:0 0 112px;font-size:12px;color:#c7c9cf;line-height:1.3;">'+d.k+'</span><span style="flex:1;height:12px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;"><span style="display:block;height:100%;width:'+d.v+'%;background:var(--gold);border-radius:4px;transition:width .8s;"></span></span><span class="mono" style="flex:0 0 32px;text-align:right;font-size:11px;color:var(--muted);">'+d.v+'%</span></div>';});
- html+='</div>'+leakHTML()+'<div style="display:flex;gap:6px;margin:18px 0 12px;">';
+ html+='</div>'+leakHTML()+'<div style="display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 12px;">';
  modes.forEach(function(m){html+='<button class="chip'+(mode===m[0]?' on':'')+'" onclick="OWN.setMode(\''+m[0]+'\')">'+m[1]+'</button>';});
  html+='</div><button class="btn" style="padding:16px;font-size:15px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.start()">今日のセッションを始める</button>'
   +'<div style="text-align:center;margin-top:12px;"><button onclick="OWN.reset()" style="font-size:11px;color:var(--dim);background:none;border:none;">進捗をリセット</button></div>';
