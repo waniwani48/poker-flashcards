@@ -90,11 +90,11 @@ var CARDS=[
 {q:"A5が飛び地でオープンされる理由は？",a:"ホイール（A2345）で最高キッカー。A6/A7より価値が高い瞬間がある",tag:"境界"},
 {q:"状況で混ぜる（境界の）3betハンドは？",a:"KJo+/JTs+/Axs/ローポケット（バランス・キャップ回避用）",tag:"境界"},
 {q:"SBオープンレンジの特徴は？",a:"≒BTN（リンプ頻度あり）。後ろ1人OOPと後ろ2人IPの長短が相殺",tag:"境界"},
-{q:"BTN vs BB、フロップ A72r。あなたBTN、c-betする？",a:"★争点。GTO/ドラマ=レンジベット肯定。HHP=相手のスロープレイを読んでチェックバック",tag:"スポット"},
-{q:"BTN vs BB、K94に33%CB被弾、AJo（BDFD付き）。守る？",a:"守る。33%CBの適正フォールドは下位30%。AJoはエースハイで下位30%に入らない",tag:"スポット"},
-{q:"BTN vs BB、AK5、あなたBTNで5ヒット。リバーまでブラフに使う？",a:"使う。5を持つと相手のツーペア/トリップスのコンボが減る＝ブロッカーが優秀",tag:"スポット"},
-{q:"CO vs BTN 3betポット、K43ツートーン、33%CB、8ポケ（色なし）。コール？",a:"フォールド。色なしポケットはセット時にフラッシュ被りで濁る。色あり優先",tag:"スポット"},
-{q:"BTN vs BB、KJ4r、フロップchk-chk、ターン3c。あなたBB、どうする？",a:"オーバーベットプローブ。IPのチェックレンジがキャップ。セットがナッツの未完成ボード",tag:"スポット"},
+{q:"BTN vs BB（100bb）、フロップ A72r。あなたBTN、c-betする？",a:"★争点。GTO/ドラマ=レンジベット肯定。HHP=相手のスロープレイを読んでチェックバック",tag:"スポット",board:"As7h2c"},
+{q:"BTN vs BB（100bb）、K94二色(ハート2枚)に33%CB被弾、AhJo（BDFD付き）。守る？",a:"守る。33%CBの適正フォールドは下位30%。AJoはエースハイ＋バックドアで下位30%に入らない",tag:"スポット",board:"Kh9h4c"},
+{q:"BTN vs BB（100bb）、AK5レインボー、あなたBTNで5ヒット。リバーまでブラフに使う？",a:"使う。5を持つと相手のツーペア/トリップスのコンボが減る＝ブロッカーが優秀",tag:"スポット",board:"AsKh5c"},
+{q:"CO vs BTN 3betポット（100bb）、K43ツートーン(ハート2枚)、33%CB、8ポケ（色なし）。コール？",a:"フォールド。色なしポケットはセット時にフラッシュ被りで濁る。色あり優先",tag:"スポット",board:"Ks4h3h"},
+{q:"BTN vs BB（100bb）、KJ4r、フロップchk-chk、ターン3c。あなたBB、どうする？",a:"オーバーベットプローブ。IPのチェックレンジがキャップ。セットがナッツの未完成ボード",tag:"スポット",board:"KhJs4d"},
 {q:"後ろにバリ型おじいちゃん（超タイト・3bet=AKsのみ）。自分のオープンは？",a:"広げてスチール。ただし3betされたらオーバーフォールド。limpレイズは降りる",tag:"スポット"},
 {q:"AK vs 22、プリフロでオールイン。EQは？",a:"約50:50（フリップ）。2オーバー vs アンダーペア",tag:"スポット"},
 {q:"マルチウェイ（3人）で A5s。参加する？",a:"控えめに。FD無しのAxsはドミネートされやすい。ポケットペアの方が向く",tag:"スポット"}
@@ -231,6 +231,8 @@ function streakHTML(){
   +'<div class="mono" style="font-size:10px;color:#6c6f77;margin-top:5px;">最長 '+(s.best||0)+'日 ・ 累計 '+(s.total||0)+'日'+(s.tday===today&&s.tcards?' ・ 今日 '+s.tcards+'枚':'')+'</div></div></div>';
 }
 function miniCards(b){if(!b)return '';var sm={s:['♠','#1a1a18'],h:['♥','#d23b3b'],d:['♦','#3a86d4'],c:['♣','#3a9b54']};var o='';for(var i=0;i+1<b.length;i+=2){var r=b[i],s=b[i+1].toLowerCase();var m=sm[s]||['?','#888'];o+='<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:32px;height:44px;background:#f6f4ee;border-radius:5px;margin-right:5px;line-height:1.05;">'+'<span style="font-size:16px;font-weight:600;color:'+m[1]+';">'+r+'</span><span style="font-size:13px;color:'+m[1]+';">'+m[0]+'</span></span>';}return '<div style="display:flex;margin:2px 0 14px;">'+o+'</div>';}
+function effChip(it){var ef=it.eff||(it.board?'100bb':'');return ef?'<div style="margin:9px 0 1px;"><span class="mono" style="font-size:10px;letter-spacing:1px;color:var(--muted);border:.5px solid rgba(255,255,255,.16);border-radius:5px;padding:2px 7px;">EFF '+ef+'</span></div>':'';}
+function boardBlock(it){return effChip(it)+miniCards(it.board);}
 function hintFor(q){
  if(/%|何割|フォールド|頻度/.test(q))return {ph:"例: 約40%",g:"数字（％）で答える。「約40%」のように。"};
  if(/戦略|c-?bet|CB|サイズ/i.test(q))return {ph:"例: 33%を高頻度 / チェック多め",g:"サイズ＋頻度で答える。「33%を高頻度」「チェック寄り」など。"};
@@ -271,8 +273,9 @@ function renderSession(){
  var it=queue[idx];
  if(it.type==='fill')return renderFill(it);
  var inner;
- if(!flipped){inner='<div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:auto;">'+it.tag+'</div><div style="font-size:21px;line-height:1.55;margin:auto 0;">'+it.q+'</div><div style="margin-top:auto;font-size:12px;color:var(--dim);">タップで答え</div>';}
- else{inner='<div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">'+it.tag+'</div><div style="font-size:14px;line-height:1.5;color:var(--muted);margin-bottom:14px;">'+it.q+'</div><div style="height:.5px;background:rgba(255,255,255,.09);margin-bottom:14px;"></div><div style="font-size:18px;line-height:1.6;color:var(--gold);font-weight:500;">'+it.a+'</div>';}
+ var bb=boardBlock(it);
+ if(!flipped){inner='<div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:auto;">'+it.tag+'</div><div style="margin:auto 0;"><div style="font-size:21px;line-height:1.55;">'+it.q+'</div>'+bb+'</div><div style="margin-top:auto;font-size:12px;color:var(--dim);">タップで答え</div>';}
+ else{inner='<div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">'+it.tag+'</div><div style="font-size:14px;line-height:1.5;color:var(--muted);margin-bottom:4px;">'+it.q+'</div>'+bb+'<div style="height:.5px;background:rgba(255,255,255,.09);margin:14px 0;"></div><div style="font-size:18px;line-height:1.6;color:var(--gold);font-weight:500;">'+it.a+'</div>';}
  root.innerHTML=sessHead()
   +'<div style="flex:1;display:flex;" id="stage"><div class="fcard" id="card" style="flex:1;min-height:280px;">'+inner+'</div></div>'
   +'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 6px 2px;font-size:12px;color:var(--dim);"><span id="hL">&#8592; また</span><span style="color:#46493f;">'+(flipped?'スワイプで採点':'タップでめくる')+'</span><span id="hR">覚えた &#8594;</span></div>';
@@ -304,7 +307,7 @@ function renderFill(it){
   }
  }
  root.innerHTML=sessHead()
-  +'<div style="background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.28);border-radius:12px;padding:12px 14px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;">'+(it.tag==='穴埋め'?'レンジ推定':it.tag)+'</div><div style="font-size:13px;line-height:1.55;color:#dcdee3;">'+it.sc+'</div>'+miniCards(it.board)+'</div>'
+  +'<div style="background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.28);border-radius:12px;padding:12px 14px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;">'+(it.tag==='穴埋め'?'レンジ推定':it.tag)+'</div><div style="font-size:13px;line-height:1.55;color:#dcdee3;">'+it.sc+'</div>'+boardBlock(it)+'</div>'
   +'<div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">'+filledHtml+body+'</div>';
  var ta=document.getElementById('fin');if(ta){ta.value=fInputs[fsi]||'';}
 }
