@@ -127,10 +127,11 @@ var FILLS=[
 {tag:"プリフロ暗記",sc:"オープンして3betされた時の4bet",steps:[{q:"バリュー/ブラフ4betの構成は？",a:"ポラー。バリュー=QQ+/A5o、ブラフ=AJs〜KTsの4マス（+A5s）"}]},
 {tag:"プリフロ暗記",sc:"UTGオープン vs 3bet のディフェンス",steps:[{q:"残すハンドとポケットの扱いは？（EP）",a:"AQs/KQs/一部ポケット。EP同士はローポケも均等コール（相手3betが10s+に寄るため）"}]},
 {tag:"プリフロ暗記",sc:"BTNオープン vs SB 3bet のディフェンス",steps:[{q:"ポケットの扱いは？（LP）",a:"強い順にコール、ローポケはフォールド（相手3betが広い）。3betへのローポケコールしすぎ注意"}]},
-{tag:"フロップCB暗記",sc:"BTN vs BB SRP・Aハイボード",steps:[{q:"c-bet戦略は？",a:"小サイズ高頻度（レンジベット寄り）。Aハイはレンジ優位。※細かい内訳はWizardで要確認"}]},
-{tag:"フロップCB暗記",board:"Kh8c4d",sc:"BTN vs BB SRP・Kハイボード（K84r等）",steps:[{q:"c-bet戦略は？",a:"33%をレンジ全体に（レンジベット）"}]},
-{tag:"フロップCB暗記",board:"9h7c6d",sc:"BTN vs BB SRP・ローコネクト（976r等）",steps:[{q:"c-bet戦略は？",a:"レンジベット不成立。チェック約50%（BBが絡みやすくレンジ優位が薄い）"}]},
-{tag:"フロップCB暗記",sc:"BTN vs BB SRP・ドライ vs ウェット（実測）",steps:[{q:"ドライとウェットでサイズ傾向は？",a:"ドライ＝ポラー化（オーバーベット増）/ ウェット＝チェック多め・控えめ・中間サイズ"}]},
+{tag:"フロップCB暗記",board:"As7h2c",sc:"HJ vs BB SRP・ドライA高 A72r（PFRのCB・実測）",steps:[{q:"c-bet戦略は？",a:"レンジベットではない！チェック47.7%。打つ時は33%主体(42%)。BBにAxがほぼ無く、PFRはマージナル域をチェックバックできる"}]},
+{tag:"フロップCB暗記",board:"Ks7h2c",sc:"HJ vs BB SRP・ドライK高 K72r（PFRのCB・実測）",steps:[{q:"c-bet戦略は？",a:"ほぼ純レンジベット。チェック0.5%。33%主体(57%)＋50%(31%)。BBにKx/Qx継続域がありPFRのレンジ優位が圧倒的"}]},
+{tag:"フロップCB暗記",board:"9s7h6c",sc:"HJ vs BB SRP・ローコネクト 976r（PFRのCB・実測）",steps:[{q:"c-bet戦略は？",a:"チェック47.6%。レンジベット不成立。打つ時は33%(29%)/50%(22%)混合。BBの域が刺さりレンジ優位が薄い"}]},
+{tag:"フロップCB暗記",sc:"HJ vs BB SRP・テクスチャ別チェック頻度（★通説の訂正）",steps:[{q:"K72r / 976r / A72r をチェック頻度の高い順に？",a:"976r・A72r≈48% ＞ 全フロップ平均37% ＞ K72r 0.5%。「Aハイ=レンジベット」は誤り。レンジベットが成立するのはK高ドライ（相手に継続域があり自分のレンジ優位が圧倒的な時）"}]},
+{tag:"フロップCB暗記",sc:"HJ vs BB SRP・サイズの実測傾向（全フロップ平均）",steps:[{q:"全フロップ平均のCB構成は？",a:"チェック37% / 33%ベット31% / 50%17% / 76%12% / オーバーベット4%。33%が最頻だがサイズは分散。SRPでオーバーベットは稀"}]},
 {tag:"フロップCB暗記",board:"As7h3d",sc:"3betポット・Aハイボード（A73等）",steps:[{q:"c-bet戦略は？",a:"20%を広く（A73等セカンドが低いとチェック半分）"}]},
 {tag:"フロップCB暗記",sc:"3betポット・Kハイボード",steps:[{q:"c-bet戦略は？",a:"33%をレンジ全体"}]},
 {tag:"フロップCB暗記",sc:"3betポット・10ハイ以下（ダイナミック）",steps:[{q:"c-bet戦略は？",a:"75%をポラーで＋チェック半分"}]},
@@ -281,7 +282,7 @@ function renderFill(it){
   }
  }
  root.innerHTML=sessHead()
-  +'<div style="background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.28);border-radius:12px;padding:12px 14px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;">レンジ推定</div><div style="font-size:13px;line-height:1.55;color:#dcdee3;">'+it.sc+'</div>'+miniCards(it.board)+'</div>'
+  +'<div style="background:rgba(201,162,39,.07);border:.5px solid rgba(201,162,39,.28);border-radius:12px;padding:12px 14px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;">'+(it.tag==='穴埋め'?'レンジ推定':it.tag)+'</div><div style="font-size:13px;line-height:1.55;color:#dcdee3;">'+it.sc+'</div>'+miniCards(it.board)+'</div>'
   +'<div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">'+filledHtml+body+'</div>';
  var ta=document.getElementById('fin');if(ta){ta.value=fInputs[fsi]||'';}
 }
