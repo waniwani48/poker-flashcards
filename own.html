@@ -137,7 +137,22 @@ var FILLS=[
 {tag:"フロップCB暗記",board:"As7h3d",sc:"3betポット・Aハイボード（A73等）",steps:[{q:"c-bet戦略は？",a:"20%を広く（A73等セカンドが低いとチェック半分）"}]},
 {tag:"フロップCB暗記",sc:"3betポット・Kハイボード",steps:[{q:"c-bet戦略は？",a:"33%をレンジ全体"}]},
 {tag:"フロップCB暗記",sc:"3betポット・10ハイ以下（ダイナミック）",steps:[{q:"c-bet戦略は？",a:"75%をポラーで＋チェック半分"}]},
-{tag:"フロップCB暗記",sc:"ナッツ優位ボード（AK5等）",steps:[{q:"c-bet戦略は？",a:"ポラー大サイズ（125%、ジオメトリック）。ブラフはブロッカー重視"}]}
+{tag:"フロップCB暗記",sc:"ナッツ優位ボード（AK5等）",steps:[{q:"c-bet戦略は？",a:"ポラー大サイズ（125%、ジオメトリック）。ブラフはブロッカー重視"}]},
+{tag:"3betCB暗記",sc:"BB3bp（BBが3bet→originalがcall）・BBの3betの構造",steps:[{q:"4群に分けると？",a:"①Value ②スーコネ(54s〜JTs・全ポジでbluff候補) ③オフスートbluff ④スートbluff。強い順ではなくpolar"}]},
+{tag:"3betCB暗記",sc:"BB3bp・Value 3betのpocket下限（ポジ別）",steps:[{q:"BTN/CO/HJ/UTGのpocket下限は？",a:"BTN TT+ / CO JJ+ / HJ QQ+ / UTG QQ境界。広い相手ほど薄く3betできる"}]},
+{tag:"3betCB暗記",sc:"BB3bp・スートbluffの選び方（抜けやすい）",steps:[{q:"自分のcall下限？相手のopen下限？",a:"相手のopen下限をbluff。vsLP=Qlow s、vsEP=Alow/Klow s〜QJs/QTs。EPはopen小でcallはoddsで広がるが、3betは相手に拮抗するハンドを選ぶ（弱ければ良いではない）"}]},
+{tag:"3betCB暗記",sc:"BB3bp・オフスートbluffのEP/LP差",steps:[{q:"vsLPとvsEPでどう違う？",a:"vsLP=callするオフスートは基本3bet候補(K9o等) / vsEP=KQo〜KTo・ATo以下の一部。EP相手のbluffはA/K heavyになる"}]},
+{tag:"3betCB暗記",sc:"BB3bp・Caller(IP)のpocket上限",steps:[{q:"BTN/CO/HJ/UTGのcallメインpocket上限は？",a:"BTN 88-99(TT) / CO TT-JJ / HJ JJ-QQ / UTG JJ-QQ(KK)。これがshirkランクの基準になる"}]},
+{tag:"3betCB暗記",board:"As7s2d",sc:"BB3bp・Aハイボードの基本CB",steps:[{q:"サイズ・頻度は？vsBTNとvsEPの差は？",a:"20% or AKpolar。vsBTN約50%・vsEP約60%頻度。Aハイでもラフに打たずpolar。AK/QQ+のレンジ優位を活かす"}]},
+{tag:"3betCB暗記",board:"Kh7c2d",sc:"BB3bp・Kハイボードの基本CB",steps:[{q:"なぜ別格に高頻度？サイズは？",a:"全ボードで別格に高頻度・全サイズ20〜75%(稀125%)。IPのAハイindifferentをprotectionで取りに行ける。range betに近いことも。特にvsEPで高頻度"}]},
+{tag:"3betCB暗記",board:"Js7s2d",sc:"BB3bp・Qハイ以下ボードの基本CB",steps:[{q:"なぜpolar？サイズは？",a:"polar 50〜75%。3bettorがQQ+/KK等の支配的overpairを持つため。3betポットは約12bbで50%betがgeometric"}]},
+{tag:"3betCB暗記",sc:"BB3bp・shirk（回避ランク）とは",steps:[{q:"どこがshirk？CBへの影響は？",a:"callerのpocket上限付近のランク=IP有利=shirk。『2shirk+overcard』または『3shirk』のボードでCB頻度が壊滅（基本レンジチェック）"}]},
+{tag:"3betCB暗記",sc:"BB3bp・shirkは位置でどう動く",steps:[{q:"vsBTNとvsUTGでCBが壊滅するボードは？",a:"shirkランクは位置で上昇。vsBTN=A98/A87で壊滅、vsUTG=AQJ/AJTで壊滅。位置に応じてきれいにshiftする"}]},
+{tag:"3betCB暗記",board:"As9h8h",sc:"BB3bp・A98 vs BTN を20%で打つのは正しい？",steps:[{q:"正しい？",a:"NG。A98 vs BTNはshirk該当でCB頻度ほぼ0＝レンジチェックが正解。smallを打つと『BB3わかってない』と読まれる。※同じA98でもvsUTGは標準的に打つ"}]},
+{tag:"3betCB暗記",sc:"BB3bp・なぜAKhi monotoneでoverbet？（urgency）",steps:[{q:"理由は？",a:"BB3のsuitedはAXs/KXs中心→AK同色がblockerでcallerにフラッシュ激減。Flush completeを恐れず、urgency優先でpot over polar。実質フラドロボード"}]},
+{tag:"3betCB暗記",sc:"BB3bp・monotoneのhicard別サイズ",steps:[{q:"Ahi/Khi/Qhi-のサイズは？",a:"Ahi=urgencyあり75/125・なし20 or check / Khi=高頻度small+低頻度75% / Qhi-=低頻度20〜50%。SRPの『低頻度smallだけ』とは別物"}]},
+{tag:"3betCB暗記",sc:"BB3bp・CB思考のフローチャート",steps:[{q:"3ステップは？",a:"STEP1 shirk判定(2shirk+overcard/3shirk→レンジチェック) → STEP2 monotone判定 → STEP3 hicard分類(Ahi 20%/AKpolar・Khi 20-75%・Qhi- 50-75%polar)"}]},
+{tag:"3betCB暗記",sc:"★SRP と BB3bp のCB基調の違い",steps:[{q:"BTN vs BBで両者どう違う？",a:"SRP=低頻度small基調（チェック約51%・Wizard実測）。BB3bp=polar基調でAハイでもラフsmall打たずAK polar。3betポットはレンジ優位/ナッツ優位がボード毎に繊細に動く"}]}
 ];
 function cid(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return 'c'+(h>>>0).toString(36);}
 CARDS.forEach(function(c){c.type='card';c.id=cid(c.q);});
@@ -161,10 +176,10 @@ function markDay(n){var s=loadStreak();var today=tstr();
  }
  saveStreak(s);return s;}
 var prog=load(),t=tstr(),mode=localStorage.getItem('pokerMode')||'all';
-function catOf(it){if(it.type==='fill'){if(it.tag==='プリフロ暗記')return 'プリフロップ';if(it.tag==='フロップCB暗記')return 'フロップ';return '穴埋め・実戦';}var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='スポット')return 'スポット';return 'その他';}
-var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','ターン','スポット','穴埋め・実戦'];
+function catOf(it){if(it.type==='fill'){if(it.tag==='プリフロ暗記')return 'プリフロップ';if(it.tag==='フロップCB暗記')return 'フロップ';if(it.tag==='3betCB暗記')return '3betポット';return '穴埋め・実戦';}var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='スポット')return 'スポット';return 'その他';}
+var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','3betポット','ターン','スポット','穴埋め・実戦'];
 function mastery(){var m={};CATORDER.forEach(function(c){m[c]={s:0,n:0};});ALL.forEach(function(it){var c=catOf(it);if(!m[c])return;var r=prog[it.id];m[c].s+=(r?r.box:0);m[c].n++;});var out=[];CATORDER.forEach(function(c){if(m[c].n)out.push({k:c,v:Math.round(m[c].s/(m[c].n*5)*100)});});return out;}
-function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.filter(function(f){return f.tag==='穴埋め';});if(mode==='pre')return FILLS.filter(function(f){return f.tag==='プリフロ暗記';});if(mode==='cb')return FILLS.filter(function(f){return f.tag==='フロップCB暗記';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
+function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.filter(function(f){return f.tag==='穴埋め';});if(mode==='pre')return FILLS.filter(function(f){return f.tag==='プリフロ暗記';});if(mode==='cb')return FILLS.filter(function(f){return f.tag==='フロップCB暗記';});if(mode==='3bet')return FILLS.filter(function(f){return f.tag==='3betCB暗記';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
 var view='home',queue=[],idx=0,flipped=false,fsi=0,fRevealed=false,fInputs={},fGrades={};
 var root=document.getElementById('root');
 function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;fsi=0;fRevealed=false;fInputs={};fGrades={};}
@@ -230,7 +245,7 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
 function next(){if(idx>=queue.length){justDone=true;markDay(queue.length);view='home';renderHome();}else{renderSession();}}
 function renderHome(){
  var ms=mastery();var avg=ms.length?Math.round(ms.reduce(function(s,d){return s+d.v;},0)/ms.length):0;
- var modes=[['all','すべて'],['memo','暗記'],['pre','プリフロ'],['cb','フロップCB'],['fill','レンジ推定'],['spot','スポット']];
+ var modes=[['all','すべて'],['memo','暗記'],['pre','プリフロ'],['cb','フロップCB(SRP)'],['3bet','3betポット'],['fill','レンジ推定'],['spot','スポット']];
  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">'
   +'<span class="wm">OWN</span><span class="mono" style="font-size:11px;color:var(--muted);letter-spacing:1px;">SKILL MAP</span></div>'
   +praiseHTML()
