@@ -145,6 +145,18 @@ function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){r
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
 function tstr(){return new Date().toISOString().slice(0,10);}
 function addD(n){var d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+var SKEY='pokerStreak_v1';
+function loadStreak(){try{return JSON.parse(localStorage.getItem(SKEY))||{streak:0,best:0,total:0,last:'',tday:'',tcards:0};}catch(e){return {streak:0,best:0,total:0,last:'',tday:'',tcards:0};}}
+function saveStreak(s){try{localStorage.setItem(SKEY,JSON.stringify(s));}catch(e){}}
+// セッション完了時：その日の学習を記録し連続日数を更新。解いた枚数nを今日分に加算。
+function markDay(n){var s=loadStreak();var today=tstr();
+ if(s.tday!==today){s.tday=today;s.tcards=0;}
+ s.tcards+=(n||0);
+ if(s.last!==today){
+  if(s.last===addD(-1))s.streak=(s.streak||0)+1; else s.streak=1;
+  s.last=today;s.total=(s.total||0)+1;s.best=Math.max(s.best||0,s.streak);
+ }
+ saveStreak(s);return s;}
 var prog=load(),t=tstr(),mode=localStorage.getItem('pokerMode')||'all';
 function catOf(it){if(it.type==='fill'){if(it.tag==='プリフロ暗記')return 'プリフロップ';if(it.tag==='フロップCB暗記')return 'フロップ';return '穴埋め・実戦';}var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='スポット')return 'スポット';return 'その他';}
 var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','ターン','スポット','穴埋め・実戦'];
@@ -176,6 +188,25 @@ function praiseHTML(){
  else{var sc={};sessAgain.forEach(function(it){var c=catOf(it);sc[c]=(sc[c]||0)+1;});var top=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];})[0];msg=n<=2?('悪くない。あと '+top+' のレンジだけ、もう一度詰めておけ。'):('まだ粗い。'+top+' のレンジがちゃんと見えてない。そこを重点的にやれ。');col='#e8917a';}
  return '<div style="background:rgba(201,162,39,.08);border:.5px solid rgba(201,162,39,.3);border-radius:12px;padding:14px 16px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:'+col+';text-transform:uppercase;margin-bottom:6px;">Hungry Horse</div><div style="font-size:14px;line-height:1.6;color:#ECEAE3;font-family:var(--serif);">'+msg+'</div></div>';
 }
+function streakHTML(){
+ var s=loadStreak();var today=tstr();var active=s.last===today;var d=s.streak||0;
+ var pips='';for(var i=6;i>=0;i--){var day=addD(-i);var on=(day<=s.last&&day>=addD(-(d-1)))&&d>0;pips+='<span style="width:9px;height:9px;border-radius:50%;background:'+(on?'var(--gold)':'rgba(255,255,255,.10)')+';"></span>';}
+ var msg;
+ if(active){
+  if(d>=30)msg=d+'日連続。もう習慣だ。';
+  else if(d>=7)msg=d+'日連続。エッジが積み上がってる。';
+  else if(d>=2)msg=d+'日連続。この火を絶やすな。';
+  else msg='今日から積み上げ直しだ。明日も来い。';
+ }else{
+  if(d>=1)msg='今日やれば '+(d+1)+'日連続。途切れさせるな。';
+  else msg='今日の1セッションで火を点けろ。';
+ }
+ var flame=active?'🔥':'<span style="filter:grayscale(1);opacity:.4;">🔥</span>';
+ return '<div style="display:flex;align-items:center;gap:13px;background:var(--surf);border:.5px solid rgba(201,162,39,.18);border-radius:13px;padding:13px 15px;margin-bottom:16px;">'
+  +'<div style="display:flex;flex-direction:column;align-items:center;line-height:1;flex:0 0 auto;"><span style="font-size:22px;">'+flame+'</span><span class="mono" style="font-size:24px;font-weight:600;color:'+(active?'var(--gold)':'var(--muted)')+';margin-top:2px;">'+d+'</span><span style="font-size:9px;letter-spacing:1px;color:var(--muted);margin-top:1px;">DAY STREAK</span></div>'
+  +'<div style="flex:1;"><div style="display:flex;gap:5px;margin-bottom:7px;">'+pips+'</div><div style="font-size:12px;line-height:1.45;color:#dcdee3;">'+msg+'</div>'
+  +'<div class="mono" style="font-size:10px;color:#6c6f77;margin-top:5px;">最長 '+(s.best||0)+'日 ・ 累計 '+(s.total||0)+'日'+(s.tday===today&&s.tcards?' ・ 今日 '+s.tcards+'枚':'')+'</div></div></div>';
+}
 function miniCards(b){if(!b)return '';var sm={s:['♠','#1a1a18'],h:['♥','#d23b3b'],d:['♦','#3a86d4'],c:['♣','#3a9b54']};var o='';for(var i=0;i+1<b.length;i+=2){var r=b[i],s=b[i+1].toLowerCase();var m=sm[s]||['?','#888'];o+='<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:32px;height:44px;background:#f6f4ee;border-radius:5px;margin-right:5px;line-height:1.05;">'+'<span style="font-size:16px;font-weight:600;color:'+m[1]+';">'+r+'</span><span style="font-size:13px;color:'+m[1]+';">'+m[0]+'</span></span>';}return '<div style="display:flex;margin:2px 0 14px;">'+o+'</div>';}
 function hintFor(q){
  if(/%|何割|フォールド|頻度/.test(q))return {ph:"例: 約40%",g:"数字（％）で答える。「約40%」のように。"};
@@ -193,13 +224,14 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  fdone:function(good){var it=queue[idx];grade(it,good);prog[it.id].last=it.steps.map(function(s,i){return {q:s.q,input:fInputs[i]||'',a:s.a,g:fGrades[i]||''};});save(prog);idx++;fsi=0;fRevealed=false;fInputs={};fGrades={};next();},
  reset:function(){if(confirm('進捗をリセットしますか？')){prog={};save(prog);renderHome();}},
  exportData:function(){var d={at:tstr(),progress:prog,cards:ALL.map(function(it){return {id:it.id,cat:catOf(it),q:it.type==='fill'?it.sc:it.q};})};var s=JSON.stringify(d);var ta=document.createElement('textarea');ta.value=s;ta.style.cssText='position:absolute;left:-9999px;';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);alert('分析データをコピーしました。Claudeのチャットに貼り付けて「これ分析して」と送ってください。');}};
-function next(){if(idx>=queue.length){justDone=true;view='home';renderHome();}else{renderSession();}}
+function next(){if(idx>=queue.length){justDone=true;markDay(queue.length);view='home';renderHome();}else{renderSession();}}
 function renderHome(){
  var ms=mastery();var avg=ms.length?Math.round(ms.reduce(function(s,d){return s+d.v;},0)/ms.length):0;
  var modes=[['all','すべて'],['memo','暗記'],['pre','プリフロ'],['cb','フロップCB'],['fill','レンジ推定'],['spot','スポット']];
  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">'
   +'<span class="wm">OWN</span><span class="mono" style="font-size:11px;color:var(--muted);letter-spacing:1px;">SKILL MAP</span></div>'
   +praiseHTML()
+  +streakHTML()
   +'<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px;"><span class="mono" style="font-size:46px;font-weight:500;color:var(--gold);line-height:1;">'+avg+'%</span><span style="font-size:13px;color:var(--muted);">今日の到達</span></div>'
   +'<p style="font-size:12.5px;color:var(--dim);margin:6px 0 20px;font-family:var(--serif);font-style:italic;">'+pick(SUBS)+'</p>'
   +'<div style="flex:1;">';
