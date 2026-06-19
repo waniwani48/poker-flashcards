@@ -23,8 +23,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,system-ui,"Hiragino Sans",sans
 .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 .chip{flex:1 1 28%;padding:9px 4px;font-size:12px;letter-spacing:.5px;border-radius:10px;border:0.5px solid rgba(255,255,255,.1);background:transparent;color:var(--muted);font-family:inherit;}
 .chip.on{background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.4);color:var(--gold);}
-.fcard{background:var(--surf);border:0.5px solid rgba(255,255,255,.07);border-radius:20px;padding:26px 22px;display:flex;flex-direction:column;cursor:pointer;will-change:transform;}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+.fcard{background:var(--surf);border:0.5px solid rgba(255,255,255,.07);border-radius:20px;padding:26px 22px;display:flex;flex-direction:column;cursor:pointer;will-change:transform;touch-action:pan-y;-webkit-tap-highlight-color:transparent;user-select:none;animation:cardin .26s cubic-bezier(.2,.8,.2,1);}
+.fcard:active{transform:scale(.985);}
+@keyframes cardin{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:none;}}
+.gbtn{flex:1;padding:16px;font-size:15px;font-weight:600;border-radius:14px;font-family:inherit;border:none;transition:transform .1s;}
+.gbtn:active{transform:scale(.95);}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
 </style>
 </head>
 <body>
@@ -282,8 +286,8 @@ function judgeHtml(i){
 }
 window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}sessAgain=[];view='session';renderSession();},
  home:function(){view='home';renderHome();},
- flip:function(){flipped=true;renderSession();},
- swipe:function(good){var it=queue[idx];grade(it,good);idx++;flipped=false;next();},
+ flip:function(){buzz(8);flipped=true;renderSession();},
+ swipe:function(good){buzz(good?14:[6,40,6]);var it=queue[idx];grade(it,good);idx++;flipped=false;next();},
  fins:function(t){var ta=document.getElementById('fin');if(!ta)return;if(t==='削除'){ta.value=ta.value.replace(/\s*[^\s,]+[,\s]*$|.$/,'');}else{ta.value+=t;}fInputs[fsi]=ta.value;ta.focus();},
  chipTab:function(n){var ta=document.getElementById('fin');if(ta)fInputs[fsi]=ta.value;chipTab=n;renderSession();},
  setKey:function(){var cur=getKey();var k=prompt(cur?'APIキーは保存済み。変更する場合のみ新しいキーを入力（空でクリア）':'Anthropic APIキーを貼り付け（端末内localStorageのみに保存、外部送信なし）','');if(k===null)return;k=k.trim();try{if(k)localStorage.setItem(AKEY,k);else if(k==='')localStorage.removeItem(AKEY);}catch(e){}renderHome();},
@@ -328,18 +332,27 @@ function renderSession(){
  var bb=boardBlock(it);
  if(!flipped){inner='<div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:auto;">'+it.tag+'</div><div style="margin:auto 0;"><div style="font-size:21px;line-height:1.55;">'+it.q+'</div>'+bb+'</div><div style="margin-top:auto;font-size:12px;color:var(--dim);">タップで答え</div>';}
  else{inner='<div style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">'+it.tag+'</div><div style="font-size:14px;line-height:1.5;color:var(--muted);margin-bottom:4px;">'+it.q+'</div>'+bb+'<div style="height:.5px;background:rgba(255,255,255,.09);margin:14px 0;"></div><div style="font-size:18px;line-height:1.6;color:var(--gold);font-weight:500;">'+it.a+'</div>';}
+ var footer;
+ if(flipped){footer='<div style="display:flex;gap:11px;padding:14px 0 2px;"><button class="gbtn" id="hL" style="background:rgba(217,96,63,.16);color:#e8917a;" onclick="OWN.swipe(false)">✗ また</button><button class="gbtn" id="hR" style="background:rgba(58,160,136,.18);color:#5fc3a8;" onclick="OWN.swipe(true)">◎ 覚えた</button></div>';}
+ else{footer='<div style="padding:16px 0 4px;text-align:center;"><span style="font-size:12.5px;color:var(--muted);">カードをタップ → 答えを表示</span></div>';}
  root.innerHTML=sessHead()
   +'<div style="flex:1;display:flex;" id="stage"><div class="fcard" id="card" style="flex:1;min-height:280px;">'+inner+'</div></div>'
-  +'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 6px 2px;font-size:12px;color:var(--dim);"><span id="hL">&#8592; また</span><span style="color:#46493f;">'+(flipped?'スワイプで採点':'タップでめくる')+'</span><span id="hR">覚えた &#8594;</span></div>';
+  +footer;
  bindSwipe(it);
 }
+function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
 function bindSwipe(it){
  var card=document.getElementById('card');var hL=document.getElementById('hL'),hR=document.getElementById('hR');
- var drag=false,sx=0,dx=0;
- card.addEventListener('click',function(){if(drag||Math.abs(dx)>5)return;if(!flipped){OWN.flip();}});
- card.addEventListener('pointerdown',function(e){if(!flipped)return;drag=true;sx=e.clientX;card.style.transition='';try{card.setPointerCapture(e.pointerId);}catch(x){}});
- card.addEventListener('pointermove',function(e){if(!drag)return;dx=e.clientX-sx;card.style.transform='translateX('+dx+'px) rotate('+(dx*.04)+'deg)';if(hL)hL.style.color=dx<-30?'#e8917a':'#5a5d65';if(hR)hR.style.color=dx>30?'#5fc3a8':'#5a5d65';});
- card.addEventListener('pointerup',function(e){if(!drag)return;drag=false;if(Math.abs(dx)>85){card.style.transition='transform .24s,opacity .24s';card.style.transform='translateX('+(dx>0?460:-460)+'px) rotate('+(dx>0?12:-12)+'deg)';card.style.opacity='0';var g=dx>0;setTimeout(function(){OWN.swipe(g);},220);}else{card.style.transition='transform .2s';card.style.transform='';}dx=0;});
+ var drag=false,sx=0,sy=0,dx=0,lock=null,TH=64;
+ function down(x,y){if(!flipped)return;drag=true;sx=x;sy=y;dx=0;lock=null;card.style.transition='';}
+ function move(x,y){if(!drag)return;var ddx=x-sx,ddy=y-sy;if(lock===null){if(Math.abs(ddx)>8||Math.abs(ddy)>8)lock=Math.abs(ddx)>Math.abs(ddy)?'h':'v';}
+  if(lock!=='h')return;dx=ddx;card.style.transform='translateX('+dx+'px) rotate('+(dx*.045)+'deg)';card.style.opacity=(1-Math.min(Math.abs(dx)/480,.55))+'';
+  if(hR)hR.style.boxShadow=dx>30?'0 0 0 2px rgba(95,195,168,.6) inset':'none';if(hL)hL.style.boxShadow=dx<-30?'0 0 0 2px rgba(232,145,122,.6) inset':'none';}
+ function up(){if(!drag)return;drag=false;if(lock==='h'&&Math.abs(dx)>TH){var g=dx>0;card.style.transition='transform .22s ease-out,opacity .22s';card.style.transform='translateX('+(g?520:-520)+'px) rotate('+(g?14:-14)+'deg)';card.style.opacity='0';setTimeout(function(){OWN.swipe(g);},190);}else{card.style.transition='transform .2s,opacity .2s';card.style.transform='';card.style.opacity='1';if(hL)hL.style.boxShadow='none';if(hR)hR.style.boxShadow='none';}dx=0;lock=null;}
+ card.addEventListener('click',function(){if(drag||Math.abs(dx)>6)return;if(!flipped)OWN.flip();});
+ card.addEventListener('pointerdown',function(e){down(e.clientX,e.clientY);try{card.setPointerCapture(e.pointerId);}catch(x){}});
+ card.addEventListener('pointermove',function(e){move(e.clientX,e.clientY);});
+ card.addEventListener('pointerup',up);card.addEventListener('pointercancel',up);
 }
 function renderFill(it){
  var done=fsi>=it.steps.length;
