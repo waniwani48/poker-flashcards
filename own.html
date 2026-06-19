@@ -189,9 +189,9 @@ function catOf(it){if(it.type==='fill'){if(it.tag==='プリフロ暗記')return 
 var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','3betポット','ターン','スポット','穴埋め・実戦'];
 function mastery(){var m={};CATORDER.forEach(function(c){m[c]={s:0,n:0};});ALL.forEach(function(it){var c=catOf(it);if(!m[c])return;var r=prog[it.id];m[c].s+=(r?r.box:0);m[c].n++;});var out=[];CATORDER.forEach(function(c){if(m[c].n)out.push({k:c,v:Math.round(m[c].s/(m[c].n*5)*100)});});return out;}
 function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.filter(function(f){return f.tag==='穴埋め';});if(mode==='pre')return FILLS.filter(function(f){return f.tag==='プリフロ暗記';});if(mode==='cb')return FILLS.filter(function(f){return f.tag==='フロップCB暗記';});if(mode==='3bet')return FILLS.filter(function(f){return f.tag==='3betCB暗記';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
-var view='home',queue=[],idx=0,flipped=false,fsi=0,fRevealed=false,fInputs={},fGrades={};
+var view='home',queue=[],idx=0,flipped=false,fsi=0,fRevealed=false,fInputs={},fGrades={},chipTab=0;
 var root=document.getElementById('root');
-function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;fsi=0;fRevealed=false;fInputs={};fGrades={};}
+function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;fsi=0;fRevealed=false;fInputs={};fGrades={};judgeRes={};chipTab=0;}
 function setMode(m){mode=m;localStorage.setItem('pokerMode',m);renderHome();}
 var sessAgain=[];
 function grade(it,good){var r=prog[it.id]||{box:1};var box=r.box||1;box=good?Math.min(box+1,5):1;prog[it.id]={box:box,due:addD(IV[box]),seen:(r.seen||0)+1,again:(r.again||0)+(good?0:1)};save(prog);if(!good)sessAgain.push(it);}
@@ -213,7 +213,7 @@ function praiseHTML(){
  var n=sessAgain.length,msg,col;
  if(n===0){msg=pick(PRAISE);col='var(--gold)';}
  else{var sc={};sessAgain.forEach(function(it){var c=catOf(it);sc[c]=(sc[c]||0)+1;});var top=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];})[0];msg=n<=2?('悪くない。あと '+top+' のレンジだけ、もう一度詰めておけ。'):('まだ粗い。'+top+' のレンジがちゃんと見えてない。そこを重点的にやれ。');col='#e8917a';}
- return '<div style="background:rgba(201,162,39,.08);border:.5px solid rgba(201,162,39,.3);border-radius:12px;padding:14px 16px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:'+col+';text-transform:uppercase;margin-bottom:6px;">Hungry Horse</div><div style="font-size:14px;line-height:1.6;color:#ECEAE3;font-family:var(--serif);">'+msg+'</div></div>';
+ return '<div style="background:rgba(201,162,39,.08);border:.5px solid rgba(201,162,39,.3);border-radius:12px;padding:14px 16px;margin-bottom:16px;"><div style="font-size:10px;letter-spacing:2px;color:'+col+';text-transform:uppercase;margin-bottom:6px;">鉄強からのありがたいお言葉</div><div style="font-size:14px;line-height:1.6;color:#ECEAE3;font-family:var(--serif);">'+msg+'</div></div>';
 }
 function streakHTML(){
  var s=loadStreak();var today=tstr();var active=s.last===today;var d=s.streak||0;
@@ -228,7 +228,8 @@ function streakHTML(){
   if(d>=1)msg='今日やれば '+(d+1)+'日連続。途切れさせるな。';
   else msg='今日の1セッションで火を点けろ。';
  }
- var flame=active?'🔥':'<span style="filter:grayscale(1);opacity:.4;">🔥</span>';
+ var fst='';if(!active){fst='filter:grayscale(1);opacity:.4;';}else if(d>=30){fst='filter:hue-rotate(180deg) saturate(1.6) drop-shadow(0 0 9px #4aa3ff);font-size:30px;';}else if(d>=14){fst='filter:hue-rotate(120deg) saturate(1.4) drop-shadow(0 0 7px #46d6c0);font-size:28px;';}else if(d>=7){fst='filter:hue-rotate(-12deg) saturate(1.5) drop-shadow(0 0 6px #ffb13a);font-size:27px;';}else if(d>=3){fst='filter:drop-shadow(0 0 4px #ff7a2a);font-size:25px;';}
+ var flame='<span style="'+fst+'">🔥</span>'+(active&&d>=14?'<span style="'+fst+'margin-left:-3px;">🔥</span>':'');
  return '<div style="display:flex;align-items:center;gap:13px;background:var(--surf);border:.5px solid rgba(201,162,39,.18);border-radius:13px;padding:13px 15px;margin-bottom:16px;">'
   +'<div style="display:flex;flex-direction:column;align-items:center;line-height:1;flex:0 0 auto;"><span style="font-size:22px;">'+flame+'</span><span class="mono" style="font-size:24px;font-weight:600;color:'+(active?'var(--gold)':'var(--muted)')+';margin-top:2px;">'+d+'</span><span style="font-size:9px;letter-spacing:1px;color:var(--muted);margin-top:1px;">DAY STREAK</span></div>'
   +'<div style="flex:1;"><div style="display:flex;gap:5px;margin-bottom:7px;">'+pips+'</div><div style="font-size:12px;line-height:1.45;color:#dcdee3;">'+msg+'</div>'
@@ -240,26 +241,57 @@ function boardBlock(it){return effChip(it)+miniCards(it.board);}
 function hintFor(q){
  if(/%|何割|フォールド|頻度/.test(q))return {ph:"例: 約40%",g:"数字（％）で答える。「約40%」のように。"};
  if(/戦略|c-?bet|CB|サイズ/i.test(q))return {ph:"例: 33%を高頻度 / チェック多め",g:"サイズ＋頻度で答える。「33%を高頻度」「チェック寄り」など。"};
- if(/完成|進展|影響|2ペア|ストレート|フラッシュ/.test(q))return {ph:"例: KTs=2ペア, T9s=ストレート",g:"具体的な手＝役で答える。「KTs=2ペア」のように。"};
- if(/構成|バリュー|ブラフ|ポラー/.test(q))return {ph:"例: バリュー=QQ+/ATo、ブラフ=Jローs",g:"バリューとブラフに分けてハンドを書く。"};
- return {ph:"例: ATo+, KJs+, 88+, AQs",g:"ハンドで答える。「ATo+」「KJs+」「88+」のように。+は「以上」。"};
+ if(/完成|進展|影響|2ペア|ストレート|フラッシュ/.test(q))return {ph:"具体的な手＝役で（タップ/入力）",g:"具体的な手＝役で答える（例: ○○=2ペア の形）。"};
+ if(/構成|バリュー|ブラフ|ポラー/.test(q))return {ph:"バリューとブラフを分けて書く",g:"バリューとブラフに分けてハンドを書く。"};
+ return {ph:"ハンドをタップ/入力（+は以上）",g:"ハンドで答える。タブからランク→s/o/+で組み立て。+は「以上」。"};
 }
 function chipsFor(q){
- var hands=['A','K','Q','J','T','9','8','+','s','o','/',' ','ATo+','KJs+','88+','QQ+','削除'];
- if(/戦略|c-?bet|CB|サイズ/i.test(q))return ['チェック','レンジベット','ポラー','20%','33%','50%','75%','OB125%','高頻度','主体','＋','削除'];
- if(/構成|バリュー|ブラフ|ポラー/i.test(q))return ['バリュー=','ブラフ=','QQ+','AK','AQ','A5s','SC','Axロー','Kローs','/','削除'];
- if(/下限|残る|レンジ|ポケット|ハンド/.test(q))return ['レイズ','約','%','、'].concat(hands);
- if(/%|何割|フォールド|頻度/.test(q))return ['チェック','レンジベット','約','20%','33%','50%','75%','125%','高頻度','低頻度','削除'];
- return hands;
+ var sep={l:'記号',c:['、',' ','/','+','削除']};
+ var ranksHi={l:'A–T',c:['A','K','Q','J','T']};
+ var ranksLo={l:'9–2',c:['9','8','7','6','5','4','3','2']};
+ var type={l:'型',c:['s','o','+']};
+ if(/戦略|c-?bet|CB|サイズ/i.test(q))return [{l:'頻度',c:['チェック','レンジベット','ポラー','高頻度','主体']},{l:'サイズ',c:['20%','33%','50%','75%','OB125%']},sep];
+ if(/構成|バリュー|ブラフ|ポラー/i.test(q))return [{l:'区分',c:['バリュー=','ブラフ=']},{l:'ハンド',c:['QQ+','AK','AQ','A5s','SC','Axロー','Kローs']},sep];
+ if(/下限|残る|レンジ|ポケット|ハンド/.test(q))return [ranksHi,ranksLo,type,{l:'頻度',c:['レイズ','約','%','チェック']},sep];
+ if(/%|何割|フォールド|頻度/.test(q))return [{l:'頻度',c:['チェック','レンジベット','高頻度','低頻度']},{l:'サイズ',c:['約','20%','33%','50%','75%','125%']},sep];
+ return [ranksHi,ranksLo,type,sep];
+}
+var AKEY='pokerApiKey',AMODEL='pokerJudgeModel';
+function getKey(){try{return localStorage.getItem(AKEY)||'';}catch(e){return '';}}
+function getModel(){try{return localStorage.getItem(AMODEL)||'claude-opus-4-8';}catch(e){return 'claude-opus-4-8';}}
+var judgeRes={};
+var JUDGE_SYS='あなたはポーカーGTOの辛口コーチ（Hungry Horse風）。学習者が書いた「レンジ言語化」の答えを模範解答と照らして細かい粒度で判定する。評価軸=①自分と相手のレンジの把握 ②アクション/カードでのレンジ変化 ③サイズと頻度の妥当性。役の強弱でなく「レンジで考えられているか」を見る。日本語で短く鋭く。表記ゆれは寛容に、内容は甘くしない。模範解答に無くても妥当な指摘は評価する。';
+var JUDGE_SCHEMA={type:'object',properties:{grade:{type:'string',enum:['◎','△','✗']},verdict:{type:'string'},good:{type:'string'},miss:{type:'string'}},required:['grade','verdict','good','miss'],additionalProperties:false};
+async function judgeAnswer(it,step,i){
+ var key=getKey();if(!key)return {error:'NO_KEY'};
+ var prompt='【状況】'+it.sc+'\n【質問】'+step.q+'\n【模範解答】'+step.a+'\n【学習者の答え】'+(fInputs[i]||'（空欄）')+'\n\nこの答えを判定して。verdictは20字程度の一言、goodは合っている点、missは抜け/ズレと直し方。';
+ try{
+  var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:getModel(),max_tokens:900,system:JUDGE_SYS,messages:[{role:'user',content:prompt}],output_config:{format:{type:'json_schema',schema:JUDGE_SCHEMA}}})});
+  if(!r.ok){return {error:r.status===401?'BAD_KEY':('HTTP '+r.status)};}
+  var j=await r.json();var txt=(j.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
+  return JSON.parse(txt);
+ }catch(e){return {error:'NET'};}
+}
+function judgeHtml(i){
+ var res=judgeRes[i];
+ if(!getKey())return '<div style="margin:14px 0 0;font-size:11.5px;color:#85888f;background:rgba(255,255,255,.03);border-radius:8px;padding:9px 11px;">🤖 <b style="color:#a8abb2;">ホームの⚙設定でAPIキー</b>を入れると、Claudeが答えを細かく判定します（自己採点はそのまま使えます）</div>';
+ if(res&&res.loading)return '<div style="margin:14px 0 0;font-size:13px;color:var(--gold);text-align:center;padding:10px;">🤖 Claudeが判定中…</div>';
+ if(res&&res.error){var em=res.error==='NO_KEY'?'キー未設定':res.error==='BAD_KEY'?'APIキーが無効':res.error==='NET'?'通信エラー':res.error;return '<div style="margin:14px 0 0;font-size:12px;color:#e8917a;background:rgba(217,96,63,.1);border-radius:8px;padding:9px 11px;">判定失敗（'+em+'）<button onclick="OWN.judge()" style="margin-left:8px;font-size:12px;color:var(--gold);background:none;border:.5px solid rgba(201,162,39,.4);border-radius:6px;padding:3px 9px;">再試行</button></div>';}
+ if(res&&res.grade){var gc=res.grade==='◎'?'#5fc3a8':res.grade==='△'?'#d8b54a':'#e8917a';return '<div style="margin:14px 0 0;background:#14171e;border:.5px solid '+gc+'55;border-radius:11px;padding:13px 14px;"><div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;"><span style="font-size:22px;color:'+gc+';font-weight:600;">'+res.grade+'</span><span style="font-size:13px;color:#dcdee3;line-height:1.4;">'+res.verdict+'</span><span style="margin-left:auto;font-size:9px;letter-spacing:1px;color:#6c6f77;">CLAUDE判定</span></div><div style="font-size:12px;line-height:1.5;color:#8fc7a8;margin-bottom:5px;">◯ '+res.good+'</div><div style="font-size:12px;line-height:1.5;color:#e0a890;">→ '+res.miss+'</div></div>';}
+ return '<button onclick="OWN.judge()" style="width:100%;margin:14px 0 0;padding:12px;font-size:13.5px;background:rgba(201,162,39,.12);color:var(--gold);border:.5px solid rgba(201,162,39,.4);border-radius:10px;font-family:inherit;">🤖 Claudeに判定してもらう</button>';
 }
 window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}sessAgain=[];view='session';renderSession();},
  home:function(){view='home';renderHome();},
  flip:function(){flipped=true;renderSession();},
  swipe:function(good){var it=queue[idx];grade(it,good);idx++;flipped=false;next();},
  fins:function(t){var ta=document.getElementById('fin');if(!ta)return;if(t==='削除'){ta.value=ta.value.replace(/\s*[^\s,]+[,\s]*$|.$/,'');}else{ta.value+=t;}fInputs[fsi]=ta.value;ta.focus();},
+ chipTab:function(n){var ta=document.getElementById('fin');if(ta)fInputs[fsi]=ta.value;chipTab=n;renderSession();},
+ setKey:function(){var cur=getKey();var k=prompt(cur?'APIキーは保存済み。変更する場合のみ新しいキーを入力（空でクリア）':'Anthropic APIキーを貼り付け（端末内localStorageのみに保存、外部送信なし）','');if(k===null)return;k=k.trim();try{if(k)localStorage.setItem(AKEY,k);else if(k==='')localStorage.removeItem(AKEY);}catch(e){}renderHome();},
+ setJudgeModel:function(m){try{localStorage.setItem(AMODEL,m);}catch(e){}renderHome();},
+ judge:async function(){var it=queue[idx],step=it.steps[fsi];judgeRes[fsi]={loading:true};renderSession();var res=await judgeAnswer(it,step,fsi);judgeRes[fsi]=res;if(res&&res.grade)fGrades[fsi]=res.grade;renderSession();},
  fcheck:function(){var ta=document.getElementById('fin');fInputs[fsi]=ta?ta.value.trim():'';fRevealed=true;renderSession();},
- fgrade:function(g){fGrades[fsi]=g;fsi++;fRevealed=false;renderSession();},
- fdone:function(good){var it=queue[idx];grade(it,good);prog[it.id].last=it.steps.map(function(s,i){return {q:s.q,input:fInputs[i]||'',a:s.a,g:fGrades[i]||''};});save(prog);idx++;fsi=0;fRevealed=false;fInputs={};fGrades={};next();},
+ fgrade:function(g){fGrades[fsi]=g;fsi++;fRevealed=false;chipTab=0;renderSession();},
+ fdone:function(good){var it=queue[idx];grade(it,good);prog[it.id].last=it.steps.map(function(s,i){return {q:s.q,input:fInputs[i]||'',a:s.a,g:fGrades[i]||''};});save(prog);idx++;fsi=0;fRevealed=false;fInputs={};fGrades={};judgeRes={};chipTab=0;next();},
  reset:function(){if(confirm('進捗をリセットしますか？')){prog={};save(prog);renderHome();}},
  exportData:function(){var d={at:tstr(),progress:prog,cards:ALL.map(function(it){return {id:it.id,cat:catOf(it),q:it.type==='fill'?it.sc:it.q};})};var s=JSON.stringify(d);var ta=document.createElement('textarea');ta.value=s;ta.style.cssText='position:absolute;left:-9999px;';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);alert('分析データをコピーしました。Claudeのチャットに貼り付けて「これ分析して」と送ってください。');}};
 function next(){if(idx>=queue.length){justDone=true;markDay(queue.length);view='home';renderHome();}else{renderSession();}}
@@ -276,7 +308,14 @@ function renderHome(){
  ms.forEach(function(d){html+='<div style="display:flex;align-items:center;gap:11px;margin-bottom:10px;"><span style="flex:0 0 112px;font-size:12px;color:#c7c9cf;line-height:1.3;">'+d.k+'</span><span style="flex:1;height:12px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;"><span style="display:block;height:100%;width:'+d.v+'%;background:var(--gold);border-radius:4px;transition:width .8s;"></span></span><span class="mono" style="flex:0 0 32px;text-align:right;font-size:11px;color:var(--muted);">'+d.v+'%</span></div>';});
  html+='</div>'+leakHTML()+'<div style="display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 12px;">';
  modes.forEach(function(m){html+='<button class="chip'+(mode===m[0]?' on':'')+'" onclick="OWN.setMode(\''+m[0]+'\')">'+m[1]+'</button>';});
- html+='</div><button class="btn" style="padding:16px;font-size:15px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.start()">今日のセッションを始める</button>'
+ html+='</div><button class="btn" style="padding:16px;font-size:15px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.start()">今日のセッションを始める</button>';
+ var hasKey=!!getKey(),mdl=getModel();
+ html+='<div style="margin-top:14px;background:var(--surf);border:.5px solid rgba(255,255,255,.07);border-radius:11px;padding:12px 14px;">'
+  +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-size:12px;color:#c7c9cf;">⚙ Claude判定 '+(hasKey?'<span style="color:#5fc3a8;">有効</span>':'<span style="color:#85888f;">無効</span>')+'</span><button onclick="OWN.setKey()" style="font-size:11.5px;color:var(--gold);background:none;border:.5px solid rgba(201,162,39,.4);border-radius:7px;padding:5px 11px;">'+(hasKey?'APIキー変更':'APIキーを入れる')+'</button></div>'
+  +(hasKey?'<div style="display:flex;align-items:center;gap:6px;margin-top:9px;"><span style="font-size:11px;color:var(--muted);">モデル</span>'
+    +'<button onclick="OWN.setJudgeModel(\'claude-opus-4-8\')" style="font-size:11px;padding:4px 10px;border-radius:6px;border:.5px solid rgba(255,255,255,.14);background:'+(mdl==='claude-opus-4-8'?'rgba(201,162,39,.18)':'none')+';color:'+(mdl==='claude-opus-4-8'?'var(--gold)':'#9a9da4')+';">Opus（精度）</button>'
+    +'<button onclick="OWN.setJudgeModel(\'claude-sonnet-4-6\')" style="font-size:11px;padding:4px 10px;border-radius:6px;border:.5px solid rgba(255,255,255,.14);background:'+(mdl==='claude-sonnet-4-6'?'rgba(201,162,39,.18)':'none')+';color:'+(mdl==='claude-sonnet-4-6'?'var(--gold)':'#9a9da4')+';">Sonnet（安）</button></div>':'')
+  +'</div>'
   +'<div style="text-align:center;margin-top:12px;"><button onclick="OWN.reset()" style="font-size:11px;color:var(--dim);background:none;border:none;">進捗をリセット</button></div>';
  root.innerHTML=html;
 }
@@ -314,10 +353,12 @@ function renderFill(it){
   var s=it.steps[fsi];
   if(!fRevealed){
    var hint=hintFor(s.q);
-   var chips=chipsFor(s.q).map(function(t){var del=t==='削除';return '<button onclick="OWN.fins(\''+t.replace(/'/g,"\\'")+'\')" style="flex:0 0 auto;font-size:13px;padding:8px 11px;border-radius:8px;border:.5px solid rgba(255,255,255,.16);background:'+(del?'rgba(217,96,63,.14)':'rgba(255,255,255,.05)')+';color:'+(del?'#e8917a':'#dcdee3')+';font-family:inherit;">'+(del?'⌫':t===' '?'␣':t)+'</button>';}).join('');
-   body='<div style="background:var(--surf);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 16px;"><div style="font-size:16px;line-height:1.6;margin-bottom:8px;">'+(fsi+1)+'. '+s.q+'</div><div style="font-size:11.5px;line-height:1.5;color:#8b8e97;margin-bottom:10px;background:rgba(255,255,255,.03);border-radius:8px;padding:7px 10px;">✍️ '+hint.g+' タップでも入力できる↓</div><textarea id="fin" placeholder="'+hint.ph+'" style="width:100%;min-height:54px;background:#14171e;color:var(--text);border:.5px solid rgba(255,255,255,.14);border-radius:10px;padding:10px;font-family:inherit;font-size:14px;line-height:1.5;resize:none;"></textarea><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;">'+chips+'</div><button class="btn" style="width:100%;margin-top:11px;padding:13px;font-size:14px;color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.fcheck()">答え合わせ</button></div>';
+   var grps=chipsFor(s.q);if(chipTab>=grps.length)chipTab=0;
+   var tabbar=grps.map(function(g,gi){var on=gi===chipTab;return '<button onclick="OWN.chipTab('+gi+')" style="flex:0 0 auto;font-size:11.5px;padding:5px 11px;border-radius:7px 7px 0 0;border:.5px solid '+(on?'rgba(201,162,39,.4)':'rgba(255,255,255,.10)')+';border-bottom:none;background:'+(on?'rgba(201,162,39,.14)':'transparent')+';color:'+(on?'var(--gold)':'#8b8e97')+';font-family:inherit;">'+g.l+'</button>';}).join('');
+   var chips=grps[chipTab].c.map(function(t){var del=t==='削除';return '<button onclick="OWN.fins(\''+t.replace(/'/g,"\\'")+'\')" style="flex:0 0 auto;font-size:14px;padding:9px 13px;border-radius:8px;border:.5px solid rgba(255,255,255,.16);background:'+(del?'rgba(217,96,63,.14)':'rgba(255,255,255,.05)')+';color:'+(del?'#e8917a':'#dcdee3')+';font-family:inherit;">'+(del?'⌫':t===' '?'␣':t)+'</button>';}).join('');
+   body='<div style="background:var(--surf);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 16px;"><div style="font-size:16px;line-height:1.6;margin-bottom:8px;">'+(fsi+1)+'. '+s.q+'</div><div style="font-size:11.5px;line-height:1.5;color:#8b8e97;margin-bottom:10px;background:rgba(255,255,255,.03);border-radius:8px;padding:7px 10px;">✍️ '+hint.g+'</div><textarea id="fin" placeholder="'+hint.ph+'" style="width:100%;min-height:54px;background:#14171e;color:var(--text);border:.5px solid rgba(255,255,255,.14);border-radius:10px;padding:10px;font-family:inherit;font-size:14px;line-height:1.5;resize:none;"></textarea><div style="margin-top:11px;"><div style="display:flex;flex-wrap:wrap;gap:4px;">'+tabbar+'</div><div style="display:flex;flex-wrap:wrap;gap:6px;padding:10px;border:.5px solid rgba(201,162,39,.2);border-radius:0 10px 10px 10px;">'+chips+'</div></div><button class="btn" style="width:100%;margin-top:11px;padding:13px;font-size:14px;color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.fcheck()">答え合わせ</button></div>';
   }else{
-   body='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.25);border-radius:14px;padding:18px 16px;"><div style="font-size:13px;color:var(--muted);margin-bottom:12px;">'+(fsi+1)+'. '+s.q+'</div><div style="font-size:10px;letter-spacing:1px;color:#85888f;text-transform:uppercase;margin-bottom:4px;">あなたの推定</div><div style="font-size:14px;line-height:1.5;color:#c7c9cf;margin-bottom:12px;background:#14171e;border-radius:8px;padding:9px 11px;">'+(fInputs[fsi]||'（空欄）')+'</div><div style="font-size:10px;letter-spacing:1px;color:#85888f;text-transform:uppercase;margin-bottom:4px;">正解</div><div style="font-size:15px;line-height:1.6;color:var(--gold);font-weight:500;margin-bottom:14px;">'+s.a+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">どれくらい合ってた?</div><div style="display:flex;gap:7px;"><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fgrade(\'◎\')">◎ ほぼ</button><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#d8b54a;border-color:rgba(201,162,39,.3);" onclick="OWN.fgrade(\'△\')">△ 半分</button><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fgrade(\'✗\')">✗ ズレ</button></div></div>';
+   body='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.25);border-radius:14px;padding:18px 16px;"><div style="font-size:13px;color:var(--muted);margin-bottom:12px;">'+(fsi+1)+'. '+s.q+'</div><div style="font-size:10px;letter-spacing:1px;color:#85888f;text-transform:uppercase;margin-bottom:4px;">あなたの推定</div><div style="font-size:14px;line-height:1.5;color:#c7c9cf;margin-bottom:12px;background:#14171e;border-radius:8px;padding:9px 11px;">'+(fInputs[fsi]||'（空欄）')+'</div><div style="font-size:10px;letter-spacing:1px;color:#85888f;text-transform:uppercase;margin-bottom:4px;">正解</div><div style="font-size:15px;line-height:1.6;color:var(--gold);font-weight:500;margin-bottom:4px;">'+s.a+'</div>'+judgeHtml(fsi)+'<div style="font-size:12px;color:var(--muted);margin:14px 0 8px;">採点して次へ（Claude判定済みならその採点でOK）</div><div style="display:flex;gap:7px;"><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#5fc3a8;border-color:rgba(58,160,136,.3);" onclick="OWN.fgrade(\'◎\')">◎ ほぼ</button><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#d8b54a;border-color:rgba(201,162,39,.3);" onclick="OWN.fgrade(\'△\')">△ 半分</button><button class="btn" style="flex:1;padding:11px 2px;font-size:13px;color:#e8917a;border-color:rgba(217,96,63,.3);" onclick="OWN.fgrade(\'✗\')">✗ ズレ</button></div></div>';
   }
  }
  root.innerHTML=sessHead()
