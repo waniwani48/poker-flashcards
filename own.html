@@ -226,7 +226,8 @@ function mastery(){var m={};CATORDER.forEach(function(c){m[c]={s:0,n:0};});ALL.f
 function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.filter(function(f){return f.tag==='穴埋め';});if(mode==='pre')return FILLS.filter(function(f){return f.tag==='プリフロ暗記';});if(mode==='cb')return FILLS.filter(function(f){return f.tag==='フロップCB暗記';});if(mode==='3bet')return FILLS.filter(function(f){return f.tag==='3betCB暗記';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
 var view='home',queue=[],idx=0,flipped=false,fsi=0,fRevealed=false,fInputs={},fGrades={},chipTab=0;
 var root=document.getElementById('root');
-function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t;});var fr=P.filter(function(c){return !prog[c.id];}).slice(0,8);queue=due.concat(fr);idx=0;flipped=false;fsi=0;fRevealed=false;fInputs={};fGrades={};judgeRes={};chipTab=0;}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x;}return a;}
+function build(){var P=pool();var due=P.filter(function(c){return prog[c.id]&&prog[c.id].due<=t&&(prog[c.id].box||1)<5;});var fr=shuffle(P.filter(function(c){return !prog[c.id];})).slice(0,8);queue=shuffle(due.concat(fr));idx=0;flipped=false;fsi=0;fRevealed=false;fInputs={};fGrades={};judgeRes={};chipTab=0;}
 function setMode(m){mode=m;localStorage.setItem('pokerMode',m);renderHome();}
 var sessAgain=[];
 function grade(it,good){var r=prog[it.id]||{box:1};var box=r.box||1;box=good?Math.min(box+1,5):1;prog[it.id]={box:box,due:addD(IV[box]),seen:(r.seen||0)+1,again:(r.again||0)+(good?0:1)};save(prog);if(!good)sessAgain.push(it);}
