@@ -28,6 +28,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,system-ui,"Hiragino Sans",sans
 @keyframes cardin{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:none;}}
 .gbtn{flex:1;padding:16px;font-size:15px;font-weight:600;border-radius:14px;font-family:inherit;border:none;transition:transform .1s;}
 .gbtn:active{transform:scale(.95);}
+.col .csec{font-size:15px;font-family:var(--serif);color:var(--gold);margin:22px 0 8px;}
+.col p{margin:0 0 12px;}
+.col b{color:var(--text);font-weight:600;}
+.col ul{margin:0 0 12px;padding-left:18px;}
+.col li{margin-bottom:7px;}
+.ckey{color:var(--gold);font-weight:600;}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
 </style>
 </head>
@@ -202,6 +208,89 @@ function cid(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;re
 CARDS.forEach(function(c){c.type='card';c.id=cid(c.q);});
 FILLS.forEach(function(f){f.type='fill';f.tag=f.tag||'穴埋め';f.id=cid(f.sc);});
 var ALL=CARDS.concat(FILLS);
+var COLUMNS=[
+{t:"レンジで考える",s:"このアプリの軸",h:`<p>ポーカー上達の本体は、<b>役の絶対値</b>で打つのをやめ、<b>自分と相手の「レンジ」</b>で考える癖をつけることだ。AAでも相手のレンジ次第で降りるし、ボトムペアでも勝負になる。</p>
+<div class="csec">レンジ言語化の4ステップ</div>
+<p>どんなスポットでも、この4つを<b>口に出せる</b>かを問う。</p>
+<ul>
+<li><span class="ckey">①自分のレンジ</span> … ここまでのアクションで自分は何を持っているか</li>
+<li><span class="ckey">②相手のレンジ</span> … 相手は何でここに来たか</li>
+<li><span class="ckey">③変化</span> … このアクション／このカードで両者のレンジはどう絞られ・進展したか</li>
+<li><span class="ckey">④優位</span> … レンジ優位（エクイティ）／ナッツ優位はどちらにあるか</li>
+</ul>
+<p>サイズも頻度も、すべてこの4つから導かれる。カードで反復し、ここが<b>反射</b>になれば、養分には一生できない芸当になる。</p>`},
+{t:"フロップCBの決め方",s:"統一則＋3軸＋位置2軸",h:`<div class="csec">統一則</div>
+<p><b>「AA（オーバーペア）が打てる盤＝PFRがレンジ優位を持つ盤」</b>。最初に「この盤、AAですら打てるか？」を問え。</p>
+<div class="csec">内訳を決める3軸</div>
+<ul>
+<li><span class="ckey">接続</span> … その接続が<b>誰のレンジに刺さるか</b>（KQJはPFRに刺さり打てる／976はBBに刺さり打てない）</li>
+<li><span class="ckey">静的/動的</span> … 静的(883)は価値手もチェック／動的(976)は保護で打つ</li>
+<li><span class="ckey">モノトーン</span> … スート保有がすべて（A♠持ちは打つ／色無しはチェック）</li>
+</ul>
+<div class="csec">位置は2軸ある</div>
+<ul>
+<li><span class="ckey">レンジ幅</span> … タイトなほどチェックが少ない。<b>UTG ≤ HJ &lt; BTN</b>（例外：883は逆転、976は位置中立）</li>
+<li><span class="ckey">IP/OOP</span> … OOPはレンジ実現が悪く<b>大幅にチェック</b>。乾いた盤でも打ち切れず、動的盤で差が最大。OOPのナッツはオーバーベットせずトラップ</li>
+</ul>
+<div class="csec">サイズ階層</div>
+<ul>
+<li>ドライK/Q高 → <b>33%純レンジベット</b></li>
+<li>中ペア・ローコネクト・A高 → <b>チェック半々</b>＋小サイズ</li>
+<li>ナッツ優位（AK4tt等） → <b>オーバーベットのポラー</b></li>
+</ul>
+<p style="font-size:11.5px;color:var(--muted);">※数値はGTO Wizard 100bb General 実測（UTG/HJ/BTN/SB vs BB）。</p>`},
+{t:"Class分類 7種 早見",s:"ボードを見た瞬間にサイズを出す",h:`<p>記事準拠のフレーム。ボードを見た瞬間に<b>7クラス</b>のどれかを判定し、サイズと頻度を出す。</p>
+<div class="csec">特殊系</div>
+<ul>
+<li><span class="ckey">Class1 monotone</span> … 低頻度で安bet（25%で33%）</li>
+<li><span class="ckey">Class2 trips</span> … 基本レンジCB100%（全部打つ）</li>
+<li><span class="ckey">Class3 pair</span> … レンジ33%bet（実践は70%で33%）</li>
+</ul>
+<div class="csec">標準系（ハイカード分類）</div>
+<ul>
+<li><span class="ckey">Class4 A〜Jhi HMSD</span> … potover(125%)が入る。強HM(AK)ほどpolar、弱HM(J7)ほど4size混合</li>
+<li><span class="ckey">Class5 A〜Jhi HMnSD</span> … Khi的に安く（33:50＝35:20）</li>
+<li><span class="ckey">Class6 T9hi</span> … 全サイズ混合（125%も入る）</li>
+<li><span class="ckey">Class7 u8hi</span> … 3size混合、ほぼconnect</li>
+</ul>
+<div class="csec">Connectedness</div>
+<p>2枚でストレート完成の可能性があれば、<b>potoverを外し・安betを好み・頻度を少し上げる</b>。判定は最初に行う。</p>
+<p style="font-size:11.5px;color:var(--muted);">※ユーザー提供の有料記事準拠。Wizard実測と照合中。</p>`},
+{t:"プリフロの梯子",s:"RFI・BB防御・3bet/4bet",h:`<div class="csec">オープン（RFI）</div>
+<p>頻度 <b>UTG17.6 / HJ21.6 / CO28.9 / SB37.5(+limp) / BTN42%</b>。サイズはUTG2→SB3bbと、後ろが減るほど大きく。後ろの人数が多いほど狭い（放銃回避）。</p>
+<div class="csec">BBの守り方は相手で変わる</div>
+<ul>
+<li><span class="ckey">vs EP</span>（UTG/HJ） … <b>コールで守る</b>。3betは薄くvalue寄り（下限QQ→JJ）</li>
+<li><span class="ckey">vs BTN</span> … <b>ポラー3bet</b>で広く突く（下限TT+、ローsuitedブラフ大量）</li>
+</ul>
+<div class="csec">★同じ手でも役割が反転する</div>
+<p><b>AQs</b>は、vs UTG では<b>コール</b>（相手が強くキャップ無し→3betは損）、vs BTN では<b>バリュー3bet</b>（相手が広く弱い→明確なバリュー）。これがレンジ思考の核。</p>
+<div class="csec">vs 3bet</div>
+<p>4bet HJ12% / BTN14.6%、フォールド約68%。純バリュー核は<b>AA/KK</b>（QQ/AKは混合〜コール寄り）、ブラフはAKo・A5s/A4s。</p>
+<p style="font-size:11.5px;color:var(--muted);">※GTO Wizard実測。</p>`},
+{t:"暗記すべき数字",s:"EQ・フォールド頻度・コンボ",h:`<div class="csec">エクイティ（覚える4つ）</div>
+<ul>
+<li>オーバーペア vs アンダーペア … <b>80:20</b></li>
+<li>2オーバー vs アンダーペア（フリップ） … <b>50:50</b></li>
+<li>2オーバー vs 2アンダーSC … <b>60:40</b></li>
+<li>ドミネート … <b>75:25</b></li>
+</ul>
+<p>2倍4倍の法則：リバーのみ＝アウツ×2／ターン+リバー＝アウツ×4。</p>
+<div class="csec">適正フォールド頻度</div>
+<ul>
+<li>33%ベット → 30% ／ 50% → 40%</li>
+<li>75% → 50% ／ 125% → 60%</li>
+</ul>
+<p>ポット50%ベットの適正VB比＝<b>3:1</b>（ブラフ25%）。フォールドのEVは常に0。</p>
+<div class="csec">コンボ／ブロッカー</div>
+<ul>
+<li>全コンボ <b>1326</b>／ポケット <b>6</b>／アンペア <b>16</b>（スーテッド4・オフ12）</li>
+<li>ブロッカー：ポケット 6 → 1枚で3 → 2枚で1</li>
+</ul>
+<div class="csec">α / MDF</div>
+<p>α（必要ブラフ成功率）＝ベット ÷ 総ポット。MDF（最低ディフェンス頻度）＝1 − α。</p>`}
+];
+var colIdx=0;
 var KEY='pokerSRS_v1',IV={1:1,2:2,3:4,4:8,5:16};
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
 function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
@@ -318,6 +407,8 @@ function judgeHtml(i){
 }
 window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}sessAgain=[];view='session';renderSession();},
  home:function(){view='home';renderHome();},
+ columns:function(){view='columns';renderColumns();try{window.scrollTo(0,0);}catch(e){}},
+ openColumn:function(i){colIdx=i;view='column';renderColumn();try{window.scrollTo(0,0);}catch(e){}},
  flip:function(){buzz(8);flipped=true;renderSession();},
  swipe:function(good){buzz(good?14:[6,40,6]);var it=queue[idx];grade(it,good);idx++;flipped=false;next();},
  fins:function(t){var ta=document.getElementById('fin');if(!ta)return;if(t==='削除'){ta.value=ta.value.replace(/\s*[^\s,]+[,\s]*$|.$/,'');}else{ta.value+=t;}fInputs[fsi]=ta.value;ta.focus();},
@@ -331,6 +422,25 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  reset:function(){if(confirm('進捗をリセットしますか？')){prog={};save(prog);renderHome();}},
  exportData:function(){var d={at:tstr(),progress:prog,cards:ALL.map(function(it){return {id:it.id,cat:catOf(it),q:it.type==='fill'?it.sc:it.q};})};var s=JSON.stringify(d);var ta=document.createElement('textarea');ta.value=s;ta.style.cssText='position:absolute;left:-9999px;';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);alert('分析データをコピーしました。Claudeのチャットに貼り付けて「これ分析して」と送ってください。');}};
 function next(){if(idx>=queue.length){justDone=true;markDay(queue.length);view='home';renderHome();}else{renderSession();}}
+function colBack(back,label){return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><button class="btn" style="padding:6px 12px;font-size:12px;border-radius:9px;" onclick="'+back+'">&#8592; '+label+'</button><span class="mono" style="font-size:11px;color:var(--muted);">基礎コラム</span></div>';}
+function renderColumns(){
+ var h=colBack('OWN.home()','マップ');
+ h+='<div style="margin-bottom:18px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">基礎コラム</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">読んで体系を掴む。カードが「問われて答える」筋トレなら、ここはその土台。</div></div>';
+ COLUMNS.forEach(function(c,i){h+='<button class="btn" style="width:100%;text-align:left;padding:15px 16px;margin-bottom:10px;background:var(--surf);border-radius:14px;" onclick="OWN.openColumn('+i+')"><div style="display:flex;align-items:baseline;gap:9px;"><span class="mono" style="font-size:12px;color:var(--gold);">'+(i+1)+'</span><span style="font-size:16px;color:var(--text);font-family:var(--serif);">'+c.t+'</span></div><div style="font-size:12px;color:var(--muted);margin-top:3px;padding-left:21px;">'+c.s+'</div></button>';});
+ root.innerHTML=h;
+}
+function renderColumn(){
+ var c=COLUMNS[colIdx];
+ var h=colBack('OWN.columns()','コラム一覧');
+ h+='<div style="font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">COLUMN '+(colIdx+1)+' / '+COLUMNS.length+'</div>';
+ h+='<div style="font-size:25px;font-family:var(--serif);color:var(--text);line-height:1.3;margin-bottom:4px;">'+c.t+'</div>';
+ h+='<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">'+c.s+'</div>';
+ h+='<div style="height:.5px;background:rgba(201,162,39,.25);margin:0 0 16px;"></div>';
+ h+='<div class="col" style="font-size:14px;line-height:1.75;color:#dcdee3;">'+c.h+'</div>';
+ if(colIdx<COLUMNS.length-1)h+='<button class="btn" style="width:100%;margin-top:24px;padding:14px;font-size:13.5px;color:var(--gold);border-color:rgba(201,162,39,.3);text-align:left;" onclick="OWN.openColumn('+(colIdx+1)+')">次へ → '+COLUMNS[colIdx+1].t+'</button>';
+ else h+='<button class="btn" style="width:100%;margin-top:24px;padding:14px;font-size:13.5px;color:var(--muted);" onclick="OWN.columns()">コラム一覧へ戻る</button>';
+ root.innerHTML=h;
+}
 function renderHome(){
  var ms=mastery();var avg=ms.length?Math.round(ms.reduce(function(s,d){return s+d.v;},0)/ms.length):0;
  var modes=[['all','すべて'],['memo','暗記'],['pre','プリフロ'],['cb','フロップCB(SRP)'],['3bet','3betポット'],['fill','レンジ推定'],['spot','スポット']];
@@ -344,7 +454,8 @@ function renderHome(){
  ms.forEach(function(d){html+='<div style="display:flex;align-items:center;gap:11px;margin-bottom:10px;"><span style="flex:0 0 112px;font-size:12px;color:#c7c9cf;line-height:1.3;">'+d.k+'</span><span style="flex:1;height:12px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;"><span style="display:block;height:100%;width:'+d.v+'%;background:var(--gold);border-radius:4px;transition:width .8s;"></span></span><span class="mono" style="flex:0 0 32px;text-align:right;font-size:11px;color:var(--muted);">'+d.v+'%</span></div>';});
  html+='</div>'+leakHTML()+'<div style="display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 12px;">';
  modes.forEach(function(m){html+='<button class="chip'+(mode===m[0]?' on':'')+'" onclick="OWN.setMode(\''+m[0]+'\')">'+m[1]+'</button>';});
- html+='</div><button class="btn" style="padding:16px;font-size:15px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.start()">今日のセッションを始める</button>';
+ html+='</div><button class="btn" style="padding:16px;font-size:15px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.start()">今日のセッションを始める</button>'
+  +'<button class="btn" style="margin-top:10px;padding:14px;font-size:14px;background:var(--surf);color:#dcdee3;" onclick="OWN.columns()">📖 基礎コラムを読む</button>';
  var hasKey=!!getKey(),mdl=getModel();
  html+='<div style="margin-top:14px;background:var(--surf);border:.5px solid rgba(255,255,255,.07);border-radius:11px;padding:12px 14px;">'
   +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-size:12px;color:#c7c9cf;">⚙ Claude判定 '+(hasKey?'<span style="color:#5fc3a8;">有効</span>':'<span style="color:#85888f;">無効</span>')+'</span><button onclick="OWN.setKey()" style="font-size:11.5px;color:var(--gold);background:none;border:.5px solid rgba(201,162,39,.4);border-radius:7px;padding:5px 11px;">'+(hasKey?'APIキー変更':'APIキーを入れる')+'</button></div>'
