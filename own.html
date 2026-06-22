@@ -212,7 +212,9 @@ var FILLS=[
 {tag:"プリフロ暗記",sc:"境界判断：UTGオープンで A5s / A4s / A3s は？",steps:[{q:"UTGオープン、A5s・A4s・A3s をそれぞれどうする？",a:"A5s＝純オープン(ホイール＋ブロッカーで価値高)、A4s-A2s＝混合(indifferent)。下限はA5sが純でA4s以下が境界。ホイールAxはA6s/A7sより価値が高い瞬間がある"}]},
 {tag:"プリフロ暗記",sc:"境界判断：COオープンで A5o（飛び地）は？",steps:[{q:"COオープン、A5o・A6o・A7o をどうする？",a:"A5o＝オープン(飛び地で混入＝A9/A8/A5o)、A6o/A7o＝フォールド。実測でA5o飛び地を確認。ホイール最高キッカーでA6/A7oより価値が高い瞬間があるため、間が抜けて飛び地になる"}]},
 {tag:"プリフロ暗記",sc:"境界判断：BB vs BTNオープンで A5s / A4s は？",steps:[{q:"BB、BTN openに対し A5s・A4s をどうする？",a:"3bet(ポラーのブラフ＝ウィールAxブロッカー)。BBのvs BTN 3betは13.9%ポラーで、A5s/A4sはブロッカー＋プレイアビリティのブラフ核。コールでなく3betに回す。vs UTG(タイト相手)ではこのブラフが薄くなる"}]},
-{tag:"プリフロ暗記",sc:"境界判断：BB vs UTGオープンで AQs は？（強い手でも）",steps:[{q:"BB、UTG openに対し AQs をどうする？vs BTNなら？",a:"vs UTG＝コール(3betでない)。相手が強くキャップ無し→AQsの3betは実質ブラフキャッチを膨らませる愚。コールで守る。vs BTN(広く弱い)なら同じAQsをバリュー3bet＝★役割反転。『ハンドの強さは相手レンジ次第』"}]}
+{tag:"プリフロ暗記",sc:"境界判断：BB vs UTGオープンで AQs は？（強い手でも）",steps:[{q:"BB、UTG openに対し AQs をどうする？vs BTNなら？",a:"vs UTG＝コール(3betでない)。相手が強くキャップ無し→AQsの3betは実質ブラフキャッチを膨らませる愚。コールで守る。vs BTN(広く弱い)なら同じAQsをバリュー3bet＝★役割反転。『ハンドの強さは相手レンジ次第』"}]},
+{tag:"プリフロ暗記",sc:"プリフロ最深部：BB vs BTN4bet の5bet応答（実測）",steps:[{q:"BB、BTNの4bet(27)に対し 5bet/コール/フォールドの頻度は？5betの形は？",a:"5betジャム31.4%/コール20.1%/フォールド48.5%。5bet＝オールイン(Raiseでなくジャム・100bb)。jam核＝AA/KK/AKs＋ブラフ(A5s/A4sブロッカー)、コール＝QQ/JJ/AQs等の中堅。AAも jam71.5%＋コール28.5%(4betポットでプレイも)"}]},
+{tag:"プリフロ暗記",sc:"プリフロ：BTN vs BB ツリー全体（open→3bet→4bet→5bet・実測）",steps:[{q:"BTN open→BB 3bet→BTN 4bet→BB 5bet、各段の頻度とフォールド傾向は？",a:"open2.5 → BB 3bet13.9%(to13) → BTN 4bet14.6%(to27) → BB 5betジャム31.4%。各段でフォールドが半分以上＝深くなるほど降りる。バリューの芯はAA/KKで一貫、各段でブラフ(A5s/A4s等ブロッカー)を足してポラーに保つ"}]}
 ];
 function cid(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return 'c'+(h>>>0).toString(36);}
 CARDS.forEach(function(c){c.type='card';c.id=cid(c.q);});
