@@ -293,7 +293,19 @@ var COLUMNS=[
 <li>ブロッカー：ポケット 6 → 1枚で3 → 2枚で1</li>
 </ul>
 <div class="csec">α / MDF</div>
-<p>α（必要ブラフ成功率）＝ベット ÷ 総ポット。MDF（最低ディフェンス頻度）＝1 − α。</p>`}
+<p>α（必要ブラフ成功率）＝ベット ÷ 総ポット。MDF（最低ディフェンス頻度）＝1 − α。</p>`},
+{t:"位置の3軸（CB戦略のなぜ）",s:"レンジ幅・IP/OOP・callerの強さ",h:`<p>SRPのフロップCB戦略は、ボードの性質だけでなく<b>3つの位置軸</b>の相互作用で決まる。合言葉は<b>「自レンジ × 自位置 × 相手callレンジ」</b>。</p>
+<div class="csec">軸1 ・ レンジ幅（自分のオープン）</div>
+<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin:2px 0 10px;"><span>タイト</span><span style="flex:1;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--teal));"></span><span>ワイド</span></div>
+<p>狭いほどレンジ優位が濃く<b>チェックが少ない</b>。UTG≈HJ &lt; BTN。例：K72r ＝ UTG0.9 / HJ0.5 / BTN34.7。</p>
+<div class="csec">軸2 ・ IP / OOP（自分の位置）</div>
+<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin:2px 0 10px;"><span>IP</span><span style="flex:1;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--teal));"></span><span>OOP</span></div>
+<p>OOPはレンジ実現が悪く<b>チェック激増</b>（特に乾いた盤・ウェット盤）。例：K72r ＝ IP0.5 ↔ SB(OOP)44.8。OOPのナッツはオーバーベットせず<b>トラップ</b>。</p>
+<div class="csec">軸3 ・ callerの強さ（相手のcallレンジ）</div>
+<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin:2px 0 10px;"><span>弱(BB)</span><span style="flex:1;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--coral));"></span><span>強(SB)</span></div>
+<p>弱いBB＝小サイズ33%レンジベット／強いSB＝<b>大型ポラー化</b>。例：中ペア883 ＝ BB相手33%小 → SB相手オーバーベット49%。</p>
+<div class="csec">使い方</div>
+<p>ボードを見たら「自分はこの3軸のどこに立つか」を問う。同じK72rでも、UTGのIPでBB相手なら<b>純レンジベット</b>、SBのOOPなら<b>大サイズ＋チェック多</b>。ボードは出発点、戦略は3軸で決まる。</p>`}
 ];
 var colIdx=0;
 var KEY='pokerSRS_v1',IV={1:1,2:2,3:4,4:8,5:16};
@@ -475,7 +487,7 @@ function renderColumn(){
  h+='<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">'+c.s+'</div>';
  h+='<div style="height:.5px;background:rgba(201,162,39,.25);margin:0 0 16px;"></div>';
  h+='<div class="col" style="font-size:14px;line-height:1.75;color:#dcdee3;">'+c.h+'</div>';
- var CDRILL=['fill','cb','cb','pre','memo'],dlab={fill:'レンジ推定',cb:'フロップCB',pre:'プリフロ',memo:'暗記'};
+ var CDRILL=['fill','cb','cb','pre','memo','cb'],dlab={fill:'レンジ推定',cb:'フロップCB',pre:'プリフロ',memo:'暗記'};
  h+='<button class="btn" style="width:100%;margin-top:24px;padding:15px;font-size:14px;font-weight:500;background:rgba(201,162,39,.14);color:var(--gold);border-color:rgba(201,162,39,.45);" onclick="OWN.drill(\''+CDRILL[colIdx]+'\')">✍️ このテーマをドリルで解く（'+dlab[CDRILL[colIdx]]+'）→</button>';
  if(colIdx<COLUMNS.length-1)h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);border-color:rgba(255,255,255,.12);text-align:left;" onclick="OWN.openColumn('+(colIdx+1)+')">次のコラム → '+COLUMNS[colIdx+1].t+'</button>';
  else h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.columns()">コラム一覧へ戻る</button>';
