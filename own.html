@@ -415,6 +415,7 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  columns:function(){view='columns';renderColumns();try{window.scrollTo(0,0);}catch(e){}},
  openColumn:function(i){colIdx=i;view='column';renderColumn();try{window.scrollTo(0,0);}catch(e){}},
  drill:function(m){mode=m;localStorage.setItem('pokerMode',m);OWN.start();},
+ matrix:function(){view='matrix';renderMatrix();try{window.scrollTo(0,0);}catch(e){}},
  flip:function(){buzz(8);flipped=true;renderSession();},
  swipe:function(good){buzz(good?14:[6,40,6]);var it=queue[idx];grade(it,good);idx++;flipped=false;next();},
  fins:function(t){var ta=document.getElementById('fin');if(!ta)return;if(t==='削除'){ta.value=ta.value.replace(/\s*[^\s,]+[,\s]*$|.$/,'');}else{ta.value+=t;}fInputs[fsi]=ta.value;ta.focus();},
@@ -429,6 +430,37 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  exportData:function(){var d={at:tstr(),progress:prog,cards:ALL.map(function(it){return {id:it.id,cat:catOf(it),q:it.type==='fill'?it.sc:it.q};})};var s=JSON.stringify(d);var ta=document.createElement('textarea');ta.value=s;ta.style.cssText='position:absolute;left:-9999px;';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);alert('分析データをコピーしました。Claudeのチャットに貼り付けて「これ分析して」と送ってください。');}};
 function next(){if(idx>=queue.length){justDone=true;markDay(queue.length);view='home';renderHome();}else{renderSession();}}
 function colBack(back,label){return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><button class="btn" style="padding:6px 12px;font-size:12px;border-radius:9px;" onclick="'+back+'">&#8592; '+label+'</button><span class="mono" style="font-size:11px;color:var(--muted);">基礎コラム</span></div>';}
+var MATRIX={cols:['UTG','HJ','BTN','SB'],rows:[
+{b:'K72r',t:'ドライK',v:[0.9,0.5,34.7,44.8]},
+{b:'Q72r',t:'ドライQ',v:[6.7,1.4,37,37.5]},
+{b:'A72r',t:'ドライA',v:[30.9,47.7,57.5,48.3]},
+{b:'KQJ',t:'コネクテッド高',v:[2.5,10.2,53.6,65.3]},
+{b:'AK4tt',t:'ナッツ優位',v:[35.5,45.2,61.6,73.7]},
+{b:'883',t:'中ペア',v:[51.1,48.1,32.7,49.7]},
+{b:'976',t:'コネクトロー',v:[49.1,47.6,49.5,80.1]},
+{b:'K94m',t:'K高モノ',v:[43.6,50.3,67.6,87.3]},
+{b:'JT9',t:'接続ウェット',v:[16.9,17.3,53,69.3]},
+{b:'A96tt',t:'A高ウェット',v:[50.2,52.2,62.1,71.1]},
+{b:'852m',t:'低モノ',v:[34.5,43.1,54.9,75.6]},
+{b:'KK7',t:'ペア+ハイ',v:[0.2,0.1,12.2,26.1]}
+]};
+function heatColor(v){var t=Math.max(0,Math.min(1,v/100));var r=Math.round(201+(58-201)*t),g=Math.round(162+(160-162)*t),b=Math.round(39+(136-39)*t);return 'rgba('+r+','+g+','+b+',0.9)';}
+function renderMatrix(){
+ var h=colBack('OWN.home()','マップ');
+ h+='<div style="margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">位置マトリクス</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">SRP・PFRのフロップ チェック頻度(%)。低い＝打つ／高い＝チェック。12テクスチャ×4ポジの実測。</div></div>';
+ h+='<div style="display:grid;grid-template-columns:58px repeat(4,1fr);gap:3px;margin-top:14px;">';
+ h+='<div></div>';
+ MATRIX.cols.forEach(function(c){h+='<div style="text-align:center;font-size:11px;color:var(--muted);padding:3px 0;">'+c+'</div>';});
+ MATRIX.rows.forEach(function(r){
+  h+='<div style="font-size:10px;color:#c7c9cf;display:flex;align-items:center;line-height:1.05;">'+r.b+'</div>';
+  r.v.forEach(function(v){h+='<div style="background:'+heatColor(v)+';color:#14171e;font-size:11px;font-weight:600;text-align:center;padding:7px 0;border-radius:4px;font-family:var(--mono);">'+v+'</div>';});
+ });
+ h+='</div>';
+ h+='<div style="display:flex;align-items:center;gap:8px;margin-top:13px;font-size:11px;color:var(--muted);"><span>打つ</span><span style="flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,'+heatColor(0)+','+heatColor(50)+','+heatColor(100)+');"></span><span>チェック</span></div>';
+ h+='<div style="margin-top:18px;font-size:12.5px;line-height:1.7;color:#dcdee3;"><b style="color:var(--gold);">読み方</b><br>・横に見る＝<b>位置勾配</b>。レンジ優位ボードは UTG≈HJ &lt; BTN &lt; SB(OOP) で右ほどチェック増。<br>・例外＝中ペア883(BTNで逆転)・コネクトロー976(IPは位置中立だがSBで激増)。<br>・縦に見る＝同じ位置でのテクスチャ差。ドライK/Q高は低く(打つ)、A高/モノ/ナッツ優位は高い(チェック)。</div>';
+ h+='<button class="btn" style="width:100%;margin-top:20px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
+ root.innerHTML=h;
+}
 function renderColumns(){
  var h=colBack('OWN.home()','マップ');
  h+='<div style="margin-bottom:18px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">基礎コラム</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">読んで体系を掴む。カードが「問われて答える」筋トレなら、ここはその土台。</div></div>';
@@ -472,6 +504,7 @@ function renderHome(){
  // 学ぶ（読み物）— クイズと分離
  html+='<div class="sect-label">学ぶ ・ 読み物</div>';
  html+='<button class="btn" style="width:100%;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.columns()"><span style="font-size:18px;">📖</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">基礎コラム</span><br><span style="font-size:11.5px;color:var(--muted);">読んで体系を掴む（全'+COLUMNS.length+'本）</span></span></button>';
+ html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.matrix()"><span style="font-size:18px;">📊</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">位置マトリクス</span><br><span style="font-size:11.5px;color:var(--muted);">12テクスチャ×4ポジのヒートマップ</span></span></button>';
  var hasKey=!!getKey(),mdl=getModel();
  html+='<div class="sect-label">設定</div>';
  html+='<div style="background:var(--surf);border:.5px solid rgba(255,255,255,.07);border-radius:11px;padding:12px 14px;">'
