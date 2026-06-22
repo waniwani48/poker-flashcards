@@ -454,18 +454,18 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
 function next(){if(idx>=queue.length){justDone=true;markDay(queue.length);view='home';renderHome();}else{renderSession();}}
 function colBack(back,label){return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><button class="btn" style="padding:6px 12px;font-size:12px;border-radius:9px;" onclick="'+back+'">&#8592; '+label+'</button><span class="mono" style="font-size:11px;color:var(--muted);">基礎コラム</span></div>';}
 var MATRIX={cols:['UTG','HJ','BTN','SB'],rows:[
-{b:'K72r',t:'ドライK',v:[0.9,0.5,34.7,44.8]},
-{b:'Q72r',t:'ドライQ',v:[6.7,1.4,37,37.5]},
-{b:'A72r',t:'ドライA',v:[30.9,47.7,57.5,48.3]},
-{b:'KQJ',t:'コネクテッド高',v:[2.5,10.2,53.6,65.3]},
-{b:'AK4tt',t:'ナッツ優位',v:[35.5,45.2,61.6,73.7]},
-{b:'883',t:'中ペア',v:[51.1,48.1,32.7,49.7]},
-{b:'976',t:'コネクトロー',v:[49.1,47.6,49.5,80.1]},
-{b:'K94m',t:'K高モノ',v:[43.6,50.3,67.6,87.3]},
-{b:'JT9',t:'接続ウェット',v:[16.9,17.3,53,69.3]},
-{b:'A96tt',t:'A高ウェット',v:[50.2,52.2,62.1,71.1]},
-{b:'852m',t:'低モノ',v:[34.5,43.1,54.9,75.6]},
-{b:'KK7',t:'ペア+ハイ',v:[0.2,0.1,12.2,26.1]}
+{b:'K72r',t:'ドライK',v:[0.9,0.5,34.7,44.8],d:'BBにKx/Qx/ペアの継続域があり、PFRのレンジ優位が圧倒的→純レンジベット33%小。「とりあえず33%」が効く代表'},
+{b:'Q72r',t:'ドライQ',v:[6.7,1.4,37,37.5],d:'K72rと同型の純レンジベット。乾いた高カードはレンジ優位が濃い'},
+{b:'A72r',t:'ドライA',v:[30.9,47.7,57.5,48.3],d:'★A高の例外。BBがAxをほぼ持たない(fold/3bet)→盤が有利すぎてマージナルを打つ価値が薄くチェックバック。半分チェック'},
+{b:'KQJ',t:'コネクテッド高',v:[2.5,10.2,53.6,65.3],d:'ブロードウェイ接続がPFRの濃いレンジ(AK/KK/QQ/JJ/ストレート)に刺さる→高頻度CB(33/50)。位置差が最大'},
+{b:'AK4tt',t:'ナッツ優位',v:[35.5,45.2,61.6,73.7],d:'ナッツ優位2トーン。オーバーベット124%の純ポラー(中サイズ皆無)。乾きでなくナッツ優位がサイズを決める'},
+{b:'883',t:'中ペア',v:[51.1,48.1,32.7,49.7],d:'低い中ペア。ドライ静的で価値手も保護不要→チェック多・33%一択。★広いBTNだけ逆転(オーバーカードがベット価値)'},
+{b:'976',t:'コネクトロー',v:[49.1,47.6,49.5,80.1],d:'動的ローでBBの域に刺さりオーバーペアが脆弱→半分チェック・50%多め(保護)。IPは位置中立だがOOPで激増'},
+{b:'K94m',t:'K高モノ',v:[43.6,50.3,67.6,87.3],d:'モノトーン＝スート保有が全て。A♠持ち(ナッツフラドロ)は打つ/色無しオーバーペアはチェック'},
+{b:'JT9',t:'接続ウェット',v:[16.9,17.3,53,69.3],d:'接続ウェット高。高頻度CBだがドライより50%サイズが増える。オーバーペアでも盤に絡む方(QQ)が裸AAより打てる'},
+{b:'A96tt',t:'A高ウェット',v:[50.2,52.2,62.1,71.1],d:'A高は乾いても濡れてもチェック寄り＋濡れるとポラー分散。AAはオーバーペアでなくトップセットとして読む'},
+{b:'852m',t:'低モノ',v:[34.5,43.1,54.9,75.6],d:'低モノトーン。スート保有が全て(色無しは打たない)。小サイズ中心'},
+{b:'KK7',t:'ペア+ハイ',v:[0.2,0.1,12.2,26.1],d:'★高ペア。BBがKxをほぼ持たずPFR圧倒→純レンジベット。中ペア883とは別物＝ペアは「高さ」で割れる'}
 ]};
 function heatColor(v){var t=Math.max(0,Math.min(1,v/100));var r=Math.round(201+(58-201)*t),g=Math.round(162+(160-162)*t),b=Math.round(39+(136-39)*t);return 'rgba('+r+','+g+','+b+',0.9)';}
 function renderMatrix(){
@@ -481,7 +481,11 @@ function renderMatrix(){
  h+='</div>';
  h+='<div style="display:flex;align-items:center;gap:8px;margin-top:13px;font-size:11px;color:var(--muted);"><span>打つ</span><span style="flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,'+heatColor(0)+','+heatColor(50)+','+heatColor(100)+');"></span><span>チェック</span></div>';
  h+='<div style="margin-top:18px;font-size:12.5px;line-height:1.7;color:#dcdee3;"><b style="color:var(--gold);">読み方</b><br>・横に見る＝<b>位置勾配</b>。レンジ優位ボードは UTG≈HJ &lt; BTN &lt; SB(OOP) で右ほどチェック増。<br>・例外＝中ペア883(BTNで逆転)・コネクトロー976(IPは位置中立だがSBで激増)。<br>・縦に見る＝同じ位置でのテクスチャ差。ドライK/Q高は低く(打つ)、A高/モノ/ナッツ優位は高い(チェック)。</div>';
- h+='<button class="btn" style="width:100%;margin-top:20px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
+ h+='<div class="csec" style="margin-top:22px;">テクスチャの体系（5系統）</div>';
+ h+='<div style="font-size:12.5px;line-height:1.7;color:#dcdee3;">大きく5系統で読む。<br>① <b>ドライ高カード</b>＝K/Q高は純レンジベット。<b>A高だけ例外</b>(BBがAxを持たずチェック多)。<br>② <b>接続</b>＝その接続が<b>誰のレンジに刺さるか</b>(KQJはPFRに刺さり打つ／976はBBに刺さりチェック)。<br>③ <b>ペア</b>＝<b>高さ</b>で割れる(高ペアKK7は純RB／中ペア883は混合)。<br>④ <b>モノトーン</b>＝<b>スート保有が全て</b>(色札持ちは打つ)。<br>⑤ <b>ナッツ優位</b>＝オーバーベットの純ポラー。<br>この分類に<b>位置3軸</b>(レンジ幅・IP/OOP・callerの強さ)が掛かって各セルが動く。</div>';
+ h+='<div class="csec" style="margin-top:22px;">各ボードの特徴</div>';
+ MATRIX.rows.forEach(function(r){h+='<div style="margin-bottom:11px;"><div style="font-size:13px;color:var(--text);"><span class="mono" style="color:var(--gold);">'+r.b+'</span> <span style="color:var(--muted);font-size:11.5px;">'+r.t+'</span></div><div style="font-size:12px;line-height:1.6;color:#c7c9cf;margin-top:2px;">'+r.d+'</div></div>';});
+ h+='<button class="btn" style="width:100%;margin-top:14px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
  root.innerHTML=h;
 }
 var cbRanks=[],cbSuit='rainbow';
