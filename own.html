@@ -460,9 +460,9 @@ function getModel(){try{return localStorage.getItem(AMODEL)||'claude-opus-4-8';}
 var judgeRes={};
 var JUDGE_SYS='あなたはポーカーGTOの辛口コーチ（Hungry Horse風）。学習者が書いた「レンジ言語化」の答えを模範解答と照らして細かい粒度で判定する。評価軸=①自分と相手のレンジの把握 ②アクション/カードでのレンジ変化 ③サイズと頻度の妥当性。役の強弱でなく「レンジで考えられているか」を見る。日本語で短く鋭く。表記ゆれは寛容に、内容は甘くしない。模範解答に無くても妥当な指摘は評価する。';
 var JUDGE_SCHEMA={type:'object',properties:{grade:{type:'string',enum:['◎','△','✗']},verdict:{type:'string'},good:{type:'string'},miss:{type:'string'}},required:['grade','verdict','good','miss'],additionalProperties:false};
-async function judgeAnswer(it,step,i){
+async function judgeCore(sc,q,a,learner){
  var key=getKey();if(!key)return {error:'NO_KEY'};
- var prompt='【状況】'+it.sc+'\n【質問】'+step.q+'\n【模範解答】'+step.a+'\n【学習者の答え】'+(fInputs[i]||'（空欄）')+'\n\nこの答えを判定して。verdictは20字程度の一言、goodは合っている点、missは抜け/ズレと直し方。';
+ var prompt='【状況】'+sc+'\n【質問】'+q+'\n【模範解答】'+a+'\n【学習者の答え】'+(learner||'（空欄）')+'\n\nこの答えを判定して。verdictは20字程度の一言、goodは合っている点、missは抜け/ズレと直し方。';
  try{
   var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:getModel(),max_tokens:900,system:JUDGE_SYS,messages:[{role:'user',content:prompt}],output_config:{format:{type:'json_schema',schema:JUDGE_SCHEMA}}})});
   if(!r.ok){return {error:r.status===401?'BAD_KEY':('HTTP '+r.status)};}
@@ -470,6 +470,7 @@ async function judgeAnswer(it,step,i){
   return JSON.parse(txt);
  }catch(e){return {error:'NET'};}
 }
+async function judgeAnswer(it,step,i){return judgeCore(it.sc,step.q,step.a,fInputs[i]);}
 function judgeHtml(i){
  var res=judgeRes[i];
  if(!getKey())return '<div style="margin:14px 0 0;font-size:11.5px;color:#85888f;background:rgba(255,255,255,.03);border-radius:8px;padding:9px 11px;">🤖 <b style="color:#a8abb2;">ホームの⚙設定でAPIキー</b>を入れると、Claudeが答えを細かく判定します（自己採点はそのまま使えます）</div>';
@@ -489,6 +490,7 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  rfiq:function(){view='rfiq';rfiqIJ=null;rfiqScore={n:0,ok:0};rfiPickItem();renderRFIQ();try{window.scrollTo(0,0);}catch(e){}},
  rfiqPick:function(a){var ta=document.getElementById('rfiqwhy');if(ta)rfiqWhy=ta.value;var g=RFI[rfiqPos].g;var c=g.charAt(rfiqIJ[0]*13+rfiqIJ[1]);rfiqPick=a;rfiqScore.n++;if(a===c)rfiqScore.ok++;try{buzz(a===c?14:[6,40,6]);}catch(e){}renderRFIQ();},
  rfiqNext:function(){rfiPickItem();renderRFIQ();try{window.scrollTo(0,0);}catch(e){}},
+ rfiqJudge:async function(){var info=rfiReason(rfiqPos,rfiqIJ[0],rfiqIJ[1]);var pickLbl={R:'純open',M:'混合',F:'fold'}[rfiqPick];var sc=rfiqPos+'からの'+info.label+'のRFI判断（あなたの選択＝'+pickLbl+'／正解＝'+info.verdict+'）';var q='なぜこの判断になるのかをレンジで言語化せよ（下限との距離・理由）';var a=info.label+'は'+rfiqPos+'で'+info.verdict+'。'+info.fam+'の下限は'+info.bound+'。下限は①レンジ優位の濃さ②位置(実現性)③ハンド固有の価値(接続/ブロッカー)で決まる。';rfiqJudge={loading:true};renderRFIQ();var res=await judgeCore(sc,q,a,rfiqWhy);rfiqJudge=res;renderRFIQ();},
  cbtool:function(){view='cbtool';renderCbtool();try{window.scrollTo(0,0);}catch(e){}},
  cbPick:function(r){if(cbRanks.length>=3)cbRanks=[];cbRanks.push(r);renderCbtool();},
  cbSuit:function(s){cbSuit=s;renderCbtool();},
@@ -597,7 +599,7 @@ function renderRFI(){
  h+='<button class="btn" style="width:100%;margin-top:14px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
  root.innerHTML=h;
 }
-var rfiqPos='UTG',rfiqIJ=null,rfiqPick=null,rfiqWhy='',rfiqScore={n:0,ok:0};
+var rfiqPos='UTG',rfiqIJ=null,rfiqPick=null,rfiqWhy='',rfiqScore={n:0,ok:0},rfiqJudge=null;
 function rfiPickItem(){
  var poss=['UTG','HJ','CO','BTN','SB'];var pos=poss[Math.floor(Math.random()*5)];
  var g=RFI[pos].g,tries=0,i=0,j=0;
@@ -606,7 +608,16 @@ function rfiPickItem(){
   for(var k=0;k<4;k++){var r=nb[k][0],c=nb[k][1];if(r>=0&&r<13&&c>=0&&c<13){var b=g.charAt(r*13+c);if(b==='R'||b==='M')return true;}}
   return false;}
  do{i=Math.floor(Math.random()*13);j=Math.floor(Math.random()*13);tries++;}while(!ok(i,j)&&tries<300);
- rfiqPos=pos;rfiqIJ=[i,j];rfiqPick=null;rfiqWhy='';
+ rfiqPos=pos;rfiqIJ=[i,j];rfiqPick=null;rfiqWhy='';rfiqJudge=null;
+}
+function rfiqJudgeHtml(){
+ if(!rfiqWhy)return getKey()?'<div style="margin-top:12px;font-size:11.5px;color:#85888f;background:rgba(255,255,255,.03);border-radius:8px;padding:9px 11px;">💬 答える前に「なぜ」を書いておくと、Claudeが言語化を判定できます</div>':'';
+ if(!getKey())return '<div style="margin-top:12px;font-size:11.5px;color:#85888f;background:rgba(255,255,255,.03);border-radius:8px;padding:9px 11px;">🤖 ホームの⚙設定でAPIキーを入れると、書いた言語化をClaudeが判定します</div>';
+ var res=rfiqJudge;
+ if(res&&res.loading)return '<div style="margin-top:12px;font-size:13px;color:var(--gold);text-align:center;padding:10px;">🤖 Claudeが判定中…</div>';
+ if(res&&res.error){var em=res.error==='BAD_KEY'?'APIキーが無効':res.error==='NET'?'通信エラー':res.error;return '<div style="margin-top:12px;font-size:12px;color:#e8917a;background:rgba(217,96,63,.1);border-radius:8px;padding:9px 11px;">判定失敗（'+em+'）<button onclick="OWN.rfiqJudge()" style="margin-left:8px;font-size:12px;color:var(--gold);background:none;border:.5px solid rgba(201,162,39,.4);border-radius:6px;padding:3px 9px;">再試行</button></div>';}
+ if(res&&res.grade){var gc=res.grade==='◎'?'#5fc3a8':res.grade==='△'?'#d8b54a':'#e8917a';return '<div style="margin-top:12px;background:#14171e;border:.5px solid '+gc+'55;border-radius:11px;padding:13px 14px;"><div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;"><span style="font-size:22px;color:'+gc+';font-weight:600;">'+res.grade+'</span><span style="font-size:13px;color:#dcdee3;line-height:1.4;">'+res.verdict+'</span><span style="margin-left:auto;font-size:9px;letter-spacing:1px;color:#6c6f77;">CLAUDE判定</span></div><div style="font-size:12px;line-height:1.5;color:#8fc7a8;margin-bottom:5px;">◯ '+res.good+'</div><div style="font-size:12px;line-height:1.5;color:#e0a890;">→ '+res.miss+'</div></div>';}
+ return '<button onclick="OWN.rfiqJudge()" style="width:100%;margin-top:12px;padding:12px;font-size:13.5px;background:rgba(201,162,39,.12);color:var(--gold);border:.5px solid rgba(201,162,39,.4);border-radius:10px;font-family:inherit;">🤖 言語化をClaudeに判定してもらう</button>';
 }
 function rfiReason(pos,i,j){
  var g=RFI[pos].g,R=RFI_RANKS;function ch(a,b){return g.charAt(a*13+b);}
@@ -644,7 +655,8 @@ function renderRFIQ(){
   h+='<div style="font-size:13px;line-height:1.6;color:#c7c9cf;border-top:.5px solid rgba(255,255,255,.08);padding-top:10px;"><b style="color:var(--gold);">'+info.fam+'</b> の下限は <b class="mono">'+info.bound+'</b>。'+info.label+' は <b>'+info.verdict+'</b>。</div>';
   if(rfiqWhy)h+='<div style="font-size:12px;line-height:1.55;color:#8fc7a8;margin-top:9px;border-top:.5px solid rgba(255,255,255,.06);padding-top:9px;">あなたの言語化：'+rfiqWhy.replace(/</g,'&lt;')+'</div>';
   h+='</div>';
-  h+='<button class="btn" style="width:100%;padding:15px;font-size:14px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.rfiqNext()">次のハンド →</button>';
+  h+=rfiqJudgeHtml();
+  h+='<button class="btn" style="width:100%;margin-top:12px;padding:15px;font-size:14px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.rfiqNext()">次のハンド →</button>';
  }
  h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.rfi()">RFIレンジ表へ戻る</button>';
  root.innerHTML=h;
