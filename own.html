@@ -134,6 +134,11 @@ var FILLS=[
 {tag:"プリフロ暗記",sc:"CO のRFI下限【系統別】",steps:[{q:"レイズ頻度とペアは？",a:"28.9%(2.3bb)。ペアは全ピュア(22+)"},{q:"スーテッドの系統別下限は？",a:"Axs=全域。Kxs=全域(K2s混合)。Qxs=Q5s+。Jxs=J7s+。Txs=T8s+。9xs=97s+。SC下限=54s(76s/65s/54s)、43s以下fold"},{q:"オフスートの下限と“飛び地”は？",a:"Axo=AKo-A8o＋【A5o飛び地】(A7o/A6oはfoldなのにA5oだけ純open＝A5ブロッカー)。Kxo=KTo+。Qxo=QTo+。Jxo=JTo"}]},
 {tag:"プリフロ暗記",sc:"BTN のRFI下限【系統別】",steps:[{q:"レイズ頻度とオフスートAxは？",a:"42%(2.5bb)。ペア全ピュア。Axo=A2o+（全域）。最も広い"},{q:"スーテッドの系統別下限は？",a:"Axs/Kxs/Qxs=全域。Jxs=J5s+。Txs=T6s+。9xs=96s+。8xs=86s+。7xs=75s+。6xs=65s。5xs=54s。43sはfold(SC下限54s)"},{q:"オフスートの下限は？(Kxo/Qxo/Jxo/Txo)",a:"Kxo=K9o+純・K8o/K7o混合。Qxo=Q9o+。Jxo=J9o+・J8o混合。Txo=T8o+(混合)。9xo=98o"}]},
 {tag:"プリフロ暗記",sc:"SB のRFI下限【系統別】(レイズ+リンプ)",steps:[{q:"頻度と全体像は？",a:"レイズ37.5%(3bb)＋リンプ約11%＝VPIP約48%。広さ≒BTNだがリンプ混在。リンプは弱めのAxo/一部スーテッドに薄く分散（純リンプ専用は少なく多くはレイズと混合）"},{q:"スーテッドの系統別下限は？",a:"Ax/Kx/Qxs=全域。Jxs=J3s+。Txs=T5s+。9xs=95s+。8xs=85s+。7xs=74s+。6xs=64s+。5xs=53s+。4xs=43s。BTNより1〜2段深い"},{q:"オフスートの下限は？(後ろ1人だから広く守れる)",a:"Axo=A2o+。Kxo=K6o+(K5o以下fold)。Qxo=Q8o+。Jxo=J8o+。Txo=T8o+。87o/76oも純open、Q7o/J7o等の中間ギャップはfold"}]},
+{tag:"RFI復元",sc:"UTG(17.6%)のオープンを“系統別下限で全部”復元せよ（ペア/Ax/Kx/Qx/Jx/Tx/SC、s・o両方）",steps:[{q:"全系統の下限を一気に書き出せ（純/混合も区別して）",a:"ペア=77+純・66-22混合｜Axs=全域(A2s混合)・Axo=ATo+(A9oまで)｜Kxs=K8s+純/K7-K5s混合・Kxo=KQo純/KJo混合｜Qxs=Q9s+・Qxo=QJo混合｜Jxs=JTs+/J9s混合・Jxo=fold｜Txs=T9s｜SC=ほぼ無し(98s混合)。合言葉＝最タイト＝下限が高い・レンジ優位が濃い"}]},
+{tag:"RFI復元",sc:"HJ(21.6%)のオープンを系統別下限で全部復元せよ",steps:[{q:"全系統の下限を一気に書き出せ",a:"ペア=77+純・66-22混合｜Axs=全域・Axo=A9o+｜Kxs=K6s+純/K5s混合・Kxo=KTo+(K9o fold)｜Qxs=Q9s+純/Q8s混合・Qxo=QJo純/QTo混合｜Jxs=J9s+/J8s混合・Jxo=JTo混合｜Txs=T9s純/T8s混合｜SC=98s混合。UTGより一段広い"}]},
+{tag:"RFI復元",sc:"CO(28.9%)のオープンを系統別下限で全部復元せよ（A5o飛び地も）",steps:[{q:"全系統の下限を一気に書き出せ",a:"ペア=全ピュア｜Axs=全域・Axo=AKo-A8o＋A5o飛び地(A7o/A6o fold)｜Kxs=全域(K2s混合)・Kxo=KTo+｜Qxs=Q5s+・Qxo=QTo+｜Jxs=J7s+・Jxo=JTo｜Txs=T8s+｜9xs=97s+｜SC下限=54s(76s/65s/54s・43s fold)"}]},
+{tag:"RFI復元",sc:"BTN(42%)のオープンを系統別下限で全部復元せよ（弱スーテッドの例外も）",steps:[{q:"全系統の下限を一気に書き出せ",a:"ペア=全｜Axo=A2o+(全域)｜Axs/Kxs/Qxs=全域｜Jxs=J5s+・Jxo=J9o+/J8o混合｜Txs=T6s+・Txo=T8o+｜9xs=96s+・9xo=98o｜8xs=86s+・7xs=75s+・6xs=65s・5xs=54s(SC下限54s、43s/53sはfold)｜Kxo=K9o+純/K8o-K7o混合・Qxo=Q9o+"}]},
+{tag:"RFI復元",sc:"SB(37.5%+リンプ11%)のオープンを系統別下限で全部復元せよ",steps:[{q:"全系統の下限とリンプの扱いを書け",a:"広さ≒BTN＋深さ1〜2段。ペア/Ax/Kx/Qxs=全域｜Jxs=J3s+・Txs=T5s+・9xs=95s+・8xs=85s+・7xs=74s+・6xs=64s+・5xs=53s+・4xs=43s｜Axo=A2o+・Kxo=K6o+(K5o fold)・Qxo=Q8o+・Jxo=J8o+・Txo=T8o+、87o/76oも純open、中間ギャップ(Q7o/J7o/97o)はfold｜リンプ11%=弱Axo/一部スーテッドに分散"}]},
 {tag:"プリフロ暗記",sc:"どのポジションからも3betする最低ライン",steps:[{q:"バリュー3betの下限は？",a:"AQo+ / KTs+ / JJ+"}]},
 {tag:"プリフロ暗記",sc:"BB vs BTNオープン の3bet",steps:[{q:"頻度と構成は？（バリュー/ブラフ）",a:"3bet13.9%/コール25.8%/フォールド60.3%。ポラー：バリュー=QQ+/AK/AQ、ブラフ=A5s/A4s・スーテッド下限Jローs・SC・Axロー。3betサイズ約13bb"}]},
 {tag:"プリフロ暗記",sc:"★BBの守り方は相手ポジで変わる（実測）",steps:[{q:"vs UTG/HJ と vs BTN で守り方はどう違う？",a:"vs EP(UTG3bet5.2%/HJ6.1%・コール33-37%)=コールで守る（open小でオッズ良）。vs BTN(3bet13.9%・コール25.8%)=ポラー3betで広いレンジを突く（コール減）。フォールドは57-62%で大差なし"}]},
@@ -340,7 +345,23 @@ var COLUMNS=[
 <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin:2px 0 10px;"><span>弱(BB)</span><span style="flex:1;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--coral));"></span><span>強(SB)</span></div>
 <p>弱いBB＝小サイズ33%レンジベット／強いSB＝<b>大型ポラー化</b>。例：中ペア883 ＝ BB相手33%小 → SB相手オーバーベット49%。</p>
 <div class="csec">使い方</div>
-<p>ボードを見たら「自分はこの3軸のどこに立つか」を問う。同じK72rでも、UTGのIPでBB相手なら<b>純レンジベット</b>、SBのOOPなら<b>大サイズ＋チェック多</b>。ボードは出発点、戦略は3軸で決まる。</p>`}
+<p>ボードを見たら「自分はこの3軸のどこに立つか」を問う。同じK72rでも、UTGのIPでBB相手なら<b>純レンジベット</b>、SBのOOPなら<b>大サイズ＋チェック多</b>。ボードは出発点、戦略は3軸で決まる。</p>`},
+{t:"RFI下限のなぜ",s:"境界は理由で動く",h:`<p>系統別下限は<b>丸暗記</b>でもいいが、<b>「なぜそこで切れるか」</b>を言語化できると、忘れても再構築できる。下限を決めるのは次の3つだ。</p>
+<ul>
+<li><span class="ckey">①レンジ優位の濃さ</span>（自分のオープンの強さ）</li>
+<li><span class="ckey">②位置＝実現性</span>（IPほど薄い手も利益化）</li>
+<li><span class="ckey">③ハンド固有の価値</span>（接続・ブロッカー）</li>
+</ul>
+<div class="csec">なぜ広いポジほど下限が深い（位置勾配）</div>
+<p>タイトなUTG(17.6%)は<b>レンジ優位が濃い</b>。薄い手を足すと、その優位を自ら薄めてしまう。BTN(42%)は後ろが少なく、<b>ポジション（IPで実現しやすい）</b>とフォールドエクイティで薄い手も利益が出る。だから UTG→BTN で下限が1〜2段ずつ深くなる。SBはBBと必ずヘッズアップで、後ろ1人なぶん広いが、毎回OOPになる短所をリンプで補う。</p>
+<div class="csec">なぜCOのオフA5oが“飛び地”か</div>
+<p>COでは A7o/A6o は折りるのに <b>A5oだけ純open</b>。理由は<b>Aブロッカー＋ホイール性</b>。A5oは相手の強Aを1枚減らし（3betされにくい）、5があることでホイール/ストレートの実現が A7o/A6o より上。<b>頻度の谷で価値が局所的に跳ねる</b>＝Axo は「上から順」ではなくブロッカーで割れる好例。</p>
+<div class="csec">なぜBTNは43s/53sを折りるのに65s/54sは開くか</div>
+<p>最下層のスーテッドは<b>「スート」より「接続」</b>が価値。54s/65sは<b>両面ストレート性</b>が高く実現しやすい。43s/53sは下が詰まりストレートの出口が狭く、実現性が落ちる。だから42%の広いBTNでも折りる。<b>スーテッドだから何でも開く、ではない</b>＝SC下限は54s。</p>
+<div class="csec">なぜ同じハンドの“役割”が反転するか</div>
+<p>KJoはUTGで混合、HJ/BTNで純open。同じ紙でも、<b>自分のレンジが濃いほど</b>薄い手は要らず、<b>薄いほど</b>同じ手が立派な上位になる。これは「ハンドの強さは相手・自レンジ次第（背骨#3）」がプリフロで出たもの。下限を覚える時も<b>「このポジでこの手は何番手か」</b>を問うと筋が通る。</p>
+<div class="csec">まとめ</div>
+<p>下限＝<b>①レンジ優位の濃さ ②位置（実現性）③ハンド固有の価値（接続・ブロッカー）</b>の三つで決まる。数字を忘れても、この3つを口に出せれば再構築できる。</p>`}
 ];
 var colIdx=0;
 var KEY='pokerSRS_v1',IV={1:1,2:2,3:4,4:8,5:16};
@@ -361,10 +382,10 @@ function markDay(n){var s=loadStreak();var today=tstr();
  }
  saveStreak(s);return s;}
 var prog=load(),t=tstr(),mode=localStorage.getItem('pokerMode')||'all';
-function catOf(it){if(it.type==='fill'){if(it.tag==='プリフロ暗記')return 'プリフロップ';if(it.tag==='フロップCB暗記')return 'フロップ';if(it.tag==='3betCB暗記')return '3betポット';if(it.tag==='エクスプロイト')return 'エクスプロイト';return '穴埋め・実戦';}var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='スポット')return 'スポット';return 'その他';}
+function catOf(it){if(it.type==='fill'){if(it.tag==='プリフロ暗記'||it.tag==='RFI復元')return 'プリフロップ';if(it.tag==='フロップCB暗記')return 'フロップ';if(it.tag==='3betCB暗記')return '3betポット';if(it.tag==='エクスプロイト')return 'エクスプロイト';return '穴埋め・実戦';}var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='スポット')return 'スポット';return 'その他';}
 var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','3betポット','ターン','スポット','エクスプロイト','穴埋め・実戦'];
 function mastery(){var m={};CATORDER.forEach(function(c){m[c]={s:0,n:0};});ALL.forEach(function(it){var c=catOf(it);if(!m[c])return;var r=prog[it.id];m[c].s+=(r?r.box:0);m[c].n++;});var out=[];CATORDER.forEach(function(c){if(m[c].n)out.push({k:c,v:Math.round(m[c].s/(m[c].n*5)*100)});});return out;}
-function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.filter(function(f){return f.tag==='穴埋め';});if(mode==='pre')return FILLS.filter(function(f){return f.tag==='プリフロ暗記';});if(mode==='cb')return FILLS.filter(function(f){return f.tag==='フロップCB暗記';});if(mode==='3bet')return FILLS.filter(function(f){return f.tag==='3betCB暗記';});if(mode==='exploit')return FILLS.filter(function(f){return f.tag==='エクスプロイト';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
+function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.filter(function(f){return f.tag==='穴埋め';});if(mode==='pre')return FILLS.filter(function(f){return f.tag==='プリフロ暗記';});if(mode==='rebuild')return FILLS.filter(function(f){return f.tag==='RFI復元';});if(mode==='cb')return FILLS.filter(function(f){return f.tag==='フロップCB暗記';});if(mode==='3bet')return FILLS.filter(function(f){return f.tag==='3betCB暗記';});if(mode==='exploit')return FILLS.filter(function(f){return f.tag==='エクスプロイト';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
 var view='home',queue=[],idx=0,flipped=false,fsi=0,fRevealed=false,fInputs={},fGrades={},chipTab=0;
 var root=document.getElementById('root');
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x;}return a;}
@@ -465,6 +486,9 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  matrix:function(){view='matrix';renderMatrix();try{window.scrollTo(0,0);}catch(e){}},
  rfi:function(){view='rfi';renderRFI();try{window.scrollTo(0,0);}catch(e){}},
  rfiPos:function(p){rfiPos=p;renderRFI();try{window.scrollTo(0,0);}catch(e){}},
+ rfiq:function(){view='rfiq';rfiqIJ=null;rfiqScore={n:0,ok:0};rfiPickItem();renderRFIQ();try{window.scrollTo(0,0);}catch(e){}},
+ rfiqPick:function(a){var ta=document.getElementById('rfiqwhy');if(ta)rfiqWhy=ta.value;var g=RFI[rfiqPos].g;var c=g.charAt(rfiqIJ[0]*13+rfiqIJ[1]);rfiqPick=a;rfiqScore.n++;if(a===c)rfiqScore.ok++;try{buzz(a===c?14:[6,40,6]);}catch(e){}renderRFIQ();},
+ rfiqNext:function(){rfiPickItem();renderRFIQ();try{window.scrollTo(0,0);}catch(e){}},
  cbtool:function(){view='cbtool';renderCbtool();try{window.scrollTo(0,0);}catch(e){}},
  cbPick:function(r){if(cbRanks.length>=3)cbRanks=[];cbRanks.push(r);renderCbtool();},
  cbSuit:function(s){cbSuit=s;renderCbtool();},
@@ -565,8 +589,64 @@ function renderRFI(){
  h+='<div class="csec" style="margin-top:20px;">系統別の下限（暗記）</div>';
  h+='<div style="font-size:12px;line-height:1.85;color:#c7c9cf;">'+p.low+'</div>';
  h+='<div style="font-size:11px;color:var(--dim);margin-top:14px;line-height:1.6;">位置勾配＝広いポジほど下限が深い（UTG→BTN）。覚え方＝系統ごとに「どこまで開くか」の1点を押さえ、ポジが上がるほど1〜2段下げる。</div>';
- h+='<button class="btn" style="width:100%;margin-top:18px;padding:14px;font-size:13.5px;background:rgba(201,162,39,.14);color:var(--gold);border-color:rgba(201,162,39,.45);" onclick="OWN.drill(\'pre\')">✍️ プリフロ暗記をドリルで解く →</button>';
- h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
+ h+='<div class="csec" style="margin-top:22px;">この表で鍛える</div>';
+ h+='<button class="btn" style="width:100%;margin-top:4px;padding:15px;font-size:14px;font-weight:600;background:var(--gold);color:#14171e;border:none;" onclick="OWN.rfiq()">🎯 逆引き即答ドリル（ハンド→open/混合/fold）</button>';
+ h+='<button class="btn" style="width:100%;margin-top:9px;padding:13px;font-size:13px;background:rgba(201,162,39,.12);color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.drill(\'rebuild\')">🧩 レンジ復元ドリル（系統別下限を全部書く）</button>';
+ h+='<button class="btn" style="width:100%;margin-top:9px;padding:13px;font-size:13px;background:rgba(201,162,39,.12);color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.drill(\'pre\')">✍️ プリフロ暗記（系統別に問う）</button>';
+ h+='<button class="btn" style="width:100%;margin-top:9px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.openColumn(6)">📖 なぜそこで切れるか（コラム）</button>';
+ h+='<button class="btn" style="width:100%;margin-top:14px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
+ root.innerHTML=h;
+}
+var rfiqPos='UTG',rfiqIJ=null,rfiqPick=null,rfiqWhy='',rfiqScore={n:0,ok:0};
+function rfiPickItem(){
+ var poss=['UTG','HJ','CO','BTN','SB'];var pos=poss[Math.floor(Math.random()*5)];
+ var g=RFI[pos].g,tries=0,i=0,j=0;
+ function ok(i,j){var a=g.charAt(i*13+j);if(a==='R'||a==='M')return true;
+  var nb=[[i-1,j],[i+1,j],[i,j-1],[i,j+1]];
+  for(var k=0;k<4;k++){var r=nb[k][0],c=nb[k][1];if(r>=0&&r<13&&c>=0&&c<13){var b=g.charAt(r*13+c);if(b==='R'||b==='M')return true;}}
+  return false;}
+ do{i=Math.floor(Math.random()*13);j=Math.floor(Math.random()*13);tries++;}while(!ok(i,j)&&tries<300);
+ rfiqPos=pos;rfiqIJ=[i,j];rfiqPick=null;rfiqWhy='';
+}
+function rfiReason(pos,i,j){
+ var g=RFI[pos].g,R=RFI_RANKS;function ch(a,b){return g.charAt(a*13+b);}
+ var fam,bound,k,c,r,b;
+ var label=i===j?(R[i]+R[i]):(i<j?(R[i]+R[j]+'s'):(R[j]+R[i]+'o'));
+ if(i===j){var lo=i;for(k=12;k>=0;k--){if(ch(k,k)==='R'||ch(k,k)==='M'){lo=k;break;}}fam='ペア';bound=R[lo]+R[lo]+'+';}
+ else if(i<j){b=i;for(c=12;c>i;c--){var a1=ch(i,c);if(a1==='R'||a1==='M'){b=c;break;}}fam=R[i]+'xs';bound=R[i]+R[b]+'s';}
+ else{b=j;for(r=12;r>j;r--){var a2=ch(r,j);if(a2==='R'||a2==='M'){b=r;break;}}fam=R[j]+'xo';bound=R[j]+R[b]+'o';}
+ var cell=ch(i,j),verdict=cell==='R'?'純open':cell==='M'?'混合（約半分open）':'fold（下限の外）';
+ return {label:label,fam:fam,bound:bound,cell:cell,verdict:verdict};
+}
+function renderRFIQ(){
+ if(!rfiqIJ)rfiPickItem();
+ var pos=rfiqPos,i=rfiqIJ[0],j=rfiqIJ[1],info=rfiReason(pos,i,j);
+ var h=colBack('OWN.rfi()','RFIレンジ表');
+ h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">逆引き即答</div><span class="mono" style="font-size:12px;color:var(--muted);">正答 '+rfiqScore.ok+' / '+rfiqScore.n+'</span></div>';
+ h+='<div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5;">出たハンドを「純open／混合／fold」で即答。下限との距離を言語化する筋トレ。</div>';
+ // hand card
+ h+='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.3);border-radius:16px;padding:22px;text-align:center;margin-bottom:16px;">';
+ h+='<div style="font-size:13px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">'+pos+' から</div>';
+ h+='<div class="mono" style="font-size:48px;font-weight:600;color:var(--text);line-height:1;">'+info.label+'</div>';
+ h+='</div>';
+ if(!rfiqPick){
+  h+='<textarea id="rfiqwhy" placeholder="なぜそう判断する？（任意・自分の言葉で。例：Kxs下限はK8sだからK6sは混合域）" style="width:100%;box-sizing:border-box;min-height:64px;background:#14171e;border:.5px solid rgba(255,255,255,.12);border-radius:11px;padding:11px 13px;font-size:13px;color:var(--text);font-family:inherit;line-height:1.5;resize:vertical;margin-bottom:12px;">'+(rfiqWhy||'')+'</textarea>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
+  h+='<button class="btn" style="padding:15px 0;font-size:14px;font-weight:600;background:rgba(201,162,39,.16);color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.rfiqPick(\'R\')">純open</button>';
+  h+='<button class="btn" style="padding:15px 0;font-size:14px;font-weight:600;background:rgba(201,162,39,.08);color:#d8b54a;border-color:rgba(201,162,39,.25);" onclick="OWN.rfiqPick(\'M\')">混合</button>';
+  h+='<button class="btn" style="padding:15px 0;font-size:14px;font-weight:600;background:rgba(255,255,255,.04);color:#9a9da4;border-color:rgba(255,255,255,.12);" onclick="OWN.rfiqPick(\'F\')">fold</button>';
+  h+='</div>';
+ }else{
+  var correct=rfiqPick===info.cell;var gc=correct?'#5fc3a8':'#e8917a';
+  var pickLbl={R:'純open',M:'混合',F:'fold'}[rfiqPick];
+  h+='<div style="background:#14171e;border:.5px solid '+gc+'55;border-radius:13px;padding:15px 16px;margin-bottom:14px;">';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;"><span style="font-size:24px;color:'+gc+';font-weight:600;">'+(correct?'◎':'✗')+'</span><span style="font-size:14px;color:#dcdee3;">あなた＝'+pickLbl+' ／ 正解＝<b style="color:var(--gold);">'+info.verdict+'</b></span></div>';
+  h+='<div style="font-size:13px;line-height:1.6;color:#c7c9cf;border-top:.5px solid rgba(255,255,255,.08);padding-top:10px;"><b style="color:var(--gold);">'+info.fam+'</b> の下限は <b class="mono">'+info.bound+'</b>。'+info.label+' は <b>'+info.verdict+'</b>。</div>';
+  if(rfiqWhy)h+='<div style="font-size:12px;line-height:1.55;color:#8fc7a8;margin-top:9px;border-top:.5px solid rgba(255,255,255,.06);padding-top:9px;">あなたの言語化：'+rfiqWhy.replace(/</g,'&lt;')+'</div>';
+  h+='</div>';
+  h+='<button class="btn" style="width:100%;padding:15px;font-size:14px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.rfiqNext()">次のハンド →</button>';
+ }
+ h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.rfi()">RFIレンジ表へ戻る</button>';
  root.innerHTML=h;
 }
 var cbRanks=[],cbSuit='rainbow';
@@ -627,7 +707,7 @@ function renderColumn(){
  h+='<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">'+c.s+'</div>';
  h+='<div style="height:.5px;background:rgba(201,162,39,.25);margin:0 0 16px;"></div>';
  h+='<div class="col" style="font-size:14px;line-height:1.75;color:#dcdee3;">'+c.h+'</div>';
- var CDRILL=['fill','cb','cb','pre','memo','cb'],dlab={fill:'レンジ推定',cb:'フロップCB',pre:'プリフロ',memo:'暗記'};
+ var CDRILL=['fill','cb','cb','pre','memo','cb','rebuild'],dlab={fill:'レンジ推定',cb:'フロップCB',pre:'プリフロ',memo:'暗記',rebuild:'RFI復元'};
  h+='<button class="btn" style="width:100%;margin-top:24px;padding:15px;font-size:14px;font-weight:500;background:rgba(201,162,39,.14);color:var(--gold);border-color:rgba(201,162,39,.45);" onclick="OWN.drill(\''+CDRILL[colIdx]+'\')">✍️ このテーマをドリルで解く（'+dlab[CDRILL[colIdx]]+'）→</button>';
  if(colIdx<COLUMNS.length-1)h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);border-color:rgba(255,255,255,.12);text-align:left;" onclick="OWN.openColumn('+(colIdx+1)+')">次のコラム → '+COLUMNS[colIdx+1].t+'</button>';
  else h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.columns()">コラム一覧へ戻る</button>';
@@ -635,7 +715,7 @@ function renderColumn(){
 }
 function renderHome(){
  var ms=mastery();var avg=ms.length?Math.round(ms.reduce(function(s,d){return s+d.v;},0)/ms.length):0;
- var modes=[['all','すべて'],['memo','暗記'],['pre','プリフロ'],['cb','フロップCB(SRP)'],['3bet','3betポット'],['fill','レンジ推定'],['spot','スポット'],['exploit','エクスプロイト']];
+ var modes=[['all','すべて'],['memo','暗記'],['pre','プリフロ'],['rebuild','RFI復元'],['cb','フロップCB(SRP)'],['3bet','3betポット'],['fill','レンジ推定'],['spot','スポット'],['exploit','エクスプロイト']];
  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">'
   +'<span class="wm">OWN</span><span class="mono" style="font-size:11px;color:var(--muted);letter-spacing:1px;">SKILL MAP</span></div>'
   +praiseHTML()
@@ -648,7 +728,7 @@ function renderHome(){
  // 鍛える（クイズ）— 学びの順に並べる
  html+='<div class="sect-label">鍛える ・ クイズ</div>';
  html+='<button class="chip'+(mode==='all'?' on':'')+'" style="flex:none;width:100%;margin-bottom:6px;" onclick="OWN.setMode(\'all\')">すべて</button>';
- var qm=[['memo','暗記'],['pre','プリフロ'],['cb','フロップCB'],['3bet','3betポット'],['fill','レンジ推定'],['spot','スポット'],['exploit','エクスプロイト']];
+ var qm=[['memo','暗記'],['pre','プリフロ'],['rebuild','RFI復元'],['cb','フロップCB'],['3bet','3betポット'],['fill','レンジ推定'],['spot','スポット'],['exploit','エクスプロイト']];
  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:13px;">';
  qm.forEach(function(m){html+='<button class="chip'+(mode===m[0]?' on':'')+'" style="flex:none;" onclick="OWN.setMode(\''+m[0]+'\')">'+m[1]+'</button>';});
  html+='</div>';
