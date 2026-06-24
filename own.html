@@ -496,6 +496,8 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  rfiq2judge:async function(){var d=BBDEF[rfiqPos];if(!d)return;var sc='あなたは'+rfiqPos+'からオープンした。相手番＝BBがこのopenにどう守るか。';var q='BBの3bet/コール/foldの頻度と「型」（コールで守るかポラー3betで守るか）を言語化せよ';var a='BB vs '+rfiqPos+'＝3bet'+d.tb+'%/コール'+d.cl+'%/fold'+d.fd+'%。'+d.type.replace(/<[^>]+>/g,'')+' EP相手はコールで守り、LP/SB相手はポラー3betで守る（同じ強ブロードウェイの役割が相手位置で反転）。';rfiq2judge={loading:true};renderRFIQ();var res=await judgeCore(sc,q,a,rfiq2why);rfiq2judge=res;renderRFIQ();},
  rfiq3reveal:function(){var ta=document.getElementById('rfiq3why');if(ta)rfiq3why=ta.value;rfiq3open=true;renderRFIQ();},
  rfiq3judge:async function(){var col=RFIQ_COL[rfiqPos],row=MATRIX.rows[rfiq3tex];var sc=rfiqPos+'オープン→BBコール→フロップ'+row.b+'('+row.t+')。あなた('+rfiqPos+')のCB。';var q='レンジ/ナッツ優位はどちらか、チェック頻度は高い/低いか、なぜかを言語化せよ';var a=col===undefined?('CO発postflopは無料データに解無し。一般原則＝自レンジの濃さ×ボード×相手継続域でCB可否が決まる。'):('フロップ'+row.b+'で'+rfiqPos+'のチェック頻度は約'+row.v[col]+'%。'+row.d.replace(/<[^>]+>/g,'')+' レンジ優位が濃いほど打ち、相手の域に刺さる/ウェットだとチェック増、OOP(SB)はさらに増。');rfiq3judge={loading:true};renderRFIQ();var res=await judgeCore(sc,q,a,rfiq3why);rfiq3judge=res;renderRFIQ();},
+ rfiq4reveal:function(){var ta=document.getElementById('rfiq4why');if(ta)rfiq4why=ta.value;rfiq4open=true;renderRFIQ();},
+ rfiq4judge:async function(){var t=TURN_ARCH[rfiq4arch];var sc='フロップCBの後、ターンで「'+t.n+'」が落ちた。レンジ/優位の移動とPFRの対応。';var q='レンジ/ナッツ優位がどちらに動くか、継続attackかbrakeか、なぜかを原則で言語化せよ';var a='（ターンは実測対象外＝原則）'+t.p.replace(/<[^>]+>/g,'')+' 核心＝カードが誰のレンジを伸ばすかで優位の移動を読む（自分を伸ばす→継続／相手を伸ばす→brake）。';rfiq4judge={loading:true};renderRFIQ();var res=await judgeCore(sc,q,a,rfiq4why);rfiq4judge=res;renderRFIQ();},
  cbtool:function(){view='cbtool';renderCbtool();try{window.scrollTo(0,0);}catch(e){}},
  cbPick:function(r){if(cbRanks.length>=3)cbRanks=[];cbRanks.push(r);renderCbtool();},
  cbSuit:function(s){cbSuit=s;renderCbtool();},
@@ -607,7 +609,7 @@ function renderRFI(){
  h+='<button class="btn" style="width:100%;margin-top:14px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
  root.innerHTML=h;
 }
-var rfiqPos='UTG',rfiqIJ=null,rfiqPick=null,rfiqWhy='',rfiqScore={n:0,ok:0},rfiqJudge=null,rfiq2open=false,rfiq2why='',rfiq2judge=null,rfiq3open=false,rfiq3why='',rfiq3judge=null,rfiq3tex=0;
+var rfiqPos='UTG',rfiqIJ=null,rfiqPick=null,rfiqWhy='',rfiqScore={n:0,ok:0},rfiqJudge=null,rfiq2open=false,rfiq2why='',rfiq2judge=null,rfiq3open=false,rfiq3why='',rfiq3judge=null,rfiq3tex=0,rfiq4open=false,rfiq4why='',rfiq4judge=null,rfiq4arch=0;
 function rfiPickItem(){
  var poss=['UTG','HJ','CO','BTN','SB'];var pos=poss[Math.floor(Math.random()*5)];
  var g=RFI[pos].g,tries=0,i=0,j=0;
@@ -616,7 +618,7 @@ function rfiPickItem(){
   for(var k=0;k<4;k++){var r=nb[k][0],c=nb[k][1];if(r>=0&&r<13&&c>=0&&c<13){var b=g.charAt(r*13+c);if(b==='R'||b==='M')return true;}}
   return false;}
  do{i=Math.floor(Math.random()*13);j=Math.floor(Math.random()*13);tries++;}while(!ok(i,j)&&tries<300);
- rfiqPos=pos;rfiqIJ=[i,j];rfiqPick=null;rfiqWhy='';rfiqJudge=null;rfiq2open=false;rfiq2why='';rfiq2judge=null;rfiq3open=false;rfiq3why='';rfiq3judge=null;rfiq3tex=Math.floor(Math.random()*MATRIX.rows.length);
+ rfiqPos=pos;rfiqIJ=[i,j];rfiqPick=null;rfiqWhy='';rfiqJudge=null;rfiq2open=false;rfiq2why='';rfiq2judge=null;rfiq3open=false;rfiq3why='';rfiq3judge=null;rfiq3tex=Math.floor(Math.random()*MATRIX.rows.length);rfiq4open=false;rfiq4why='';rfiq4judge=null;rfiq4arch=Math.floor(Math.random()*TURN_ARCH.length);
 }
 function judgeBlockHtml(why,res,handler){
  if(!why)return getKey()?'<div style="margin-top:12px;font-size:11.5px;color:#85888f;background:rgba(255,255,255,.03);border-radius:8px;padding:9px 11px;">💬 書いてから進めると、Claudeが言語化を判定できます</div>':'';
@@ -674,6 +676,30 @@ function rfiq3Html(pos){
  }
  h+='</div>';return h;
 }
+var TURN_ARCH=[
+ {n:'ブランク（下位・絡まないカード）',p:'両者のレンジ・優位は大きく動かない。フロップで優位だった側がそのまま継続（セカンドバレル）。レンジは絞られるが相対関係は維持。'},
+ {n:'オーバーカード（A / K）',p:'PFRのレンジに刺さりやすい（PFRはA/Kを多く持つ）→PFR優位が増し継続attackが有利。ただしコーラーにAx/Kxのトップができる分も意識。'},
+ {n:'フラッシュ完成（3枚目のスート）',p:'ナッツがコーラー側にも完成しうる→PFRはナッツ放銃の恐怖でbrake／サイズ抑制・チェック増。※相手が裸フラドロを早期にジャム/CRで消費していたら相手のレンジはフラッシュをキャップ→逆にオーバーベットでattack（HHP exploit）。'},
+ {n:'ストレート / 接続カード',p:'コーラーの域（SC・2ペア・ガッショ）が完成しやすい→PFRのレンジ優位が薄まりチェック増。ナッツ優位が相手に移りやすいので慎重に。'},
+ {n:'ボードペア',p:'トリップス/フルハウスの分布次第。PFRがそのペアのトップを持てるボードなら優位維持で継続、コーラーがトリップスを持てるならチェック寄り。'}
+];
+function rfiq4Html(){
+ var t=TURN_ARCH[rfiq4arch];
+ var h='<div style="margin-top:14px;border-top:.5px solid rgba(201,162,39,.25);padding-top:14px;">';
+ h+='<div style="font-size:11px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">④ ターン ・ レンジ/優位の移動</div>';
+ h+='<div style="font-size:10px;color:var(--dim);margin-bottom:8px;">原則ベース（ターンはWizard実測の対象外＝数値なし）</div>';
+ if(!rfiq4open){
+  h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.6;margin-bottom:10px;">ターンで <b style="color:var(--gold);">'+t.n+'</b> が落ちた。<b>レンジ/ナッツ優位はどっちに動く？</b> あなた(PFR)は継続attackかbrake（チェック）か、なぜ。</div>';
+  h+='<textarea id="rfiq4why" placeholder="例：このカードは相手の域を完成させる→優位が相手に移る→brake寄り…" style="width:100%;box-sizing:border-box;min-height:56px;background:#14171e;border:.5px solid rgba(255,255,255,.12);border-radius:11px;padding:11px 13px;font-size:13px;color:var(--text);font-family:inherit;line-height:1.5;resize:vertical;margin-bottom:10px;">'+(rfiq4why||'')+'</textarea>';
+  h+='<button class="btn" style="width:100%;padding:13px;font-size:13.5px;background:rgba(201,162,39,.14);color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.rfiq4reveal()">原則を見る →</button>';
+ }else{
+  h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.7;background:rgba(201,162,39,.06);border-radius:9px;padding:11px 13px;">'+t.p+'</div>';
+  h+='<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.6;">核心＝<b>カードが「誰のレンジを伸ばすか」</b>で優位の移動を読む。自分を伸ばす→継続／相手を伸ばす→brake。</div>';
+  if(rfiq4why)h+='<div style="font-size:12px;line-height:1.55;color:#8fc7a8;margin-top:10px;">あなたの言語化：'+rfiq4why.replace(/</g,'&lt;')+'</div>';
+  h+=judgeBlockHtml(rfiq4why,rfiq4judge,'OWN.rfiq4judge');
+ }
+ h+='</div>';return h;
+}
 function rfiReason(pos,i,j){
  var g=RFI[pos].g,R=RFI_RANKS;function ch(a,b){return g.charAt(a*13+b);}
  var fam,bound,k,c,r,b;
@@ -689,7 +715,7 @@ function renderRFIQ(){
  var pos=rfiqPos,i=rfiqIJ[0],j=rfiqIJ[1],info=rfiReason(pos,i,j);
  var h=colBack('OWN.rfi()','RFIレンジ表');
  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">逆引き即答</div><span class="mono" style="font-size:12px;color:var(--muted);">正答 '+rfiqScore.ok+' / '+rfiqScore.n+'</span></div>';
- h+='<div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5;">①自分のopen→②相手(BB)の守り→③フロップCB まで言語化。<b style="color:#c7c9cf;">自/相手レンジ→変化→優位</b>の4ステップを1ハンドで回す筋トレ。</div>';
+ h+='<div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5;">①open→②相手の守り→③フロップCB→④ターン まで言語化。<b style="color:#c7c9cf;">自/相手レンジ→ストリートでの変化→優位</b>を1ハンドで追う筋トレ。</div>';
  // hand card
  h+='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.3);border-radius:16px;padding:22px;text-align:center;margin-bottom:16px;">';
  h+='<div style="font-size:13px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">'+pos+' から</div>';
@@ -711,7 +737,7 @@ function renderRFIQ(){
   if(rfiqWhy)h+='<div style="font-size:12px;line-height:1.55;color:#8fc7a8;margin-top:9px;border-top:.5px solid rgba(255,255,255,.06);padding-top:9px;">あなたの言語化：'+rfiqWhy.replace(/</g,'&lt;')+'</div>';
   h+='</div>';
   h+=judgeBlockHtml(rfiqWhy,rfiqJudge,'OWN.rfiqJudge');
-  if(info.cell==='R'||info.cell==='M'){h+=rfiq2Html(pos,i,j);if(rfiq2open)h+=rfiq3Html(pos);}
+  if(info.cell==='R'||info.cell==='M'){h+=rfiq2Html(pos,i,j);if(rfiq2open)h+=rfiq3Html(pos);if(rfiq3open)h+=rfiq4Html();}
   h+='<button class="btn" style="width:100%;margin-top:16px;padding:15px;font-size:14px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.rfiqNext()">次のハンド →</button>';
  }
  h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.rfi()">RFIレンジ表へ戻る</button>';
