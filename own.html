@@ -48,9 +48,9 @@ var CARDS=[
 {q:"【深さ】200bbでSBのオープンはどう変わる？",a:"リンプを完全に捨てて純レイズ化。100bb=37.5%+リンプ11% → 200bb=43.3%純レイズ・リンプ消滅。",tag:"深さ"},
 {q:"【深さ】200bbで5bet(BB vs BTN4bet)はどう変わる？",a:"オールインジャム→『75bbへのサイズドレイズ』が主役に。100bb=純ジャム31.4% → 200bb=Raise75 19.7%＋ジャム8.1%。深いとコミットの代償が上がりサイズドで継続。",tag:"深さ"},
 {q:"【深さ】200bbで3bet/4betの各レベルに共通する変化は？",a:"フラット(コール)が増える。BTNが3betを28.6%コール(vs 17.1)。深いほどポストフロップを戦う余地を残す＝ツリーがジャム決着→コール/サイズド継続へ降温(de-escalation)。",tag:"深さ"},
-{q:"【深さ】200bbのフロップCBの一番大きな変化は？(一語で)",a:"圧縮(compression)。100bbで0.5〜50%とバラついたCB頻度が200bbでは約27〜60%に収束。乾いたボードを打つエッジが消える(K72r 0.5→27.2、KQJ 10→49)。",tag:"深さ"},
-{q:"【深さ】「乾いたKハイ＝純レンジベット」は200bbでも成立する？",a:"しない＝100bb・IP限定の現象。K72r HJは100bb 0.5%チェック→200bb 27.2%チェック＋サイズも50%主体に上昇。高SPRで小サイズのレンジベットが機能しない。",tag:"深さ"},
-{q:"【深さ】深さの効果はIPとOOPどちらに強く出る？",a:"ほぼIP現象。OOP(SB)は100bbで既にチェック天井に近く小動。結果、乾いた高ボードはIP↔OOPが収束(KQJ 55点差→8点差)、ウェット/ペアはOOPが純チェック化(976 OOP91)。",tag:"深さ"},
+{q:"【深さ】200bbのフロップCBの一番大きな変化は？(一語で)",a:"圧縮(compression)。100bbで0.5〜50%とバラついたCB頻度が200bbでは約27〜60%に収束。ドライなボードを打つエッジが消える(K72r 0.5→27.2、KQJ 10→49)。",tag:"深さ"},
+{q:"【深さ】「ドライなKハイ＝純レンジベット」は200bbでも成立する？",a:"しない＝100bb・IP限定の現象。K72r HJは100bb 0.5%チェック→200bb 27.2%チェック＋サイズも50%主体に上昇。高SPRで小サイズのレンジベットが機能しない。",tag:"深さ"},
+{q:"【深さ】深さの効果はIPとOOPどちらに強く出る？",a:"ほぼIP現象。OOP(SB)は100bbで既にチェック天井に近く小動。結果、ドライなハイボードはIP↔OOPが収束(KQJ 55点差→8点差)、ウェット/ペアはOOPが純チェック化(976 OOP91)。",tag:"深さ"},
 {q:"【深さ】200bbの一言サマリーは？",a:"de-escalation(降温)。高SPRでコミットの代償が上がり、プリフロもポストフロップも温度が下がる＝フラット増・サイズド5bet・チェック増。",tag:"深さ"},
 {q:"オーバーペア vs アンダーペアのEQ（AA vs KK）は？",a:"約 80 : 20",tag:"EQ"},
 {q:"2オーバー vs アンダーペア（AK vs 22）のEQは？ 通称は？",a:"約 50 : 50（フリップ）",tag:"EQ"},
@@ -156,7 +156,7 @@ var FILLS=[
 {tag:"フロップCB暗記",board:"As7h2c",sc:"HJ vs BB SRP・ドライAハイ A72r（PFRのCB・実測）",steps:[{q:"c-bet戦略は？",a:"レンジベットではない！チェック47.7%。打つ時は33%主体(42%)。BBにAxがほぼ無く、PFRはマージナル域をチェックバックできる"},{q:"内訳：どのハンドで打って、どのハンドでチェックバックする？",a:"打つ(33%主体)＝AA/77/22のセット・Aトップペア(AK〜AT・Axs)の多く・空気の一部をバックドア付きでブラフ。チェックバック＝KK〜99のアンダーペア(SDVあり改善しない)・キッカー弱いAxの一部・完全な空気。AAでも約2割はチェック"}]},
 {tag:"フロップCB暗記",board:"Ks7h2c",sc:"HJ vs BB SRP・ドライKハイ K72r 内訳（PFRのCB・実測）",steps:[{q:"K72rはほぼ全レンジで33%。バリューと空気で何が違う？A72rとの差は？",a:"ほぼ全レンジが打つ(チェック0.5%)が、サイズが段階的：33%57%/50%31%/76%11%。空気・弱キッカーは33%小、強いハンド(AA/KK/77・22セット・強Kx)は50〜76%を混ぜる(AAは50/76多め)。A72rと真逆でマージナルを打ち切る。理由＝BBにKx/Qx/ドローの継続域があり全域で打つ価値が立つ"}]},
 {tag:"フロップCB暗記",board:"AhKh4c",sc:"HJ vs BB SRP・ナッツ優位 AK4ツートーン 内訳（PFRのCB・実測）",steps:[{q:"なぜ中サイズが無く、OBかチェックの2極？何を打って何をチェック？",a:"オーバーベット124%＝AA/KK/AK等のナッツ級2ペア+(ナッツ優位を最大化)＋ブラフ(フラドロ・弱め空気をブロッカーで)。チェック＝中途半端な1ペア(Ax/Kxでキッカー弱・ポット膨らませたくないハンド)とSDV。中サイズは中間が宙ぶらりんになるので排除＝純ポラー"}]},
-{tag:"フロップCB暗記",sc:"★なぜBTNは同じK72rで1/3チェックなのか",steps:[{q:"HJは0.5%しかチェックしないのに、BTNがK72rで34.7%チェックする理由は？",a:"BTNの広いオープンには『K72で打っても得しない弱い空気』が多い。さらにBBはvs BTNを広くディフェンス→相手にKx/Qx/ドローが厚くBTNのレンジ優位が薄まる。よってBTNは価値の薄いハンドをチェックバックに回す。レンジベットの可否はボードの乾きでなく自分のレンジの濃さ×相手の継続域で決まる"}]},
+{tag:"フロップCB暗記",sc:"★なぜBTNは同じK72rで1/3チェックなのか",steps:[{q:"HJは0.5%しかチェックしないのに、BTNがK72rで34.7%チェックする理由は？",a:"BTNの広いオープンには『K72で打っても得しない弱い空気』が多い。さらにBBはvs BTNを広くディフェンス→相手にKx/Qx/ドローが厚くBTNのレンジ優位が薄まる。よってBTNは価値の薄いハンドをチェックバックに回す。レンジベットの可否はボードのドライさでなく自分のレンジの濃さ×相手の継続域で決まる"}]},
 {tag:"フロップCB暗記",board:"Ks7h2c",sc:"HJ vs BB SRP・ドライKハイ K72r（PFRのCB・実測）",steps:[{q:"c-bet戦略は？",a:"ほぼ純レンジベット。チェック0.5%。33%主体(57%)＋50%(31%)。BBにKx/Qx継続域がありPFRのレンジ優位が圧倒的"}]},
 {tag:"フロップCB暗記",board:"9s7h6c",sc:"HJ vs BB SRP・ローコネクト 976r（PFRのCB・実測）",steps:[{q:"c-bet戦略は？",a:"チェック47.6%。レンジベット不成立。打つ時は33%(29%)/50%(22%)混合。BBの域が刺さりレンジ優位が薄い"},{q:"内訳：オーバーペア(AA)はどうする？50%サイズが多い理由は？",a:"AAでも約61%チェック！ダイナミックなコネクテッドボードでオーバーペアは脆弱(BBに2ペア/ストレート/ドローが厚い)→大半チェックバック。打つハンド＝メイドの保護＋ストレート/ドローのセミブラフ、33/50混合で50%多め＝相手のドローを高く課金するため。ドライボードの小サイズと違い動くボードは1段大きく"}]},
 {tag:"フロップCB暗記",sc:"HJ vs BB SRP・テクスチャ別チェック頻度（★通説の訂正）",steps:[{q:"K72r / 976r / A72r をチェック頻度の高い順に？",a:"976r・A72r≈48% ＞ 全フロップ平均37% ＞ K72r 0.5%。「Aハイ=レンジベット」は誤り。レンジベットが成立するのはKハイドライ（相手に継続域があり自分のレンジ優位が圧倒的な時）"}]},
@@ -164,15 +164,15 @@ var FILLS=[
 {tag:"フロップCB暗記",sc:"SRP・PFRのCB頻度はポジションでどう変わる？（実測・全フロップ平均）",steps:[{q:"UTG / HJ / BTN vs BB のチェック頻度は？",a:"UTG 37.6% ≒ HJ 36.8% ＜ BTN 51.1%。広いオープンほどチェック増＆サイズ大（ポラー）。BTNはオーバーベット6%まで使う"}]},
 {tag:"フロップCB暗記",board:"Ks7h2c",sc:"K72r・同じボードでもポジションで激変（実測）",steps:[{q:"K72rでHJ vs BB と BTN vs BB のチェック頻度は？",a:"HJ 0.5%（純レンジベット）／ BTN 34.7%。BTNは広いレンジで優位が薄れ、ドライKハイでも3割チェック。ボードだけでなく『自分のレンジの濃さ』で決まる"}]},
 {tag:"フロップCB暗記",sc:"SRP・ドライハイカードの梯子（HJ vs BB・実測）",steps:[{q:"A72r / K72r / Q72r をチェック頻度の高い順に？理由は？",a:"A72r 47.7% ≫ Q72r 1.4% ≒ K72r 0.5%。Aハイだけ別格にチェック多い＝BBはAxをほぼ持たず（fold/3bet）PFRがマージナルをチェックバックできる。K/QハイはBBにKx/Qx・ドローがありprotectionで純レンジベット"}]},
-{tag:"フロップCB暗記",sc:"★SRP・ドライK/QハイはHJとBTNでチェック頻度が激変（実測）",steps:[{q:"K72r・Q72rでHJ vs BB と BTN vs BB のチェック頻度は？何が言える？",a:"K72r: HJ 0.5% → BTN 34.7% ／ Q72r: HJ 1.4% → BTN 37%。『ドライハイカード＝33%レンジベット』はタイトレンジ(UTG/HJ)限定。広いBTNは同じ乾いたボードでも1/3チェック。レンジベットの成否はボードの乾きより『自分のオープンの濃さ＝レンジ優位』で決まる"}]},
+{tag:"フロップCB暗記",sc:"★SRP・ドライK/QハイはHJとBTNでチェック頻度が激変（実測）",steps:[{q:"K72r・Q72rでHJ vs BB と BTN vs BB のチェック頻度は？何が言える？",a:"K72r: HJ 0.5% → BTN 34.7% ／ Q72r: HJ 1.4% → BTN 37%。『ドライハイカード＝33%レンジベット』はタイトレンジ(UTG/HJ)限定。広いBTNは同じドライなボードでも1/3チェック。レンジベットの成否はボードのドライさより『自分のオープンの濃さ＝レンジ優位』で決まる"}]},
 {tag:"フロップCB暗記",sc:"SRP・コネクテッドボードKQJはポジションで最大の差（実測）",steps:[{q:"KQJでHJ vs BB と BTN vs BB のチェック頻度は？",a:"HJ 10.2%（高頻度CB）→ BTN 53.6%（半分チェック）。差+43で全テクスチャ最大。広いBTNはBBの広いディフェンスにレンジ優位を取れず、コネクテッドハイボードで半分チェックになる"}]},
 {tag:"フロップCB暗記",board:"8s8h3c",sc:"★SRP・ペアボードだけ位置トレンドが逆転（実測）",steps:[{q:"883中ペアでHJ vs BB と BTN vs BB のチェック頻度は？なぜ逆転？",a:"HJ 48.1% → BTN 32.7%（BTNの方がチェック少＝ベット多）。他テクスチャは全部BTNがチェック多いのに、ペアボードだけ逆。理由: ペアボードはBTNの広いレンジのオーバーカード/エクイティがベット価値を持ち、HJの濃い大ペア中心レンジはチェックバックの余裕がある"}]},
 {tag:"フロップCB暗記",board:"KsQhJc",sc:"SRP・ブロードウェイコネクテッド KQJ（HJ vs BB・実測）",steps:[{q:"CB戦略は？",a:"高頻度CB。チェック10.2%・33%(63%)＋50%(25%)。コネクテッドなハイボードはPFRのレンジ優位が強い（AK/AQ/KK/QQ/JJ/ストレート）"},{q:"内訳：AAは？976(コネクテッドロー)と何が違う？",a:"AAでも約96%打つ(33%主体)！＝976でAAが61%チェックだったのと真逆。同じコネクテッドボードでもKQJはPFRのブロードウェイ濃いレンジに刺さる→ほぼ全域ベット。976は低くてBBに刺さりオーバーペアが脆弱→チェック。コネクテッド度でなくコネクテッドが誰のレンジに刺さるかで決まる"}]},
 {tag:"フロップCB暗記",board:"AhKh4c",sc:"SRP・ナッツ優位 AK4ツートーン（HJ vs BB・実測）",steps:[{q:"CB戦略は？",a:"純ポラー。チェック45.2%＋オーバーベット124%(50%)。小中サイズ皆無。AA/KK/AKのナッツ優位を活かしurgency優先で大きく焚く"}]},
 {tag:"フロップCB暗記",board:"8s8h3c",sc:"SRP・中ペアボード 883（HJ vs BB・実測）",steps:[{q:"CB戦略とサイズの特徴は？",a:"チェック48.1%＋33%(51%)。サイズは33%一択で大サイズ皆無。ペアボードは小サイズかチェックの二択"},{q:"内訳：オーバーペア(AA)はどうする？なぜ？",a:"なんとAAでも約52%チェック！ドライボードでAAは『worseから価値を取れず・protection不要』→半分チェックバック。打つ(33%)＝8xトリップス・薄いバリュー・バックドア空気のブラフ。大サイズ皆無はナッツ優位が穏やかだから。ペアボードは価値ハンドすらチェック多めが核"}]},
 {tag:"フロップCB暗記",board:"Ks9s4s",sc:"SRP・Kハイモノトーン K94mono（HJ vs BB・実測）",steps:[{q:"ドライK72r(チェック0.5%)とどう違う？",a:"チェック50.3%・33%(38%)。同じKハイでもモノトーンは半分チェック（フラッシュ完成を警戒しレンジ優位が薄れる）。Kハイ=常にレンジベットではない"},{q:"内訳：モノトーンで打つハンドとチェックするハンドの分かれ目は？(AAの例)",a:"★その色(スート)を持ってるかが分岐！ A♠持ちAA(ナッツフラドロ)＝85%ベット、♠無しAA＝41%チェック。打つ＝フラッシュ札持ち(A♠/K♠等のFD・メイドフラッシュ・セット)、チェック＝色無しの脆弱なオーバーペア/トップペア。モノトーンはハンドセレクションがスート保有で決まる"}]},
-{tag:"フロップCB暗記",board:"JhTs9c",sc:"SRP・コネクテッドウェット JT9ツートーン（HJ vs BB・実測）",steps:[{q:"CB戦略は？ドライハイボードと何が違う？",a:"チェック10.6%＝高頻度CB。ただしコネクテッド度が高いぶん50%サイズの比率UP（50%が40%/33%が45%）。乾いたハイボードより1段大きいサイズを混ぜる"}]},
-{tag:"フロップCB暗記",board:"Ah9h6c",sc:"SRP・Aハイウェット A96ツートーン（HJ vs BB・実測）",steps:[{q:"CB戦略は？ドライA72rとどう違う？",a:"チェック52.2%（A72rの47.7%よりさらにチェック多い）＋打つ時は33/50/76/OBに分散しポラー化。Aハイは乾いても濡れてもチェック寄り、濡れると更にポラー"}]},
+{tag:"フロップCB暗記",board:"JhTs9c",sc:"SRP・コネクテッドウェット JT9ツートーン（HJ vs BB・実測）",steps:[{q:"CB戦略は？ドライハイボードと何が違う？",a:"チェック10.6%＝高頻度CB。ただしコネクテッド度が高いぶん50%サイズの比率UP（50%が40%/33%が45%）。ドライなハイボードより1段大きいサイズを混ぜる"}]},
+{tag:"フロップCB暗記",board:"Ah9h6c",sc:"SRP・Aハイウェット A96ツートーン（HJ vs BB・実測）",steps:[{q:"CB戦略は？ドライA72rとどう違う？",a:"チェック52.2%（A72rの47.7%よりさらにチェック多い）＋打つ時は33/50/76/OBに分散しポラー化。Aハイはドライでもウェットでもチェック寄り、ウェットだと更にポラー"}]},
 {tag:"フロップCB暗記",board:"KsKh7c",sc:"SRP・ペア+ハイ KK7（HJ vs BB・実測）",steps:[{q:"CB戦略は？中ペア883とどう違う？",a:"チェック0.1%＝ほぼ純レンジベット(33%73%＋50%25%)。ハイカード随伴のペアはレンジ優位が濃く打ち切る。中ペア883(チェック48%)とは別物"}]},
 {tag:"フロップCB暗記",board:"As7h3d",sc:"3betポット・Aハイボード（A73等）",steps:[{q:"c-bet戦略は？",a:"20%を広く（A73等セカンドが低いとチェック半分）"}]},
 {tag:"フロップCB暗記",sc:"3betポット・Kハイボード",steps:[{q:"c-bet戦略は？",a:"33%をレンジ全体"}]},
@@ -194,11 +194,11 @@ var FILLS=[
 {tag:"3betCB暗記",sc:"BB3bp・CB思考のフローチャート",steps:[{q:"3ステップは？",a:"STEP1 shirk判定(2shirk+overcard/3shirk→レンジチェック) → STEP2 monotone判定 → STEP3 hicard分類(Ahi 20%/AKpolar・Khi 20-75%・Qhi- 50-75%polar)"}]},
 {tag:"3betCB暗記",sc:"★SRP と BB3bp のCB基調の違い",steps:[{q:"BTN vs BBで両者どう違う？",a:"SRP=低頻度small基調（チェック約51%・Wizard実測）。BB3bp=polar基調でAハイでもラフsmall打たずAK polar。3betポットはレンジ優位/ナッツ優位がボード毎に繊細に動く"}]},
 {tag:"フロップCB暗記",board:"JhTh9c",sc:"★SRP・コネクテッドボードはオーバーペアの中でも『ボードに絡む方』が打てる（JT9・実測）",steps:[{q:"JT9でAA(裸のオーバーペア)とQQ、打てる頻度はどっちが上？理由は？",a:"QQ約92% ＞ 裸AA約72%。QQはK or 8でストレート完成のダブルガットショット＋オーバーペアだから打てる。AAはストレートに絡まない裸のオーバーペアで脆く約28%チェック。コネクテッドボードでは同じオーバーペアでも『ボードのストレートに絡む方』が打てる＝統一則の精緻化"}]},
-{tag:"フロップCB暗記",board:"Ah9h6c",sc:"★SRP・AハイではAAは『オーバーペア』でなく『トップセット』（A96・実測）",steps:[{q:"A96でAA(トップセット)はどう動く？乾いたA72rのセット(約80%)と比べて？",a:"約64%ベット/36%チェック。A72rより濡れていてトップセットすら混合チェック。集計も52%チェック＋ポラー(OB5/76%14)。Aハイは乾いても濡れてもチェック寄り。暗記の入口でAハイは『AA=セットとして読む(天井が薄い)』"}]},
+{tag:"フロップCB暗記",board:"Ah9h6c",sc:"★SRP・AハイではAAは『オーバーペア』でなく『トップセット』（A96・実測）",steps:[{q:"A96でAA(トップセット)はどう動く？ドライなA72rのセット(約80%)と比べて？",a:"約64%ベット/36%チェック。A72rよりウェットでトップセットすら混合チェック。集計も52%チェック＋ポラー(OB5/76%14)。Aハイはドライでもウェットでもチェック寄り。暗記の入口でAハイは『AA=セットとして読む(天井が薄い)』"}]},
 {tag:"フロップCB暗記",board:"KsKh7c",sc:"★SRP・ペアボードは『ペアの高さ』で純レンジベット↔混合に割れる（KK7 vs 883・実測）",steps:[{q:"KK7と883はどちらもペアボード。AAの打てる頻度と理由の違いは？",a:"KK7=AA約99.7%(純レンジベット・チェック0.1%)、883=AA約48%(混合・チェック半分)。決定軸は『ペアの高さ』。ハイペアKK7はBBがKxをほぼ持たずPFRが圧倒的支配→打ち切る。低ペア883はドライでPFRが支配しきれず価値ハンドもチェック。『ペアボード』と一括りにできない"}]},
 {tag:"フロップCB暗記",sc:"★SRP・位置勾配の統一則（UTG/HJ/BTN 3ポジ実測）",steps:[{q:"レンジ優位ボード(A/K/Qハイ・コネクテッド・ナッツ優位)でUTG/HJ/BTNのチェック頻度の大小は？例外2つは？",a:"UTG ≤ HJ < BTN の単調（タイトなほどチェック少＝レンジ優位が濃い）。例: A72r 30.9/47.7/57.5、KQJ 2.5/10.2/53.6。例外①中ペア883は逆転(51/48/33・BTNが打つ)②ウェット976は位置中立(全ポジ約48-49)。『広い＝チェック多』はHJ→BTNで真、タイト端UTGはさらに減る"}]},
-{tag:"フロップCB暗記",board:"Ks7h2c",sc:"★SRP・位置はもう1軸ある＝IP/OOP（SB=OOP実測）",steps:[{q:"SBはBBに対しOOP。乾いたK72rでIP(HJ)は0.5%チェック。OOPのSBは？何が言える？",a:"SB約44.8%チェック！OOPはレンジ実現が悪く乾いたボードでも打ち切れず大幅チェック。位置は2軸＝①レンジ幅(タイト→ワイド・HJ→BTN)②IP/OOP(OOPでチェック激増)。SBは『ワイド＋OOP』で最もチェックが多い"}]},
-{tag:"フロップCB暗記",board:"9s7h6c",sc:"★IP/OOP差はどのボードで最大か（976・SB OOP実測）",steps:[{q:"ウェットロー976はIP3ポジ全部約48%(位置中立)。OOPのSBは？どんなボードでOOP効果が最大？",a:"SB約80%チェック！ウェット/濡れボードほどIP/OOP差が最大(976は+31 vs BTN)。ボードがBBの域に刺さる時OOPは全く実現できない。逆に乾いたAハイ(A72r)はIPも元々チェック多くOOP≈IP。『IPなら純レンジベットできるボードでこそOOPは打ち切れない』"}]},
+{tag:"フロップCB暗記",board:"Ks7h2c",sc:"★SRP・位置はもう1軸ある＝IP/OOP（SB=OOP実測）",steps:[{q:"SBはBBに対しOOP。ドライなK72rでIP(HJ)は0.5%チェック。OOPのSBは？何が言える？",a:"SB約44.8%チェック！OOPはレンジ実現が悪くドライなボードでも打ち切れず大幅チェック。位置は2軸＝①レンジ幅(タイト→ワイド・HJ→BTN)②IP/OOP(OOPでチェック激増)。SBは『ワイド＋OOP』で最もチェックが多い"}]},
+{tag:"フロップCB暗記",board:"9s7h6c",sc:"★IP/OOP差はどのボードで最大か（976・SB OOP実測）",steps:[{q:"ウェットロー976はIP3ポジ全部約48%(位置中立)。OOPのSBは？どんなボードでOOP効果が最大？",a:"SB約80%チェック！ウェットなボードほどIP/OOP差が最大(976は+31 vs BTN)。ボードがBBの域に刺さる時OOPは全く実現できない。逆にドライなAハイ(A72r)はIPも元々チェック多くOOP≈IP。『IPなら純レンジベットできるボードでこそOOPは打ち切れない』"}]},
 {tag:"フロップCB暗記",board:"AhKh4c",sc:"★OOPのナッツはオーバーベットせずチェックでトラップ（AK4tt・SB実測）",steps:[{q:"ナッツ優位AK4ttでAA(トップセット)。IPは約68%打つ。OOPのSBは？なぜ？",a:"OOPは約8%しか打たず91%チェック(トラップ)。OOPで打つと実現損→チェックしてBBに打たせ/誘う方が稼げる。OOPのナッツはオーバーベットでなくスロープレイ。位置(IP/OOP)で役の天井の使い方まで反転する"}]},
 {tag:"プリフロ暗記",sc:"★レンジ言語化の核：同じAQsが相手で役割反転（BB 3bet実測）",steps:[{q:"BBのAQs。vs UTG と vs BTN で3betかコールか？なぜ逆になる？",a:"vs UTG=コール / vs BTN=バリュー3bet。UTGは強くキャップ無し→AQsを3betすると実質ブラフキャッチを膨らませる愚→コールでレンジを厚く守る。BTNは広く弱い→AQsが明確にレンジ優位のバリュー→3betで取る。『ハンドの強さは相手レンジ次第』がプリフロでそのまま出る"}]},
 {tag:"プリフロ暗記",sc:"BB 3betのバリュー下限はオープン位置でどう動く（実測）",steps:[{q:"BBが3betするバリューのポケット下限、vs UTG/HJ/BTNで？AQs/KQsの役割は？",a:"下限 UTG QQ → HJ JJ → BTN TT+。広いほど薄く(下げて)3betできる。AQs/KQsの役割もコール→混合→バリュー3betへmorph、ブラフ量も少→大(Q/K/J-low suited追加)"}]},
@@ -283,7 +283,7 @@ var COLUMNS=[
 <div class="csec">位置は2軸ある</div>
 <ul>
 <li><span class="ckey">レンジ幅</span> … タイトなほどチェックが少ない。<b>UTG ≤ HJ &lt; BTN</b>（例外：883は逆転、976は位置中立）</li>
-<li><span class="ckey">IP/OOP</span> … OOPはレンジ実現が悪く<b>大幅にチェック</b>。乾いたボードでも打ち切れず、ウェットボードで差が最大。OOPのナッツはオーバーベットせずトラップ</li>
+<li><span class="ckey">IP/OOP</span> … OOPはレンジ実現が悪く<b>大幅にチェック</b>。ドライなボードでも打ち切れず、ウェットボードで差が最大。OOPのナッツはオーバーベットせずトラップ</li>
 </ul>
 <div class="csec">サイズ階層</div>
 <ul>
@@ -348,7 +348,7 @@ var COLUMNS=[
 <p>狭いほどレンジ優位が濃く<b>チェックが少ない</b>。UTG≈HJ &lt; BTN。例：K72r ＝ UTG0.9 / HJ0.5 / BTN34.7。</p>
 <div class="csec">軸2 ・ IP / OOP（自分の位置）</div>
 <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin:2px 0 10px;"><span>IP</span><span style="flex:1;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--teal));"></span><span>OOP</span></div>
-<p>OOPはレンジ実現が悪く<b>チェック激増</b>（特に乾いたボード・ウェットボード）。例：K72r ＝ IP0.5 ↔ SB(OOP)44.8。OOPのナッツはオーバーベットせず<b>トラップ</b>。</p>
+<p>OOPはレンジ実現が悪く<b>チェック激増</b>（特にドライなボード・ウェットボード）。例：K72r ＝ IP0.5 ↔ SB(OOP)44.8。OOPのナッツはオーバーベットせず<b>トラップ</b>。</p>
 <div class="csec">軸3 ・ callerの強さ（相手のcallレンジ）</div>
 <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin:2px 0 10px;"><span>弱(BB)</span><span style="flex:1;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--coral));"></span><span>強(SB)</span></div>
 <p>弱いBB＝小サイズ33%レンジベット／強いSB＝<b>大型ポラー化</b>。例：中ペア883 ＝ BB相手33%小 → SB相手オーバーベット49%。</p>
@@ -527,15 +527,15 @@ function next(){if(idx>=queue.length){justDone=true;markDay(queue.length);view='
 function colBack(back,label){return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><button class="btn" style="padding:6px 12px;font-size:12px;border-radius:9px;" onclick="'+back+'">&#8592; '+label+'</button><span class="mono" style="font-size:11px;color:var(--muted);">基礎コラム</span></div>';}
 var MATRIX={cols:['UTG','HJ','BTN','SB'],rows:[
 {b:'K72r',t:'ドライK',v:[0.9,0.5,34.7,44.8],d:'BBにKx/Qx/ペアの継続域があり、PFRのレンジ優位が圧倒的→純レンジベット33%小。「とりあえず33%」が効く代表'},
-{b:'Q72r',t:'ドライQ',v:[6.7,1.4,37,37.5],d:'K72rと同型の純レンジベット。乾いたハイカードはレンジ優位が濃い'},
+{b:'Q72r',t:'ドライQ',v:[6.7,1.4,37,37.5],d:'K72rと同型の純レンジベット。ドライハイカードはレンジ優位が濃い'},
 {b:'A72r',t:'ドライA',v:[30.9,47.7,57.5,48.3],d:'★Aハイの例外。BBがAxをほぼ持たない(fold/3bet)→ボードが有利すぎてマージナルを打つ価値が薄くチェックバック。半分チェック'},
 {b:'KQJ',t:'コネクテッドハイ',v:[2.5,10.2,53.6,65.3],d:'ブロードウェイのコネクテッドがPFRの濃いレンジ(AK/KK/QQ/JJ/ストレート)に刺さる→高頻度CB(33/50)。位置差が最大'},
-{b:'AK4tt',t:'ナッツ優位',v:[35.5,45.2,61.6,73.7],d:'ナッツ優位2トーン。オーバーベット124%の純ポラー(中サイズ皆無)。乾きでなくナッツ優位がサイズを決める'},
+{b:'AK4tt',t:'ナッツ優位',v:[35.5,45.2,61.6,73.7],d:'ナッツ優位2トーン。オーバーベット124%の純ポラー(中サイズ皆無)。ドライさでなくナッツ優位がサイズを決める'},
 {b:'883',t:'中ペア',v:[51.1,48.1,32.7,49.7],d:'低い中ペア。ドライで価値ハンドも保護不要→チェック多・33%一択。★広いBTNだけ逆転(オーバーカードがベット価値)'},
 {b:'976',t:'コネクトロー',v:[49.1,47.6,49.5,80.1],d:'ウェットローでBBの域に刺さりオーバーペアが脆弱→半分チェック・50%多め(保護)。IPは位置中立だがOOPで激増'},
 {b:'K94m',t:'Kハイモノ',v:[43.6,50.3,67.6,87.3],d:'モノトーン＝スート保有が全て。A♠持ち(ナッツフラドロ)は打つ/色無しオーバーペアはチェック'},
 {b:'JT9',t:'コネクテッドウェット',v:[16.9,17.3,53,69.3],d:'コネクテッドウェットハイ。高頻度CBだがドライより50%サイズが増える。オーバーペアでもボードに絡む方(QQ)が裸AAより打てる'},
-{b:'A96tt',t:'Aハイウェット',v:[50.2,52.2,62.1,71.1],d:'Aハイは乾いても濡れてもチェック寄り＋濡れるとポラー分散。AAはオーバーペアでなくトップセットとして読む'},
+{b:'A96tt',t:'Aハイウェット',v:[50.2,52.2,62.1,71.1],d:'Aハイはドライでもウェットでもチェック寄り＋ウェットだとポラー分散。AAはオーバーペアでなくトップセットとして読む'},
 {b:'852m',t:'低モノ',v:[34.5,43.1,54.9,75.6],d:'低モノトーン。スート保有が全て(色無しは打たない)。小サイズ中心'},
 {b:'KK7',t:'ペア+ハイ',v:[0.2,0.1,12.2,26.1],d:'★ハイペア。BBがKxをほぼ持たずPFR圧倒→純レンジベット。中ペア883とは別物＝ペアは「高さ」で割れる'},
 {b:'987',t:'両面ストレート2トーン',v:[55.7,54.2,57.6,89.9],d:'★OOP効果が全テクスチャ最大。超ウェット(BBにストレート/2ペア/フラドロが厚い)でPFRは半分超チェック・33/50混合。IP位置勾配は緩やか(UTG≈HJ<BTN)だがSB(OOP)は89.9%でほぼ純チェック＝+32 vs BTN。AAも約7割チェック(オーバーペアが脆い)'}
@@ -558,7 +558,7 @@ function renderMatrix(){
  h+='<div style="font-size:12.5px;line-height:1.7;color:#dcdee3;">大きく5系統で読む。<br>① <b>ドライハイカード</b>＝K/Qハイは純レンジベット。<b>Aハイだけ例外</b>(BBがAxを持たずチェック多)。<br>② <b>コネクテッド</b>＝そのつながりが<b>誰のレンジに刺さるか</b>(KQJはPFRに刺さり打つ／976はBBに刺さりチェック)。<br>③ <b>ペア</b>＝<b>高さ</b>で割れる(ハイペアKK7は純RB／中ペア883は混合)。<br>④ <b>モノトーン</b>＝<b>スート保有が全て</b>(色札持ちは打つ)。<br>⑤ <b>ナッツ優位</b>＝オーバーベットの純ポラー。<br>この分類に<b>位置3軸</b>(レンジ幅・IP/OOP・callerの強さ)が掛かって各セルが動く。</div>';
  h+='<div class="csec" style="margin-top:22px;">各ボードの特徴</div>';
  MATRIX.rows.forEach(function(r){h+='<div style="margin-bottom:11px;"><div style="font-size:13px;color:var(--text);"><span class="mono" style="color:var(--gold);">'+r.b+'</span> <span style="color:var(--muted);font-size:11.5px;">'+r.t+'</span></div><div style="font-size:12px;line-height:1.6;color:#c7c9cf;margin-top:2px;">'+r.d+'</div></div>';});
- h+='<div style="font-size:11.5px;color:var(--dim);margin-top:8px;line-height:1.6;">※この数値は全て<b>100bb</b>前提。深いスタックでは別物（乾いたボードもチェック増）＝</div>';
+ h+='<div style="font-size:11.5px;color:var(--dim);margin-top:8px;line-height:1.6;">※この数値は全て<b>100bb</b>前提。深いスタックでは別物（ドライなボードもチェック増）＝</div>';
  h+='<button class="btn" style="width:100%;margin-top:8px;padding:13px;font-size:13px;background:rgba(201,162,39,.1);color:var(--gold);border-color:rgba(201,162,39,.35);" onclick="OWN.depth()">📏 スタックの深さがもたらす変化 →</button>';
  h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
  root.innerHTML=h;
@@ -623,7 +623,7 @@ var RFIQ_SPOTS=[
  {pos:'CO',hand:'A5o',why:'★A5o飛び地：A7o/A6oはfoldなのにA5oだけ純open（A5ブロッカー＋ホイール）'},
  {pos:'UTG',hand:'AQs',tex:0,why:'★役割反転①：UTGのAQs。BBは強く守れずコール主体→AQsは厚いコールに守られる'},
  {pos:'BTN',hand:'AQs',tex:0,why:'★役割反転②：BTNの同じAQs。BBはポラー3betで広く突く→相手位置で役割が反転'},
- {pos:'HJ',hand:'AKo',tex:0,why:'★乾いたK純RB：HJ K72rはチェック0.5%＝ほぼ純レンジベット（100bb・IP限定）'},
+ {pos:'HJ',hand:'AKo',tex:0,why:'★ドライなK純RB：HJ K72rはチェック0.5%＝ほぼ純レンジベット（100bb・IP限定）'},
  {pos:'SB',hand:'KQs',tex:6,why:'★OOP×ウェット：SB 976はチェック80%＝OOPで実現できずほぼチェック'},
  {pos:'BTN',hand:'AJs',tex:2,why:'★Aハイの例外：BTN A72rはチェック57.5%。BBがAxを持たずマージナルをチェックバック'},
  {pos:'SB',hand:'AKs',tex:4,why:'★OOPナッツのトラップ：SB AK4ttはチェック73.7%、AAは約8%しか打たず誘う'},
@@ -778,7 +778,7 @@ var DEPTH={
 function renderDepth(){
  var h=colBack('OWN.home()','マップ');
  h+='<div style="margin-bottom:6px;"><div style="font-size:22px;font-family:var(--serif);color:var(--text);">スタックの深さがもたらす変化</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">100bb ↔ 200bb（Wizard実測・General）。<b style="color:#e8917a;">このアプリの他の数字は全て100bb前提</b>。深いと別物になる点を押さえる。</div></div>';
- h+='<div style="background:rgba(201,162,39,.1);border:.5px solid rgba(201,162,39,.3);border-radius:12px;padding:13px 15px;margin:16px 0;font-size:13px;line-height:1.6;color:#dcdee3;"><b style="color:var(--gold);">一言で＝de-escalation（降温）</b><br>深いほど高SPRでコミットの代償が上がり、プリフロもポストフロップも温度が下がる。フラットが増え、5betはジャムでなくサイズド、乾いたボードもチェックが増える。</div>';
+ h+='<div style="background:rgba(201,162,39,.1);border:.5px solid rgba(201,162,39,.3);border-radius:12px;padding:13px 15px;margin:16px 0;font-size:13px;line-height:1.6;color:#dcdee3;"><b style="color:var(--gold);">一言で＝de-escalation（降温）</b><br>深いほど高SPRでコミットの代償が上がり、プリフロもポストフロップも温度が下がる。フラットが増え、5betはジャムでなくサイズド、ドライなボードもチェックが増える。</div>';
  // RFI
  h+='<div class="csec" style="margin-top:20px;">① RFI（オープン）</div>';
  h+=depthTable(['ポジ','100bb','200bb'],DEPTH.rfi.map(function(r){return [r[0],r[1],r[2]];}));
@@ -799,8 +799,8 @@ function renderDepth(){
   h+='<div style="background:#14171e;padding:7px 6px;text-align:center;">'+dArrow(r[4],r[5])+'</div>';
  });
  h+='</div>';
- h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.7;margin-top:10px;"><b style="color:var(--gold);">核心＝圧縮(compression)＋IP主導</b>。深さの効果は<b>ほぼIP現象</b>＝IPは乾いた/ブロードウェイ(K72r/Q72r/KQJ)で激増、OOPは100bbで既にチェック天井に近く小動。<b>乾いた高ボードはIP↔OOPが収束</b>（KQJ＝100bbはIP10/OOP65の55点差→200bbはIP49/OOP57の8点差）。一方<b>ウェット/ペアはOOPがほぼ純チェック化</b>(976 OOP91・883 OOP77)。</div>';
- h+='<div style="font-size:11px;color:var(--dim);margin-top:14px;line-height:1.6;">※<b>「乾いたKハイ＝純レンジベット」は100bb・IP限定の現象</b>。高SPRでは小サイズのレンジベットが機能せず、打つ時はサイズも上がる(K72r 200bbは50%主体)。位置/IPOOPの軸自体は残るが、深いほどテクスチャ間・IP/OOP間の差が圧縮される。</div>';
+ h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.7;margin-top:10px;"><b style="color:var(--gold);">核心＝圧縮(compression)＋IP主導</b>。深さの効果は<b>ほぼIP現象</b>＝IPはドライ/ブロードウェイ(K72r/Q72r/KQJ)で激増、OOPは100bbで既にチェック天井に近く小動。<b>ドライなハイボードはIP↔OOPが収束</b>（KQJ＝100bbはIP10/OOP65の55点差→200bbはIP49/OOP57の8点差）。一方<b>ウェット/ペアはOOPがほぼ純チェック化</b>(976 OOP91・883 OOP77)。</div>';
+ h+='<div style="font-size:11px;color:var(--dim);margin-top:14px;line-height:1.6;">※<b>「ドライなKハイ＝純レンジベット」は100bb・IP限定の現象</b>。高SPRでは小サイズのレンジベットが機能せず、打つ時はサイズも上がる(K72r 200bbは50%主体)。位置/IPOOPの軸自体は残るが、深いほどテクスチャ間・IP/OOP間の差が圧縮される。</div>';
  h+='<button class="btn" style="width:100%;margin-top:18px;padding:14px;font-size:13.5px;background:rgba(201,162,39,.14);color:var(--gold);border-color:rgba(201,162,39,.45);" onclick="OWN.drill(\'deep\')">✍️ この知見を暗記ドリルで解く →</button>';
  h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.matrix()">100bbの位置マトリクスを見る →</button>';
  h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
