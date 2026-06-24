@@ -521,12 +521,13 @@ var MATRIX={cols:['UTG','HJ','BTN','SB'],rows:[
 {b:'JT9',t:'コネクテッドウェット',v:[16.9,17.3,53,69.3],d:'コネクテッドウェットハイ。高頻度CBだがドライより50%サイズが増える。オーバーペアでもボードに絡む方(QQ)が裸AAより打てる'},
 {b:'A96tt',t:'Aハイウェット',v:[50.2,52.2,62.1,71.1],d:'Aハイは乾いても濡れてもチェック寄り＋濡れるとポラー分散。AAはオーバーペアでなくトップセットとして読む'},
 {b:'852m',t:'低モノ',v:[34.5,43.1,54.9,75.6],d:'低モノトーン。スート保有が全て(色無しは打たない)。小サイズ中心'},
-{b:'KK7',t:'ペア+ハイ',v:[0.2,0.1,12.2,26.1],d:'★ハイペア。BBがKxをほぼ持たずPFR圧倒→純レンジベット。中ペア883とは別物＝ペアは「高さ」で割れる'}
+{b:'KK7',t:'ペア+ハイ',v:[0.2,0.1,12.2,26.1],d:'★ハイペア。BBがKxをほぼ持たずPFR圧倒→純レンジベット。中ペア883とは別物＝ペアは「高さ」で割れる'},
+{b:'987',t:'両面ストレート2トーン',v:[55.7,54.2,57.6,89.9],d:'★OOP効果が全テクスチャ最大。超ウェット(BBにストレート/2ペア/フラドロが厚い)でPFRは半分超チェック・33/50混合。IP位置勾配は緩やか(UTG≈HJ<BTN)だがSB(OOP)は89.9%でほぼ純チェック＝+32 vs BTN。AAも約7割チェック(オーバーペアが脆い)'}
 ]};
 function heatColor(v){var t=Math.max(0,Math.min(1,v/100));var r=Math.round(201+(58-201)*t),g=Math.round(162+(160-162)*t),b=Math.round(39+(136-39)*t);return 'rgba('+r+','+g+','+b+',0.9)';}
 function renderMatrix(){
  var h=colBack('OWN.home()','マップ');
- h+='<div style="margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">位置マトリクス</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">SRP・PFRのフロップ チェック頻度(%)。低い＝打つ／高い＝チェック。12テクスチャ×4ポジの実測。</div></div>';
+ h+='<div style="margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">位置マトリクス</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">SRP・PFRのフロップ チェック頻度(%)。低い＝打つ／高い＝チェック。13テクスチャ×4ポジの実測。</div></div>';
  h+='<div style="display:grid;grid-template-columns:58px repeat(4,1fr);gap:3px;margin-top:14px;">';
  h+='<div></div>';
  MATRIX.cols.forEach(function(c){h+='<div style="text-align:center;font-size:11px;color:var(--muted);padding:3px 0;">'+c+'</div>';});
@@ -663,7 +664,7 @@ function renderRFIQ(){
 }
 var cbRanks=[],cbSuit='rainbow';
 var RV={A:14,K:13,Q:12,J:11,T:10,'9':9,'8':8,'7':7,'6':6,'5':5,'4':4,'3':3,'2':2};
-var TEX={'K,7,2,rainbow':'K72r','A,7,2,rainbow':'A72r','Q,7,2,rainbow':'Q72r','K,Q,J,rainbow':'KQJ','A,K,4,twotone':'AK4tt','8,8,3,rainbow':'883','9,7,6,rainbow':'976','K,9,4,mono':'K94m','J,T,9,twotone':'JT9','A,9,6,twotone':'A96tt','8,5,2,mono':'852m','K,K,7,rainbow':'KK7'};
+var TEX={'K,7,2,rainbow':'K72r','A,7,2,rainbow':'A72r','Q,7,2,rainbow':'Q72r','K,Q,J,rainbow':'KQJ','A,K,4,twotone':'AK4tt','8,8,3,rainbow':'883','9,7,6,rainbow':'976','K,9,4,mono':'K94m','J,T,9,twotone':'JT9','A,9,6,twotone':'A96tt','8,5,2,mono':'852m','K,K,7,rainbow':'KK7','9,8,7,twotone':'987'};
 var STRAT={Class1:['monotone','低頻度で安bet（25%で33%/5%で50%）。スート保有が全て＝色札持ちは打つ／色無しはチェック'],Class2:['trips','基本レンジCB100%。range 33% or 50%（全部打つ）'],Class3:['pair','レンジ33%bet（実践70%で33%）。ペアの高さで割れる＝ハイペア純RB／低ペア混合'],Class4:['A〜Jhi HMSD','potover(125%)が入るpolar。強HM(AK)ほど125%寄り／弱HM(J7)ほど4size混合'],Class5:['A〜Jhi HMnSD','安bet。33:50＝35:20。Khi的に安く打つ'],Class6:['T9hi','全サイズ混合（125%入る）。ただし2トーンは大サイズ抑制＝色依存'],Class7:['u8hi','3size混合（33/50/75）。connectは安bet寄り。オーバーペア脆弱でチェック多']};
 function classify(){
  var rs=cbRanks.map(function(c){return RV[c];}).sort(function(a,b){return b-a;});
@@ -748,7 +749,7 @@ function renderHome(){
  // 学ぶ（読み物）— クイズと分離
  html+='<div class="sect-label">学ぶ ・ 読み物</div>';
  html+='<button class="btn" style="width:100%;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.columns()"><span style="font-size:18px;">📖</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">基礎コラム</span><br><span style="font-size:11.5px;color:var(--muted);">読んで体系を掴む（全'+COLUMNS.length+'本）</span></span></button>';
- html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.matrix()"><span style="font-size:18px;">📊</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">位置マトリクス</span><br><span style="font-size:11.5px;color:var(--muted);">12テクスチャ×4ポジのヒートマップ</span></span></button>';
+ html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.matrix()"><span style="font-size:18px;">📊</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">位置マトリクス</span><br><span style="font-size:11.5px;color:var(--muted);">13テクスチャ×4ポジのヒートマップ</span></span></button>';
  html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.rfi()"><span style="font-size:18px;">🃏</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">RFIレンジ表</span><br><span style="font-size:11.5px;color:var(--muted);">13×13オープン表（5ポジ・系統別下限）</span></span></button>';
  html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.cbtool()"><span style="font-size:18px;">🎯</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">CB判定ツール</span><br><span style="font-size:11.5px;color:var(--muted);">ボード→Class分類＋戦略＋実測</span></span></button>';
  var hasKey=!!getKey(),mdl=getModel();
