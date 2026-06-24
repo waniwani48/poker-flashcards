@@ -44,6 +44,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,system-ui,"Hiragino Sans",sans
 <script>
 (function(){
 var CARDS=[
+{q:"【深さ】200bbでRFIのサイズ・幅はどう変わる？",a:"サイズが2.5bbに統一UP（UTG/HJ 2→2.5、CO 2.3→2.5、BTN/SBは据置）。幅も全ポジ広がる（特にBTN 42→47.5%）。深いほど大きく・広く開く。",tag:"深さ"},
+{q:"【深さ】200bbでSBのオープンはどう変わる？",a:"リンプを完全に捨てて純レイズ化。100bb=37.5%+リンプ11% → 200bb=43.3%純レイズ・リンプ消滅。",tag:"深さ"},
+{q:"【深さ】200bbで5bet(BB vs BTN4bet)はどう変わる？",a:"オールインジャム→『75bbへのサイズドレイズ』が主役に。100bb=純ジャム31.4% → 200bb=Raise75 19.7%＋ジャム8.1%。深いとコミットの代償が上がりサイズドで継続。",tag:"深さ"},
+{q:"【深さ】200bbで3bet/4betの各レベルに共通する変化は？",a:"フラット(コール)が増える。BTNが3betを28.6%コール(vs 17.1)。深いほどポストフロップを戦う余地を残す＝ツリーがジャム決着→コール/サイズド継続へ降温(de-escalation)。",tag:"深さ"},
+{q:"【深さ】200bbのフロップCBの一番大きな変化は？(一語で)",a:"圧縮(compression)。100bbで0.5〜50%とバラついたCB頻度が200bbでは約27〜60%に収束。乾いたボードを打つエッジが消える(K72r 0.5→27.2、KQJ 10→49)。",tag:"深さ"},
+{q:"【深さ】「乾いたKハイ＝純レンジベット」は200bbでも成立する？",a:"しない＝100bb・IP限定の現象。K72r HJは100bb 0.5%チェック→200bb 27.2%チェック＋サイズも50%主体に上昇。高SPRで小サイズのレンジベットが機能しない。",tag:"深さ"},
+{q:"【深さ】深さの効果はIPとOOPどちらに強く出る？",a:"ほぼIP現象。OOP(SB)は100bbで既にチェック天井に近く小動。結果、乾いた高ボードはIP↔OOPが収束(KQJ 55点差→8点差)、ウェット/ペアはOOPが純チェック化(976 OOP91)。",tag:"深さ"},
+{q:"【深さ】200bbの一言サマリーは？",a:"de-escalation(降温)。高SPRでコミットの代償が上がり、プリフロもポストフロップも温度が下がる＝フラット増・サイズド5bet・チェック増。",tag:"深さ"},
 {q:"オーバーペア vs アンダーペアのEQ（AA vs KK）は？",a:"約 80 : 20",tag:"EQ"},
 {q:"2オーバー vs アンダーペア（AK vs 22）のEQは？ 通称は？",a:"約 50 : 50（フリップ）",tag:"EQ"},
 {q:"2オーバー vs 2アンダーのSC（AK vs 54s）のEQは？",a:"約 60 : 40",tag:"EQ"},
@@ -382,10 +390,10 @@ function markDay(n){var s=loadStreak();var today=tstr();
  }
  saveStreak(s);return s;}
 var prog=load(),t=tstr(),mode=localStorage.getItem('pokerMode')||'all';
-function catOf(it){if(it.type==='fill'){if(it.tag==='プリフロ暗記'||it.tag==='RFI復元')return 'プリフロップ';if(it.tag==='フロップCB暗記')return 'フロップ';if(it.tag==='3betCB暗記')return '3betポット';if(it.tag==='エクスプロイト')return 'エクスプロイト';return '穴埋め・実戦';}var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='スポット')return 'スポット';return 'その他';}
-var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','3betポット','ターン','スポット','エクスプロイト','穴埋め・実戦'];
+function catOf(it){if(it.type==='fill'){if(it.tag==='プリフロ暗記'||it.tag==='RFI復元')return 'プリフロップ';if(it.tag==='フロップCB暗記')return 'フロップ';if(it.tag==='3betCB暗記')return '3betポット';if(it.tag==='エクスプロイト')return 'エクスプロイト';return '穴埋め・実戦';}var x=it.tag;if(x==='EQ'||x==='VB比')return 'エクイティ・オッズ';if(x==='理論'||x==='概念'||x==='原則')return '理論';if(x==='コンボ')return 'コンボ/ブロッカー';if(x==='レンジ')return 'レンジ';if(x==='プリフロップ'||x==='境界')return 'プリフロップ';if(x==='フロップ')return 'フロップ';if(x==='ターン')return 'ターン';if(x==='深さ')return '深さ・スタック';if(x==='スポット')return 'スポット';return 'その他';}
+var CATORDER=['エクイティ・オッズ','理論','コンボ/ブロッカー','レンジ','プリフロップ','フロップ','3betポット','ターン','深さ・スタック','スポット','エクスプロイト','穴埋め・実戦'];
 function mastery(){var m={};CATORDER.forEach(function(c){m[c]={s:0,n:0};});ALL.forEach(function(it){var c=catOf(it);if(!m[c])return;var r=prog[it.id];m[c].s+=(r?r.box:0);m[c].n++;});var out=[];CATORDER.forEach(function(c){if(m[c].n)out.push({k:c,v:Math.round(m[c].s/(m[c].n*5)*100)});});return out;}
-function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.filter(function(f){return f.tag==='穴埋め';});if(mode==='pre')return FILLS.filter(function(f){return f.tag==='プリフロ暗記';});if(mode==='rebuild')return FILLS.filter(function(f){return f.tag==='RFI復元';});if(mode==='cb')return FILLS.filter(function(f){return f.tag==='フロップCB暗記';});if(mode==='3bet')return FILLS.filter(function(f){return f.tag==='3betCB暗記';});if(mode==='exploit')return FILLS.filter(function(f){return f.tag==='エクスプロイト';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
+function pool(){if(mode==='spot')return CARDS.filter(function(c){return c.tag==='スポット';});if(mode==='fill')return FILLS.filter(function(f){return f.tag==='穴埋め';});if(mode==='pre')return FILLS.filter(function(f){return f.tag==='プリフロ暗記';});if(mode==='rebuild')return FILLS.filter(function(f){return f.tag==='RFI復元';});if(mode==='cb')return FILLS.filter(function(f){return f.tag==='フロップCB暗記';});if(mode==='3bet')return FILLS.filter(function(f){return f.tag==='3betCB暗記';});if(mode==='exploit')return FILLS.filter(function(f){return f.tag==='エクスプロイト';});if(mode==='deep')return CARDS.filter(function(c){return c.tag==='深さ';});if(mode==='memo')return CARDS.filter(function(c){return c.tag!=='スポット';});return ALL;}
 var view='home',queue=[],idx=0,flipped=false,fsi=0,fRevealed=false,fInputs={},fGrades={},chipTab=0;
 var root=document.getElementById('root');
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x;}return a;}
@@ -774,7 +782,8 @@ function renderDepth(){
  h+='</div>';
  h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.7;margin-top:10px;"><b style="color:var(--gold);">核心＝圧縮(compression)＋IP主導</b>。深さの効果は<b>ほぼIP現象</b>＝IPは乾いた/ブロードウェイ(K72r/Q72r/KQJ)で激増、OOPは100bbで既にチェック天井に近く小動。<b>乾いた高ボードはIP↔OOPが収束</b>（KQJ＝100bbはIP10/OOP65の55点差→200bbはIP49/OOP57の8点差）。一方<b>ウェット/ペアはOOPがほぼ純チェック化</b>(976 OOP91・883 OOP77)。</div>';
  h+='<div style="font-size:11px;color:var(--dim);margin-top:14px;line-height:1.6;">※<b>「乾いたKハイ＝純レンジベット」は100bb・IP限定の現象</b>。高SPRでは小サイズのレンジベットが機能せず、打つ時はサイズも上がる(K72r 200bbは50%主体)。位置/IPOOPの軸自体は残るが、深いほどテクスチャ間・IP/OOP間の差が圧縮される。</div>';
- h+='<button class="btn" style="width:100%;margin-top:18px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.matrix()">100bbの位置マトリクスを見る →</button>';
+ h+='<button class="btn" style="width:100%;margin-top:18px;padding:14px;font-size:13.5px;background:rgba(201,162,39,.14);color:var(--gold);border-color:rgba(201,162,39,.45);" onclick="OWN.drill(\'deep\')">✍️ この知見を暗記ドリルで解く →</button>';
+ h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.matrix()">100bbの位置マトリクスを見る →</button>';
  h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
  root.innerHTML=h;
 }
