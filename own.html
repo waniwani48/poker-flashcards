@@ -668,7 +668,7 @@ function renderRFIQ(){
 var DEPTH={
  rfi:[['UTG','17.6% / 2bb','18.6% / 2.5bb'],['HJ','21.6% / 2bb','22.4% / 2.5bb'],['CO','28.9% / 2.3bb','30.7% / 2.5bb'],['BTN','42% / 2.5bb','47.5% / 2.5bb'],['SB','37.5%+リンプ11%','43.3% 純レイズ(リンプ消滅)']],
  tree:[['BB 3bet (vs BTN open)','13.9%→13bb・Call25.8','12.7%→12bb・Call30.9'],['BTN 4bet (vs BB 3bet)','14.6%→27bb・Call17.1','10%→38bb・Call28.6'],['BB 5bet (vs BTN 4bet)','純ジャム 31.4%','Raise75 19.7% ＋ジャム8.1%']],
- srp:[['K72r','ドライK',0.5,27.2],['Q72r','ドライQ',1.4,30],['KQJ','コネクテッドハイ',10.2,49.3],['AK4tt','ナッツ優位',45.2,57.3],['K94m','Kハイモノ',50.3,59.9],['A72r','ドライA',47.7,49.4],['976','コネクトロー',47.6,47.3],['883','中ペア',48.1,43.4]]
+ srp:[['K72r','ドライK',0.5,27.2,44.8,47.5],['Q72r','ドライQ',1.4,30,37.5,46.3],['KQJ','コネクテッドハイ',10.2,49.3,65.3,56.5],['AK4tt','ナッツ優位',45.2,57.3,73.7,77.3],['K94m','Kハイモノ',50.3,59.9,87.3,82.3],['A72r','ドライA',47.7,49.4,48.3,56.9],['976','コネクトロー',47.6,47.3,80.1,90.8],['883','中ペア',48.1,43.4,49.7,77]]
 };
 function renderDepth(){
  var h=colBack('OWN.home()','マップ');
@@ -683,19 +683,19 @@ function renderDepth(){
  h+=depthTable(['レベル','100bb','200bb'],DEPTH.tree.map(function(r){return [r[0],r[1],r[2]];}));
  h+='<div style="font-size:12px;color:#c7c9cf;line-height:1.7;margin-top:8px;">各レベルで<b>フラットが増える</b>（BTNが3betを28.6%コール vs 17.1）。★<b style="color:var(--gold);">5betがオールインジャム→「75bbサイズドレイズ」に</b>。ジャムで決着でなくコール・サイズドで継続。</div>';
  // SRP
- h+='<div class="csec" style="margin-top:22px;">③ SRPフロップCB（HJ vs BB・チェック%）</div>';
- h+='<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 0.9fr;gap:1px;background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;font-size:12px;">';
- h+='<div style="background:#1a1d24;padding:7px 9px;color:var(--muted);">ボード</div><div style="background:#1a1d24;padding:7px 4px;color:var(--muted);text-align:center;">100bb</div><div style="background:#1a1d24;padding:7px 4px;color:var(--muted);text-align:center;">200bb</div><div style="background:#1a1d24;padding:7px 4px;color:var(--muted);text-align:center;">Δ</div>';
+ h+='<div class="csec" style="margin-top:22px;">③ SRPフロップCB（チェック%・100→200bb）</div>';
+ h+='<div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;line-height:1.5;">IP＝HJ vs BB ／ OOP＝SB vs BB。深さでチェック%がどう動くか。</div>';
+ h+='<div style="display:grid;grid-template-columns:1fr 1.25fr 1.25fr;gap:1px;background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;font-size:12px;">';
+ h+='<div style="background:#1a1d24;padding:7px 9px;color:var(--muted);">ボード</div><div style="background:#1a1d24;padding:7px 6px;color:var(--muted);text-align:center;">IP 100→200</div><div style="background:#1a1d24;padding:7px 6px;color:var(--muted);text-align:center;">OOP 100→200</div>';
+ function dArrow(a,b){var d=b-a;var c=Math.abs(d)>=20?'#c9a227':Math.abs(d)>=8?'#b0922f':'#85888f';var w=Math.abs(d)>=20?'600':'400';return '<span class="mono" style="color:#9a9da4;">'+a+'</span><span style="color:'+c+';"> → </span><span class="mono" style="color:#dcdee3;font-weight:'+w+';">'+b+'</span>';}
  DEPTH.srp.forEach(function(r){
-  var d=Math.round((r[3]-r[2])*10)/10;var dc=d>=20?'#c9a227':d>=8?'#b0922f':'#6c6f77';var dw=d>=20?'600':'400';
-  h+='<div style="background:#14171e;padding:7px 9px;color:#dcdee3;"><span class="mono" style="color:var(--gold);">'+r[0]+'</span> <span style="color:var(--muted);font-size:10.5px;">'+r[1]+'</span></div>';
-  h+='<div style="background:#14171e;padding:7px 4px;text-align:center;color:#9a9da4;" class="mono">'+r[2]+'</div>';
-  h+='<div style="background:#14171e;padding:7px 4px;text-align:center;color:#dcdee3;" class="mono">'+r[3]+'</div>';
-  h+='<div style="background:#14171e;padding:7px 4px;text-align:center;color:'+dc+';font-weight:'+dw+';" class="mono">'+(d>0?'+':'')+d+'</div>';
+  h+='<div style="background:#14171e;padding:7px 9px;color:#dcdee3;"><span class="mono" style="color:var(--gold);">'+r[0]+'</span></div>';
+  h+='<div style="background:#14171e;padding:7px 6px;text-align:center;">'+dArrow(r[2],r[3])+'</div>';
+  h+='<div style="background:#14171e;padding:7px 6px;text-align:center;">'+dArrow(r[4],r[5])+'</div>';
  });
  h+='</div>';
- h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.7;margin-top:10px;"><b style="color:var(--gold);">核心＝圧縮(compression)</b>。100bbで0.5〜50%とバラついたCB頻度が、200bbでは約27〜60%に収束。<b>深いと「乾いたボードを打つ」エッジが消える</b>＝100bbで攻めてたボード(K72r/Q72r/KQJ)ほど激増、元々チェック多いボード(A72r/976/883)は不変。<b>「乾いたKハイ＝純レンジベット」は100bb限定の現象</b>。</div>';
- h+='<div style="font-size:11px;color:var(--dim);margin-top:14px;line-height:1.6;">※高SPRでは小サイズのレンジベットが機能せず、打つ時はサイズも上がる(K72r 200bbは50%主体)。位置/IPOOPの軸自体は残るが、テクスチャ間の差が圧縮される。</div>';
+ h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.7;margin-top:10px;"><b style="color:var(--gold);">核心＝圧縮(compression)＋IP主導</b>。深さの効果は<b>ほぼIP現象</b>＝IPは乾いた/ブロードウェイ(K72r/Q72r/KQJ)で激増、OOPは100bbで既にチェック天井に近く小動。<b>乾いた高ボードはIP↔OOPが収束</b>（KQJ＝100bbはIP10/OOP65の55点差→200bbはIP49/OOP57の8点差）。一方<b>ウェット/ペアはOOPがほぼ純チェック化</b>(976 OOP91・883 OOP77)。</div>';
+ h+='<div style="font-size:11px;color:var(--dim);margin-top:14px;line-height:1.6;">※<b>「乾いたKハイ＝純レンジベット」は100bb・IP限定の現象</b>。高SPRでは小サイズのレンジベットが機能せず、打つ時はサイズも上がる(K72r 200bbは50%主体)。位置/IPOOPの軸自体は残るが、深いほどテクスチャ間・IP/OOP間の差が圧縮される。</div>';
  h+='<button class="btn" style="width:100%;margin-top:18px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.matrix()">100bbの位置マトリクスを見る →</button>';
  h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
  root.innerHTML=h;
