@@ -498,7 +498,8 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  rfiPos:function(p){rfiPos=p;renderRFI();try{window.scrollTo(0,0);}catch(e){}},
  rfiq:function(){view='rfiq';rfiqIJ=null;rfiqScore={n:0,ok:0};rfiPickItem();renderRFIQ();try{window.scrollTo(0,0);}catch(e){}},
  rfiqPick:function(a){var ta=document.getElementById('rfiqwhy');if(ta)rfiqWhy=ta.value;var g=RFI[rfiqPos].g;var c=g.charAt(rfiqIJ[0]*13+rfiqIJ[1]);rfiqPick=a;rfiqScore.n++;if(a===c)rfiqScore.ok++;try{buzz(a===c?14:[6,40,6]);}catch(e){}renderRFIQ();},
- rfiqNext:function(){rfiPickItem();renderRFIQ();try{window.scrollTo(0,0);}catch(e){}},
+ rfiqNext:function(){if(rfiqMode==='spot')rfiqSpotIdx++;rfiPickItem();renderRFIQ();try{window.scrollTo(0,0);}catch(e){}},
+ rfiqSetMode:function(m){rfiqMode=m;rfiqSpotIdx=0;rfiqScore={n:0,ok:0};rfiqIJ=null;rfiPickItem();renderRFIQ();try{window.scrollTo(0,0);}catch(e){}},
  rfiqJudge:async function(){var info=rfiReason(rfiqPos,rfiqIJ[0],rfiqIJ[1]);var pickLbl={R:'純open',M:'混合',F:'fold'}[rfiqPick];var sc=rfiqPos+'からの'+info.label+'のRFI判断（あなたの選択＝'+pickLbl+'／正解＝'+info.verdict+'）';var q='なぜこの判断になるのかをレンジで言語化せよ（下限との距離・理由）';var a=info.label+'は'+rfiqPos+'で'+info.verdict+'。'+info.fam+'の下限は'+info.bound+'。下限は①レンジ優位の濃さ②位置(実現性)③ハンド固有の価値(接続/ブロッカー)で決まる。';rfiqJudge={loading:true};renderRFIQ();var res=await judgeCore(sc,q,a,rfiqWhy);rfiqJudge=res;renderRFIQ();},
  rfiq2reveal:function(){var ta=document.getElementById('rfiq2why');if(ta)rfiq2why=ta.value;rfiq2open=true;renderRFIQ();},
  rfiq2judge:async function(){var d=BBDEF[rfiqPos];if(!d)return;var sc='あなたは'+rfiqPos+'からオープンした。相手番＝BBがこのopenにどう守るか。';var q='BBの3bet/コール/foldの頻度と「型」（コールで守るかポラー3betで守るか）を言語化せよ';var a='BB vs '+rfiqPos+'＝3bet'+d.tb+'%/コール'+d.cl+'%/fold'+d.fd+'%。'+d.type.replace(/<[^>]+>/g,'')+' EP相手はコールで守り、LP/SB相手はポラー3betで守る（同じ強ブロードウェイの役割が相手位置で反転）。';rfiq2judge={loading:true};renderRFIQ();var res=await judgeCore(sc,q,a,rfiq2why);rfiq2judge=res;renderRFIQ();},
@@ -617,8 +618,21 @@ function renderRFI(){
  h+='<button class="btn" style="width:100%;margin-top:14px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
  root.innerHTML=h;
 }
-var rfiqPos='UTG',rfiqIJ=null,rfiqPick=null,rfiqWhy='',rfiqScore={n:0,ok:0},rfiqJudge=null,rfiq2open=false,rfiq2why='',rfiq2judge=null,rfiq3open=false,rfiq3why='',rfiq3judge=null,rfiq3tex=0,rfiq4open=false,rfiq4why='',rfiq4judge=null,rfiq4arch=0;
+var rfiqPos='UTG',rfiqIJ=null,rfiqPick=null,rfiqWhy='',rfiqScore={n:0,ok:0},rfiqJudge=null,rfiq2open=false,rfiq2why='',rfiq2judge=null,rfiq3open=false,rfiq3why='',rfiq3judge=null,rfiq3tex=0,rfiq4open=false,rfiq4why='',rfiq4judge=null,rfiq4arch=0,rfiqMode='rand',rfiqSpotIdx=0;
+var RFIQ_SPOTS=[
+ {pos:'CO',hand:'A5o',why:'★A5o飛び地：A7o/A6oはfoldなのにA5oだけ純open（A5ブロッカー＋ホイール）'},
+ {pos:'UTG',hand:'AQs',tex:0,why:'★役割反転①：UTGのAQs。BBは強く守れずコール主体→AQsは厚いコールに守られる'},
+ {pos:'BTN',hand:'AQs',tex:0,why:'★役割反転②：BTNの同じAQs。BBはポラー3betで広く突く→相手位置で役割が反転'},
+ {pos:'HJ',hand:'AKo',tex:0,why:'★乾いたK純RB：HJ K72rはチェック0.5%＝ほぼ純レンジベット（100bb・IP限定）'},
+ {pos:'SB',hand:'KQs',tex:6,why:'★OOP×ウェット：SB 976はチェック80%＝OOPで実現できずほぼチェック'},
+ {pos:'BTN',hand:'AJs',tex:2,why:'★Aハイの例外：BTN A72rはチェック57.5%。BBがAxを持たずマージナルをチェックバック'},
+ {pos:'SB',hand:'AKs',tex:4,why:'★OOPナッツのトラップ：SB AK4ttはチェック73.7%、AAは約8%しか打たず誘う'},
+ {pos:'UTG',hand:'77',why:'★ペアの下限：UTGは77+が純open、66以下は混合。タイトな下限'}
+];
+function rfiParseHand(lbl){var R=RFI_RANKS,hi=R.indexOf(lbl.charAt(0)),lo=R.indexOf(lbl.charAt(1));if(lbl.length===2)return [hi,hi];if(lbl.charAt(2)==='s')return [hi,lo];return [lo,hi];}
+function rfiqResetStages(){rfiqPick=null;rfiqWhy='';rfiqJudge=null;rfiq2open=false;rfiq2why='';rfiq2judge=null;rfiq3open=false;rfiq3why='';rfiq3judge=null;rfiq4open=false;rfiq4why='';rfiq4judge=null;rfiq4arch=Math.floor(Math.random()*TURN_ARCH.length);}
 function rfiPickItem(){
+ if(rfiqMode==='spot'){var s=RFIQ_SPOTS[rfiqSpotIdx%RFIQ_SPOTS.length];rfiqPos=s.pos;rfiqIJ=rfiParseHand(s.hand);rfiq3tex=(s.tex!=null?s.tex:Math.floor(Math.random()*MATRIX.rows.length));rfiqResetStages();return;}
  var poss=['UTG','HJ','CO','BTN','SB'];var pos=poss[Math.floor(Math.random()*5)];
  var g=RFI[pos].g,tries=0,i=0,j=0;
  function ok(i,j){var a=g.charAt(i*13+j);if(a==='R'||a==='M')return true;
@@ -723,12 +737,17 @@ function renderRFIQ(){
  var pos=rfiqPos,i=rfiqIJ[0],j=rfiqIJ[1],info=rfiReason(pos,i,j);
  var h=colBack('OWN.rfi()','RFIレンジ表');
  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">逆引き即答</div><span class="mono" style="font-size:12px;color:var(--muted);">正答 '+rfiqScore.ok+' / '+rfiqScore.n+'</span></div>';
- h+='<div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5;">①open→②相手の守り→③フロップCB→④ターン まで言語化。<b style="color:#c7c9cf;">自/相手レンジ→ストリートでの変化→優位</b>を1ハンドで追う筋トレ。</div>';
+ h+='<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;">①open→②相手の守り→③フロップCB→④ターン まで言語化。<b style="color:#c7c9cf;">自/相手レンジ→ストリートでの変化→優位</b>を1ハンドで追う筋トレ。</div>';
+ h+='<div style="display:flex;gap:6px;margin-bottom:14px;">';
+ h+='<button class="chip'+(rfiqMode==='rand'?' on':'')+'" style="flex:1;" onclick="OWN.rfiqSetMode(\'rand\')">ランダム</button>';
+ h+='<button class="chip'+(rfiqMode==='spot'?' on':'')+'" style="flex:1;" onclick="OWN.rfiqSetMode(\'spot\')">重要スポット</button>';
+ h+='</div>';
  // hand card
- h+='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.3);border-radius:16px;padding:22px;text-align:center;margin-bottom:16px;">';
+ h+='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.3);border-radius:16px;padding:22px;text-align:center;margin-bottom:'+(rfiqMode==='spot'?'10px':'16px')+';">';
  h+='<div style="font-size:13px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">'+pos+' から</div>';
  h+='<div class="mono" style="font-size:48px;font-weight:600;color:var(--text);line-height:1;">'+info.label+'</div>';
  h+='</div>';
+ if(rfiqMode==='spot'){var sp=RFIQ_SPOTS[rfiqSpotIdx%RFIQ_SPOTS.length];h+='<div style="font-size:12px;color:#dcdee3;line-height:1.6;background:rgba(201,162,39,.08);border-radius:9px;padding:10px 12px;margin-bottom:16px;"><span class="mono" style="color:var(--gold);font-size:10px;">スポット '+(rfiqSpotIdx%RFIQ_SPOTS.length+1)+' / '+RFIQ_SPOTS.length+'</span><br>'+sp.why+'</div>';}
  if(!rfiqPick){
   h+='<textarea id="rfiqwhy" placeholder="なぜそう判断する？（任意・自分の言葉で。例：Kxs下限はK8sだからK6sは混合域）" style="width:100%;box-sizing:border-box;min-height:64px;background:#14171e;border:.5px solid rgba(255,255,255,.12);border-radius:11px;padding:11px 13px;font-size:13px;color:var(--text);font-family:inherit;line-height:1.5;resize:vertical;margin-bottom:12px;">'+(rfiqWhy||'')+'</textarea>';
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
