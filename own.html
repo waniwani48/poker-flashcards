@@ -544,7 +544,7 @@ function renderMatrix(){
  h+='<div class="csec" style="margin-top:22px;">各ボードの特徴</div>';
  MATRIX.rows.forEach(function(r){h+='<div style="margin-bottom:11px;"><div style="font-size:13px;color:var(--text);"><span class="mono" style="color:var(--gold);">'+r.b+'</span> <span style="color:var(--muted);font-size:11.5px;">'+r.t+'</span></div><div style="font-size:12px;line-height:1.6;color:#c7c9cf;margin-top:2px;">'+r.d+'</div></div>';});
  h+='<div style="font-size:11.5px;color:var(--dim);margin-top:8px;line-height:1.6;">※この数値は全て<b>100bb</b>前提。深いスタックでは別物（乾いたボードもチェック増）＝</div>';
- h+='<button class="btn" style="width:100%;margin-top:8px;padding:13px;font-size:13px;background:rgba(201,162,39,.1);color:var(--gold);border-color:rgba(201,162,39,.35);" onclick="OWN.depth()">📏 深さの効果（100↔200bb）→</button>';
+ h+='<button class="btn" style="width:100%;margin-top:8px;padding:13px;font-size:13px;background:rgba(201,162,39,.1);color:var(--gold);border-color:rgba(201,162,39,.35);" onclick="OWN.depth()">📏 スタックの深さがもたらす変化 →</button>';
  h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
  root.innerHTML=h;
 }
@@ -672,7 +672,7 @@ var DEPTH={
 };
 function renderDepth(){
  var h=colBack('OWN.home()','マップ');
- h+='<div style="margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">深さの効果</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">100bb ↔ 200bb（Wizard実測・General）。<b style="color:#e8917a;">このアプリの他の数字は全て100bb前提</b>。深いと別物になる点を押さえる。</div></div>';
+ h+='<div style="margin-bottom:6px;"><div style="font-size:22px;font-family:var(--serif);color:var(--text);">スタックの深さがもたらす変化</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">100bb ↔ 200bb（Wizard実測・General）。<b style="color:#e8917a;">このアプリの他の数字は全て100bb前提</b>。深いと別物になる点を押さえる。</div></div>';
  h+='<div style="background:rgba(201,162,39,.1);border:.5px solid rgba(201,162,39,.3);border-radius:12px;padding:13px 15px;margin:16px 0;font-size:13px;line-height:1.6;color:#dcdee3;"><b style="color:var(--gold);">一言で＝de-escalation（降温）</b><br>深いほど高SPRでコミットの代償が上がり、プリフロもポストフロップも温度が下がる。フラットが増え、5betはジャムでなくサイズド、乾いたボードもチェックが増える。</div>';
  // RFI
  h+='<div class="csec" style="margin-top:20px;">① RFI（オープン）</div>';
@@ -795,7 +795,7 @@ function renderHome(){
  html+='<button class="btn" style="width:100%;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.columns()"><span style="font-size:18px;">📖</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">基礎コラム</span><br><span style="font-size:11.5px;color:var(--muted);">読んで体系を掴む（全'+COLUMNS.length+'本）</span></span></button>';
  html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.matrix()"><span style="font-size:18px;">📊</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">位置マトリクス</span><br><span style="font-size:11.5px;color:var(--muted);">13テクスチャ×4ポジのヒートマップ</span></span></button>';
  html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.rfi()"><span style="font-size:18px;">🃏</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">RFIレンジ表</span><br><span style="font-size:11.5px;color:var(--muted);">13×13オープン表（5ポジ・系統別下限）</span></span></button>';
- html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.depth()"><span style="font-size:18px;">📏</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">深さの効果（100↔200bb）</span><br><span style="font-size:11.5px;color:var(--muted);">深いとどう変わるか・RFI/3bet/CB</span></span></button>';
+ html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.depth()"><span style="font-size:18px;">📏</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">スタックの深さがもたらす変化</span><br><span style="font-size:11.5px;color:var(--muted);">100↔200bb・RFI/3bet/フロップCB</span></span></button>';
  html+='<button class="btn" style="width:100%;margin-top:10px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.cbtool()"><span style="font-size:18px;">🎯</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">CB判定ツール</span><br><span style="font-size:11.5px;color:var(--muted);">ボード→Class分類＋戦略＋実測</span></span></button>';
  var hasKey=!!getKey(),mdl=getModel();
  html+='<div class="sect-label">設定</div>';
