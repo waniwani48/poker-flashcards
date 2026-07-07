@@ -519,6 +519,10 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  drill:function(m){mode=m;localStorage.setItem('pokerMode',m);OWN.start();},
  matrix:function(){view='matrix';renderMatrix();try{window.scrollTo(0,0);}catch(e){}},
  depth:function(){view='depth';renderDepth();try{window.scrollTo(0,0);}catch(e){}},
+ reads:function(){view='reads';rdOrder=[];renderReads();try{window.scrollTo(0,0);}catch(e){}},
+ rdPick:function(i){var it=READS[rdOrder[rdIdx%rdOrder.length]];rdPick=i;rdScore.n++;if(i===it.c)rdScore.ok++;try{buzz(i===it.c?14:[6,40,6]);}catch(e){}renderReads();},
+ rdNext:function(){rdIdx++;rdPick=null;if(rdIdx%rdOrder.length===0)rdOrder=shuffle(rdOrder);renderReads();try{window.scrollTo(0,0);}catch(e){}},
+ leakDrill:function(){var leaks=ALL.filter(function(it){var r=prog[it.id];return r&&r.again>0;}).sort(function(a,b){return prog[b.id].again-prog[a.id].again;}).slice(0,10);if(!leaks.length){alert('弱点データがまだありません（✗を付けたカードが対象）');return;}queue=shuffle(leaks);idx=0;flipped=false;fsi=0;fRevealed=false;fInputs={};fGrades={};judgeRes={};chipTab=0;sessAgain=[];view='session';renderSession();},
  rfi:function(){view='rfi';renderRFI();try{window.scrollTo(0,0);}catch(e){}},
  rfiPos:function(p){rfiPos=p;renderRFI();try{window.scrollTo(0,0);}catch(e){}},
  rfiq:function(){view='rfiq';rfiqIJ=null;rfiqScore={n:0,ok:0};rfiPickItem();renderRFIQ();try{window.scrollTo(0,0);}catch(e){}},
@@ -874,6 +878,41 @@ function depthTable(head,rows){
  rows.forEach(function(r){h+='<div style="background:#14171e;padding:7px 9px;color:#dcdee3;font-weight:500;">'+r[0]+'</div><div style="background:#14171e;padding:7px 9px;color:#9a9da4;">'+r[1]+'</div><div style="background:#14171e;padding:7px 9px;color:#dcdee3;">'+r[2]+'</div>';});
  h+='</div>';return h;
 }
+var READS=[
+ {sc:'レク相手・HUのSRP。相手がフロップで半ポット以下のドンクを2連続で打ってきた。相手のレンジは？',o:['弱い(ドロー/弱ペア)寄り','強い(メイド)寄り'],c:0,why:'小サイズ連打はバリューの乏しさを示す。強いフラッシュ等はサイズを上げるインセンティブがある。サイズアップした時だけ強い手に警戒。',src:'ko62oOOAf_Q / J3yglo9-yqI'},
+ {sc:'同じ相手（サイズがハンド強度と相関するタイプ）がポット級の大きいドンクを打ってきた。',o:['強い＝ナッツ級ならバリュー最大化で即レイズ','弱い＝ブラフで飛ばせる'],c:0,why:'大きいドンク＝ハンドが好き。このタイプはウェットでもA7や9で大レイズに降りない→こちらがナッツ級なら今すぐ大きく入れる。',src:'ko62oOOAf_Q 判断基準3'},
+ {sc:'マルチウェイ（複数人）で相手がドンクしてきた。HUの同サイズと比べて評価は？',o:['はるかに強いレンジ','同じ','むしろ弱い'],c:0,why:'マルチウェイのドンクはHUよりはるかに強い。人数がレンジを絞る。同じサイズでも文脈で意味が変わる。',src:'ko62oOOAf_Q 判断基準4'},
+ {sc:'ターン→リバーで、前のストリートのちょうど2倍の機械的なサイズでベットしてきた。',o:['ブラフ寄り','バリュー寄り'],c:0,why:'バリューなら適切なサイズを考える。ブラフ時は注目を集めたくないため深く考えず倍数など安直なサイズを選ぶ傾向。SDVがあればコールを強く検討。',src:'7zlh-B0dSII / vsSFecrDrb0'},
+ {sc:'フラッシュ完成カードの直後、相手が考えずスナップでベットしてきた。',o:['弱さの示唆','強さの示唆'],c:0,why:'ナッツが変化した時にバリューを持っていればサイズを考えるはず。即座に動くのは「考えると怪しまれる」の心理回避＝弱さ寄り。',src:'7zlh-B0dSII 判断基準4'},
+ {sc:'ライブのリバーで相手がポット超のビッグベット。こちらはSDVのあるブラフキャッチャー。',o:['フォールド寄り','コール寄り(MDF確保)'],c:0,why:'ライブはサイズが大きいほどブラフ頻度が下がる(アンダーブラフ)。絶対額がスタックに対して巨大ならなおさら。MDFは対バランス相手の盾でしかない。',src:'7zlh-B0dSII 判断基準6・7'},
+ {sc:'フロップをチェックバックした相手が、ターンで(特にレイズで)アグレッションを見せた。',o:['バリューに大きく偏る','ブラフが増える'],c:0,why:'ブラフとしてフロップを見送る理由が薄い＝パッシブ→突然のアグレッションはバリュー激濃。コール閾値を上げる。',src:'vsSFecrDrb0 判断基準5'},
+ {sc:'3ストリートコールし続けたレクが、リバーで突然レイズしてきた。こちらミドルワンペア。',o:['フォールド(バリュー激濃)','コール(ブラフも十分)'],c:0,why:'レクはリバーでブラフレイズをほぼしない。3ストリートコール後のレイズは特にバリューに偏る。',src:'9xSyYuvqhKQ 判断基準9'},
+ {sc:'BB(アクションを閉じる位置)からの3betを受けた。レンジの形は？',o:['リニア寄り＝強い(4betよりコール優先)','ポーラー＝ブラフも厚い'],c:0,why:'コールが簡単な位置ではレイズが自然に絞られる。ライブプレイヤーはクロージングでポーラー3betを見つけられない＝アンダー3bet。',src:'hb5V55q-tTU / gc7faxBVjm8'},
+ {sc:'マルチウェイで自分がベット→コーラーを挟んで第三者がレイズしてきた。',o:['超バリュー寄り＝ライトな続行を控える','HUのレイズと同程度'],c:0,why:'マルチウェイ＋コーラー込みのレイズはHUよりはるかにバリューに偏る(ブラフとしては極端に薄い)。',src:'hb5V55q-tTU 判断基準3'},
+ {sc:'レクがターンにダブルバレル＋大サイズ。こちらは強い手。ベストは？',o:['チェックレイズで最大バリュー','チェックコールで安全に'],c:0,why:'レクはダブルバレルをアンダーする＋サイズで強さを示す＝この組合せは強シグナルで相手は降りない。チェックコールは取り逃し＝ミス。',src:'hb5V55q-tTU 判断基準5'},
+ {sc:'5betポットで相手がフロップも大きくベットしてきた。',o:['ブラフほぼ無し＝降りてよい','ここまで来たらコール'],c:0,why:'積み重なるコミットメント(5bet＋フロップ大)はブラフ密度を極小にする。「ここまで来たから」はコミットメントの錯覚。',src:'hb5V55q-tTU 判断基準2'}
+];
+var rdOrder=[],rdIdx=0,rdPick=null,rdScore={n:0,ok:0};
+function renderReads(){
+ if(!rdOrder.length){rdOrder=shuffle(READS.map(function(_,i){return i;}));rdIdx=0;rdPick=null;rdScore={n:0,ok:0};}
+ var it=READS[rdOrder[rdIdx%rdOrder.length]];
+ var h=colBack('OWN.home()','マップ');
+ h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">サイズ&ライン読み</div><span class="mono" style="font-size:12px;color:var(--muted);">正答 '+rdScore.ok+' / '+rdScore.n+'</span></div>';
+ h+='<div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;">相手のサイズ・スピード・ラインから何を読むか。HHPの引き出しを即答で反射にする（相手の観察が前提のエクスプロイト・レク想定）。</div>';
+ h+='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.3);border-radius:14px;padding:17px;margin-bottom:14px;font-size:14px;line-height:1.7;color:var(--text);">'+it.sc+'</div>';
+ if(rdPick===null){
+  it.o.forEach(function(op,i){h+='<button class="btn" style="width:100%;margin-bottom:8px;padding:14px;font-size:13.5px;text-align:left;background:rgba(255,255,255,.04);" onclick="OWN.rdPick('+i+')">'+op+'</button>';});
+ }else{
+  var correct=rdPick===it.c;var gc=correct?'#5fc3a8':'#e8917a';
+  h+='<div style="background:#14171e;border:.5px solid '+gc+'55;border-radius:13px;padding:15px 16px;">';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;"><span style="font-size:24px;color:'+gc+';font-weight:600;">'+(correct?'◎':'✗')+'</span><span style="font-size:13.5px;color:#dcdee3;line-height:1.4;">正解＝<b style="color:var(--gold);">'+it.o[it.c]+'</b></span></div>';
+  h+='<div style="font-size:13px;line-height:1.65;color:#c7c9cf;border-top:.5px solid rgba(255,255,255,.08);padding-top:10px;">'+it.why+'</div>';
+  h+='<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">出典: '+it.src+'</div></div>';
+  h+='<button class="btn" style="width:100%;margin-top:12px;padding:15px;font-size:14px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.rdNext()">次のシナリオ →</button>';
+ }
+ h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
+ root.innerHTML=h;
+}
 var cbRanks=[],cbSuit='rainbow';
 var RV={A:14,K:13,Q:12,J:11,T:10,'9':9,'8':8,'7':7,'6':6,'5':5,'4':4,'3':3,'2':2};
 var TEX={'K,7,2,rainbow':'K72r','A,7,2,rainbow':'A72r','Q,7,2,rainbow':'Q72r','K,Q,J,rainbow':'KQJ','A,K,4,twotone':'AK4tt','8,8,3,rainbow':'883','9,7,6,rainbow':'976','K,9,4,mono':'K94m','J,T,9,twotone':'JT9','A,9,6,twotone':'A96tt','8,5,2,mono':'852m','K,K,7,rainbow':'KK7','9,8,7,twotone':'987'};
@@ -958,6 +997,10 @@ function renderHome(){
  qm.forEach(function(m){html+='<button class="chip'+(mode===m[0]?' on':'')+'" style="flex:none;" onclick="OWN.setMode(\''+m[0]+'\')">'+m[1]+'</button>';});
  html+='</div>';
  html+='<button class="btn" style="width:100%;padding:16px;font-size:15px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.start()">今日のセッションを始める</button>';
+ html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">';
+ html+='<button class="btn" style="padding:12px 8px;font-size:12.5px;background:rgba(217,96,63,.1);color:#e8917a;border-color:rgba(217,96,63,.35);" onclick="OWN.leakDrill()">🩹 弱点だけ叩く</button>';
+ html+='<button class="btn" style="padding:12px 8px;font-size:12.5px;background:rgba(201,162,39,.1);color:var(--gold);border-color:rgba(201,162,39,.35);" onclick="OWN.reads()">👁 サイズ&ライン読み</button>';
+ html+='</div>';
  // 学ぶ（読み物）— クイズと分離
  html+='<div class="sect-label">学ぶ ・ 読み物</div>';
  html+='<button class="btn" style="width:100%;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.columns()"><span style="font-size:18px;">📖</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">基礎コラム</span><br><span style="font-size:11.5px;color:var(--muted);">読んで体系を掴む（全'+COLUMNS.length+'本）</span></span></button>';
