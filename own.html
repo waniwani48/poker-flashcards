@@ -531,6 +531,8 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  rfiq3reveal:function(){var ta=document.getElementById('rfiq3why');if(ta)rfiq3why=ta.value;rfiq3open=true;renderRFIQ();},
  rfiq3judge:async function(){var col=RFIQ_COL[rfiqPos],row=MATRIX.rows[rfiq3tex];var sc=rfiqPos+'オープン→BBコール→フロップ'+row.b+'('+row.t+')。あなた('+rfiqPos+')のCB。';var q='レンジ/ナッツ優位はどちらか、チェック頻度は高い/低いか、なぜかを言語化せよ';var a=col===undefined?('CO発postflopは無料データに解無し。一般原則＝自レンジの濃さ×ボード×相手継続域でCB可否が決まる。'):('フロップ'+row.b+'で'+rfiqPos+'のチェック頻度は約'+row.v[col]+'%。'+row.d.replace(/<[^>]+>/g,'')+' レンジ優位が濃いほど打ち、相手の域に刺さる/ウェットだとチェック増、OOP(SB)はさらに増。');rfiq3judge={loading:true};renderRFIQ();var res=await judgeCore(sc,q,a,rfiq3why);rfiq3judge=res;renderRFIQ();},
  rfiq4reveal:function(){var ta=document.getElementById('rfiq4why');if(ta)rfiq4why=ta.value;rfiq4open=true;renderRFIQ();},
+ rfiq5reveal:function(){var ta=document.getElementById('rfiq5why');if(ta)rfiq5why=ta.value;rfiq5open=true;renderRFIQ();},
+ rfiq5judge:async function(){var list=EXPL_ASSOC[rfiq4arch];var b=MATRIX.rows[rfiq3tex].b;var sc=rfiqPos+'オープン→BBコール→フロップ'+b+'→ターンで「'+TURN_ARCH[rfiq4arch].n+'」。この状況で使えるHHPのエクスプロイト引き出し。';var q='この流れで想起すべき引き出し(と前提となる相手観察)を挙げよ';var a=list.map(function(x){return x.t+'＝'+x.w;}).join('／')+'。どれも相手の観察(前提成立)を確認してから使う逸脱レイヤーで、GTOの基準とは別。';rfiq5judge={loading:true};renderRFIQ();var res=await judgeCore(sc,q,a,rfiq5why);rfiq5judge=res;renderRFIQ();},
  rfiq4judge:async function(){var t=TURN_ARCH[rfiq4arch];var sc='フロップCBの後、ターンで「'+t.n+'」が落ちた。レンジ/優位の移動とPFRの対応。';var q='レンジ/ナッツ優位がどちらに動くか、継続attackかbrakeか、なぜかを原則で言語化せよ';var a='（ターンは実測対象外＝原則）'+t.p.replace(/<[^>]+>/g,'')+' 核心＝カードが誰のレンジを伸ばすかで優位の移動を読む（自分を伸ばす→継続／相手を伸ばす→brake）。';rfiq4judge={loading:true};renderRFIQ();var res=await judgeCore(sc,q,a,rfiq4why);rfiq4judge=res;renderRFIQ();},
  cbtool:function(){view='cbtool';renderCbtool();try{window.scrollTo(0,0);}catch(e){}},
  cbPick:function(r){if(cbRanks.length>=3)cbRanks=[];cbRanks.push(r);renderCbtool();},
@@ -643,7 +645,7 @@ function renderRFI(){
  h+='<button class="btn" style="width:100%;margin-top:14px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.home()">マップへ戻る</button>';
  root.innerHTML=h;
 }
-var rfiqPos='UTG',rfiqIJ=null,rfiqPick=null,rfiqWhy='',rfiqScore={n:0,ok:0},rfiqJudge=null,rfiq2open=false,rfiq2why='',rfiq2judge=null,rfiq3open=false,rfiq3why='',rfiq3judge=null,rfiq3tex=0,rfiq4open=false,rfiq4why='',rfiq4judge=null,rfiq4arch=0,rfiqMode='rand',rfiqSpotIdx=0;
+var rfiqPos='UTG',rfiqIJ=null,rfiqPick=null,rfiqWhy='',rfiqScore={n:0,ok:0},rfiqJudge=null,rfiq2open=false,rfiq2why='',rfiq2judge=null,rfiq3open=false,rfiq3why='',rfiq3judge=null,rfiq3tex=0,rfiq4open=false,rfiq4why='',rfiq4judge=null,rfiq4arch=0,rfiq5open=false,rfiq5why='',rfiq5judge=null,rfiqMode='rand',rfiqSpotIdx=0;
 var RFIQ_SPOTS=[
  {pos:'CO',hand:'A5o',why:'★A5o飛び地：A7o/A6oはfoldなのにA5oだけ純open（A5ブロッカー＋ホイール）'},
  {pos:'UTG',hand:'AQs',tex:0,why:'★役割反転①：UTGのAQs。BBは強く守れずコール主体→AQsは厚いコールに守られる'},
@@ -655,7 +657,7 @@ var RFIQ_SPOTS=[
  {pos:'UTG',hand:'77',why:'★ペアの下限：UTGは77+が純open、66以下は混合。タイトな下限'}
 ];
 function rfiParseHand(lbl){var R=RFI_RANKS,hi=R.indexOf(lbl.charAt(0)),lo=R.indexOf(lbl.charAt(1));if(lbl.length===2)return [hi,hi];if(lbl.charAt(2)==='s')return [hi,lo];return [lo,hi];}
-function rfiqResetStages(){rfiqPick=null;rfiqWhy='';rfiqJudge=null;rfiq2open=false;rfiq2why='';rfiq2judge=null;rfiq3open=false;rfiq3why='';rfiq3judge=null;rfiq4open=false;rfiq4why='';rfiq4judge=null;rfiq4arch=Math.floor(Math.random()*TURN_ARCH.length);}
+function rfiqResetStages(){rfiqPick=null;rfiqWhy='';rfiqJudge=null;rfiq2open=false;rfiq2why='';rfiq2judge=null;rfiq3open=false;rfiq3why='';rfiq3judge=null;rfiq4open=false;rfiq4why='';rfiq4judge=null;rfiq4arch=Math.floor(Math.random()*TURN_ARCH.length);rfiq5open=false;rfiq5why='';rfiq5judge=null;}
 function rfiPickItem(){
  if(rfiqMode==='spot'){var s=RFIQ_SPOTS[rfiqSpotIdx%RFIQ_SPOTS.length];rfiqPos=s.pos;rfiqIJ=rfiParseHand(s.hand);rfiq3tex=(s.tex!=null?s.tex:Math.floor(Math.random()*MATRIX.rows.length));rfiqResetStages();return;}
  var poss=['UTG','HJ','CO','BTN','SB'];var pos=poss[Math.floor(Math.random()*5)];
@@ -665,7 +667,7 @@ function rfiPickItem(){
   for(var k=0;k<4;k++){var r=nb[k][0],c=nb[k][1];if(r>=0&&r<13&&c>=0&&c<13){var b=g.charAt(r*13+c);if(b==='R'||b==='M')return true;}}
   return false;}
  do{i=Math.floor(Math.random()*13);j=Math.floor(Math.random()*13);tries++;}while(!ok(i,j)&&tries<300);
- rfiqPos=pos;rfiqIJ=[i,j];rfiqPick=null;rfiqWhy='';rfiqJudge=null;rfiq2open=false;rfiq2why='';rfiq2judge=null;rfiq3open=false;rfiq3why='';rfiq3judge=null;rfiq3tex=Math.floor(Math.random()*MATRIX.rows.length);rfiq4open=false;rfiq4why='';rfiq4judge=null;rfiq4arch=Math.floor(Math.random()*TURN_ARCH.length);
+ rfiqPos=pos;rfiqIJ=[i,j];rfiqPick=null;rfiqWhy='';rfiqJudge=null;rfiq2open=false;rfiq2why='';rfiq2judge=null;rfiq3open=false;rfiq3why='';rfiq3judge=null;rfiq3tex=Math.floor(Math.random()*MATRIX.rows.length);rfiq4open=false;rfiq4why='';rfiq4judge=null;rfiq4arch=Math.floor(Math.random()*TURN_ARCH.length);rfiq5open=false;rfiq5why='';rfiq5judge=null;
 }
 function judgeBlockHtml(why,res,handler){
  if(!why)return getKey()?'<div style="margin-top:12px;font-size:11.5px;color:#85888f;background:rgba(255,255,255,.03);border-radius:8px;padding:9px 11px;">💬 書いてから進めると、Claudeが言語化を判定できます</div>':'';
@@ -747,6 +749,41 @@ function rfiq4Html(){
  }
  h+='</div>';return h;
 }
+var EXPL_ASSOC=[
+ [{t:'ターンでビッグ/OB切替（相手がフロップでキャップ）',w:'相手がナッツ系をフロップで使い切るタイプなら、ブランクターンは一段大きく'},
+  {t:'フロップ小ベット＝情報収集（キャップ確認→ターンOB）',w:'フロップにレイズが無かった＝キャップ読みをこのターンで回収'},
+  {t:'マルチストリートブラフはSPRから逆算',w:'2発目を打つ前に残弾と各サイズを先に計算'}],
+ [{t:'論理スレッドの持ち越し＝「しなかった行動」から読む',w:'A/Kに対する相手の反応を過去のパターンと照合する'},
+  {t:'ターンでビッグ/OB切替（相手がフロップでキャップ）',w:'PFR優位が増すカード＝キャップ相手にはサイズを上げる好機'}],
+ [{t:'フラッシュ完成ターンで継続（相手がドロー早期消費）',w:'相手がフラドロを早く動かすタイプなら、完成ターンはむしろ攻められる'},
+  {t:'ナッツチェンジターンは小さく打って相手のナッツを先に動かす',w:'非ナッツのバリュー/ブラフは小さく＝レクのナッツを表に出させる'},
+  {t:'論理スレッドの持ち越し＝「しなかった行動」から読む',w:'アグレッシブだった相手が急にパッシブ＝フラッシュ不在の推論'}],
+ [{t:'ナッツチェンジターンは小さく打って相手のナッツを先に動かす',w:'ストレート完成でも同じ原理が効く'},
+  {t:'アグレッション前に『強い手が降りるか』を問う',w:'相手の域が完成した後のレイズ/バレルは、降ろせる相手がいるか先に検証'},
+  {t:'パッシブ→突然のアグレッション＝バリュー激濃',w:'完成カードで相手が突然レイズしてきたらバリューに寄せて読む'}],
+ [{t:'アグレッション前に『強い手が降りるか』を問う',w:'トリップスの分布次第＝降ろせない相手への圧は無意味'},
+  {t:'SDVの補完2則（ゼロなら小ブラフ／リバーまで見通す）',w:'ペア化で自分のSDVが変わったら再判定し、リバーまで見通す'}]
+];
+function rfiq5Html(pos){
+ var list=EXPL_ASSOC[rfiq4arch].slice();
+ var b=MATRIX.rows[rfiq3tex].b;
+ if(b==='A72r'||b==='A96tt'||b==='AK4tt')list.push({t:'レク相手のドライなAハイは『ビッグorチェック』二極化',w:'このハンドのフロップ('+b+')で効く引き出し。GTOの33%小とはwhyが違う'});
+ else if(b==='K72r'||b==='Q72r'||b==='KQJ'||b==='KK7')list.push({t:'同じKハイドライでもプロとレクでCB戦略が逆転',w:'このハンドのフロップ('+b+')で効く引き出し。相手がどこでミスるかが起点'});
+ var h='<div style="margin-top:14px;border-top:.5px solid rgba(201,162,39,.25);padding-top:14px;">';
+ h+='<div style="font-size:11px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">⑤ 引き出し ・ この状況で効くエクスプロイトは？</div>';
+ h+='<div style="font-size:10px;color:var(--dim);margin-bottom:8px;">GTO(①〜④)は基準、ここは相手の観察が前提の逸脱レイヤー</div>';
+ if(!rfiq5open){
+  h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.6;margin-bottom:10px;">このハンドの流れ(フロップ'+b+'→'+TURN_ARCH[rfiq4arch].n+')で、<b>思い出せるHHPの引き出し</b>を書き出せ（どんな相手観察が前提かも添えて）。</div>';
+  h+='<textarea id="rfiq5why" placeholder="例：相手がフラドロを早く使うタイプなら完成ターンはむしろ攻める…" style="width:100%;box-sizing:border-box;min-height:56px;background:#14171e;border:.5px solid rgba(255,255,255,.12);border-radius:11px;padding:11px 13px;font-size:13px;color:var(--text);font-family:inherit;line-height:1.5;resize:vertical;margin-bottom:10px;">'+(rfiq5why||'')+'</textarea>';
+  h+='<button class="btn" style="width:100%;padding:13px;font-size:13.5px;background:rgba(201,162,39,.14);color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.rfiq5reveal()">引き出しリストを見る →</button>';
+ }else{
+  list.forEach(function(x){h+='<div style="margin-bottom:9px;background:#14171e;border:.5px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;"><div style="font-size:12.5px;color:var(--gold);line-height:1.4;">'+x.t+'</div><div style="font-size:11.5px;color:#c7c9cf;line-height:1.55;margin-top:3px;">'+x.w+'</div></div>';});
+  h+='<div style="font-size:11px;color:var(--dim);line-height:1.6;margin-top:6px;">※詳細はエクスプロイトモードの同名カード。引き出しは『観察→前提成立』を確認してから使う。</div>';
+  if(rfiq5why)h+='<div style="font-size:12px;line-height:1.55;color:#8fc7a8;margin-top:10px;">あなたの言語化：'+rfiq5why.replace(/</g,'&lt;')+'</div>';
+  h+=judgeBlockHtml(rfiq5why,rfiq5judge,'OWN.rfiq5judge');
+ }
+ h+='</div>';return h;
+}
 function rfiReason(pos,i,j){
  var g=RFI[pos].g,R=RFI_RANKS;function ch(a,b){return g.charAt(a*13+b);}
  var fam,bound,k,c,r,b;
@@ -762,7 +799,7 @@ function renderRFIQ(){
  var pos=rfiqPos,i=rfiqIJ[0],j=rfiqIJ[1],info=rfiReason(pos,i,j);
  var h=colBack('OWN.rfi()','RFIレンジ表');
  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">逆引き即答</div><span class="mono" style="font-size:12px;color:var(--muted);">正答 '+rfiqScore.ok+' / '+rfiqScore.n+'</span></div>';
- h+='<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;">①open→②相手の守り→③フロップCB→④ターン まで言語化。<b style="color:#c7c9cf;">自/相手レンジ→ストリートでの変化→優位</b>を1ハンドで追う筋トレ。</div>';
+ h+='<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;">①open→②相手の守り→③フロップCB→④ターン→⑤引き出し(エクスプロイト) まで言語化。<b style="color:#c7c9cf;">GTOの基準→相手観察での逸脱</b>まで1ハンドで追う筋トレ。</div>';
  h+='<div style="display:flex;gap:6px;margin-bottom:14px;">';
  h+='<button class="chip'+(rfiqMode==='rand'?' on':'')+'" style="flex:1;" onclick="OWN.rfiqSetMode(\'rand\')">ランダム</button>';
  h+='<button class="chip'+(rfiqMode==='spot'?' on':'')+'" style="flex:1;" onclick="OWN.rfiqSetMode(\'spot\')">重要スポット</button>';
@@ -789,7 +826,7 @@ function renderRFIQ(){
   if(rfiqWhy)h+='<div style="font-size:12px;line-height:1.55;color:#8fc7a8;margin-top:9px;border-top:.5px solid rgba(255,255,255,.06);padding-top:9px;">あなたの言語化：'+rfiqWhy.replace(/</g,'&lt;')+'</div>';
   h+='</div>';
   h+=judgeBlockHtml(rfiqWhy,rfiqJudge,'OWN.rfiqJudge');
-  if(info.cell==='R'||info.cell==='M'){h+=rfiq2Html(pos,i,j);if(rfiq2open)h+=rfiq3Html(pos);if(rfiq3open)h+=rfiq4Html();}
+  if(info.cell==='R'||info.cell==='M'){h+=rfiq2Html(pos,i,j);if(rfiq2open)h+=rfiq3Html(pos);if(rfiq3open)h+=rfiq4Html();if(rfiq4open)h+=rfiq5Html(pos);}
   h+='<button class="btn" style="width:100%;margin-top:16px;padding:15px;font-size:14px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.rfiqNext()">次のハンド →</button>';
  }
  h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.rfi()">RFIレンジ表へ戻る</button>';
