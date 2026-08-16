@@ -282,6 +282,33 @@ var FILLS=[
 {tag:"エクスプロイト",sc:"HHP：ブラフを見せる相手はアンダーブラフ",steps:[{q:"レク相手が自分からブラフを見せびらかす(ウィンドミル)。今後のリバーコール判断は？",a:"そのプレイヤーは平均してアンダーブラッフィングと判断し、リバーのブラフキャッチでのコール閾値を上げる(よりフォールド寄り)。ブラフを自発的に開示するのはフューチャーアクション獲得のためで、実際に稼ぐプレイヤーはブラフを見せない。見せる行為自体が普段のアンダーブラフの証拠。(出典: pJaifszkyPk.md 主張7、vsSFecrDrb0.md 判断基準9)"}]},
 {tag:"エクスプロイト",sc:"HHP：キャップされたターンは大サイズ",steps:[{q:"相手レンジがキャップされた(ナッツ系を持ち込めない)ターン。サイジングは？",a:"大きいサイズ(オーバーベット含む)でプレッシャーをかける。相手がナッツを持てない以上、大ベットで降りさせられ、価格非感応なハンド(トップペア/ドロー)には最大バリューが取れる。逆にナッツが変化するターン(フラッシュ完成等)では相手がアンキャップされるためサイズを落とし、小ベットでレイズを誘い情報収集する。(出典: -FdPlAVG5ms.md 判断基準1、S7eq8103TDg.md 判断基準3、hb5V55q-tTU.md 判断基準8)"}]}
 ];
+var KINDRILL=[
+ {node:'BTN 2.5bb open → BB(Hero) call → フロップ → BB check → BTN CB',
+  hand:'Ad4d', board:'Ks7d5c (K75r)', size:'33%', foldTarget:'約30%（実測29.2%）',
+  comp:'Qhi以下trash / Ahi / 1pair以上 の3層。Qhi以下trashを降りれば約30%に到達。',
+  action:'call', model:'①33%→約30%fold ②自レンジを弱い順(Qhi以下→Ahi→1pair以上) ③Ahiはfold域の上でBDFDもあり守る→call',
+  drawKey:'K75では低Khi/Qhiにドローが乏しく、Qhi以下foldだけで30%に届く→Ahi(A4 BDFD)は残す'},
+ {node:'BTN 2.5bb open → BB(Hero) call → フロップ → BB check → BTN CB',
+  hand:'Ad4d', board:'QsJd9c (QJ9r)', size:'33%', foldTarget:'約30%',
+  comp:'Khi以下trash / Ahi / 1pair以上。ただしKhi以下trashの多くがgutshot/OEを持つ。',
+  action:'fold', model:'①33%→約30%fold ②Khi以下trashがdrawで守るためfoldが約15%しか出ない→残りをdraw無し弱Ahiから捻出 ③A4はBDFDのみでA8+より下位→fold',
+  drawKey:'QJ9ではKhi以下trashがgutshot/OEでdefenceに回り、foldの負担がdraw無し弱Ahi(A4)に回る'},
+ {node:'HJ 2bb open → BTN 7.5bb 3bet → HJ(Hero) call → フロップ → HJ check → BTN CB（3bp）',
+  hand:'9s9d (99)', board:'Ts4h2h (T42・2ハート)', size:'50%', foldTarget:'約40%（実測35.5%）',
+  comp:'Trash10% / AhiKhi40% / Pocket50%。pocket序列 Set(TT,44,22)>Overpair(JJ)>BDSD(33,55,66)>Middle(99,88,77)。',
+  action:'fold', model:'①50%→約40%fold ②Ahi/Khiのdraw付きは守り、pocketから約10%捻出 ③低ポケ33/55/66がBDSDで99超え・2トーンでFD防御にcall枠→99(BDFD無)は最下位でfold',
+  drawKey:'低ポケ33/55/66がバックドアストレートで99より上位＝99が最下位に落ちる。2トーンでFD防御も必要'},
+ {node:'HJ 2bb open → BTN 7.5bb 3bet → HJ(Hero) call → フロップ → HJ check → BTN CB（3bp）',
+  hand:'9s9d (99)', board:'Qs7h2d (Q72r)', size:'50%', foldTarget:'約40%',
+  comp:'Trash10% / AhiKhi20%(減) / Qhit20%(新) / Pocket50%。AQ/KQがQhit化。序列 Set(QQ,77,22)>Middle(JJ,TT,99,88)>Low(66,55,44,33)。',
+  action:'call', model:'①50%→約40%fold ②Qhit独立化でAhiKhi減、pocketから約15%捻出 ③レインボーでBDSD無し→低ポケ66-33が最下位、それを降りて15%達成→99はMiddleで残りcall',
+  drawKey:'レインボーでBDSD無し＝低ポケ66-33が最下位に沈み、99は中堅pocketとして生存'},
+ {node:'HJ 2bb open → BTN 7.5bb 3bet → HJ(Hero) call → フロップ → HJ check → BTN CB（3bp）',
+  hand:'9s9d (99色なし)', board:'As8h2h (A82・2ハート)', size:'50%', foldTarget:'約40%',
+  comp:'Trash10% / Khi10%(激減) / Ahit30%(新・トップペア) / Pocket50%。序列 Set(88,22)>Middle(JJ,TT,99)>Low(77..33)。',
+  action:'fold', model:'①50%→約40%fold ②Ahit30%化・Khi激減、pocketの半分(約25%)を降りる ③2ハートで色(FD)が序列支配・色あり色なし1:1→色なしpocket全fold→99色なしはfold',
+  drawKey:'2ハート＝役の強さより色(FD)が序列を支配。色なしpocketから先にfold→99色なしは降りる'}
+];
 function cid(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return 'c'+(h>>>0).toString(36);}
 CARDS.forEach(function(c){c.type='card';c.id=cid(c.q);});
 FILLS.forEach(function(f){f.type='fill';f.tag=f.tag||'穴埋め';f.id=cid(f.sc);});
@@ -503,6 +530,18 @@ async function judgeCore(sc,q,a,learner){
   return JSON.parse(txt);
  }catch(e){return {error:'NET'};}
 }
+var JUDGE_SYS_KIN='あなたはポーカー均衡思考の辛口コーチ。学習者のcall/fold判定の"思考過程"を10点満点で採点する。配点＝①3stepの手順で構成できている(サイズ→必要fold頻度／自レンジを捕捉し弱い順にfold候補を選ぶ／自手がfold域か):3点 ②このボードでの自レンジの役別構成(%)を正しく推定できている:3点(★最重要) ③弱い順にfoldするハンドの選定に言及(低ランクpocketから／2トーンならランクを問わずFDの色を持たないpocketから／drawやFD/BDSD/BDFDを持つ弱いハンドは守る):3点 ④正しいアクション:1点。★答えより過程を重視。相手レンジ・相手戦略への言及からcall/foldを決めるのは減点(均衡は自分側3変数で閉じる=相手はバランス前提)。drawの無い弱ハンドのレンジ内%の細かい見積もりミスは厳しく減点しない。日本語で短く鋭く。';
+var KIN_SCHEMA={type:'object',properties:{score:{type:'integer'},verdict:{type:'string'},good:{type:'string'},miss:{type:'string'}},required:['score','verdict','good','miss'],additionalProperties:false};
+async function judgeKin(sc,q,a,learner){
+ var key=getKey();if(!key)return {error:'NO_KEY'};
+ var prompt='【状況】'+sc+'\n【質問】'+q+'\n【模範解答】'+a+'\n【学習者の答え】'+(learner||'（空欄）')+'\n\nこの答えを10点満点で採点して。verdictは20字程度の一言、goodは合っている点、missは抜け/ズレと直し方。';
+ try{
+  var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:getModel(),max_tokens:900,system:JUDGE_SYS_KIN,messages:[{role:'user',content:prompt}],output_config:{format:{type:'json_schema',schema:KIN_SCHEMA}}})});
+  if(!r.ok){return {error:r.status===401?'BAD_KEY':('HTTP '+r.status)};}
+  var j=await r.json();var txt=(j.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
+  return JSON.parse(txt);
+ }catch(e){return {error:'NET'};}
+}
 async function judgeAnswer(it,step,i){return judgeCore(it.sc,step.q,step.a,fInputs[i]);}
 function judgeHtml(i){
  var res=judgeRes[i];
@@ -542,6 +581,11 @@ window.OWN={setMode:setMode,start:function(){build();if(!queue.length){return;}s
  cbPick:function(r){if(cbRanks.length>=3)cbRanks=[];cbRanks.push(r);renderCbtool();},
  cbSuit:function(s){cbSuit=s;renderCbtool();},
  cbReset:function(){cbRanks=[];renderCbtool();},
+ kinStart:function(){view='kin';kinIdx=0;kinCompShown=false;kinCompWhy='';kinWhy='';kinJudge=null;renderKin();try{window.scrollTo(0,0);}catch(e){}},
+ kinShowComp:function(){var ta=document.getElementById('kincompwhy');if(ta)kinCompWhy=ta.value;kinCompShown=true;renderKin();},
+ kinJudge:async function(){var ta=document.getElementById('kinwhy');if(ta)kinWhy=ta.value;var d=KINDRILL[kinIdx];var sc=d.node+'。Hero＝'+d.hand+'、ボード＝'+d.board+'、CBサイズ＝'+d.size+'。';var q='必要fold頻度を出し、自レンジを役別%で弱い順に並べ、この手がfold域か判定してcall/foldせよ';var a=d.model+' / 構成:'+d.comp+' / 正解アクション:'+d.action+' / 核心:'+d.drawKey;kinJudge={loading:true};renderKin();var res=await judgeKin(sc,q,a,kinWhy);kinJudge=res;renderKin();},
+ kinNext:function(){kinIdx=(kinIdx+1)%KINDRILL.length;kinCompShown=false;kinCompWhy='';kinWhy='';kinJudge=null;renderKin();try{window.scrollTo(0,0);}catch(e){}},
+ kinBack:function(){view='home';renderHome();},
  flip:function(){buzz(8);flipped=true;renderSession();},
  swipe:function(good){buzz(good?14:[6,40,6]);var it=queue[idx];grade(it,good);idx++;flipped=false;next();},
  fins:function(t){var ta=document.getElementById('fin');if(!ta)return;if(t==='削除'){ta.value=ta.value.replace(/\s*[^\s,]+[,\s]*$|.$/,'');}else{ta.value+=t;}fInputs[fsi]=ta.value;ta.focus();},
@@ -957,6 +1001,49 @@ function renderCbtool(){
  }
  root.innerHTML=h;
 }
+var kinIdx=0,kinCompShown=false,kinCompWhy='',kinWhy='',kinJudge=null;
+function kinJudgeBlockHtml(res){
+ if(!getKey())return '<div style="margin-top:12px;font-size:11.5px;color:#85888f;background:rgba(255,255,255,.03);border-radius:8px;padding:9px 11px;">🤖 <b style="color:#a8abb2;">ホームの⚙設定でAPIキー</b>を入れると、書いた言語化をClaudeが判定します（自己採点はそのまま使えます）</div>';
+ if(res&&res.loading)return '<div style="margin-top:12px;font-size:13px;color:var(--gold);text-align:center;padding:10px;">🤖 Claudeが判定中…</div>';
+ if(res&&res.error){var em=res.error==='BAD_KEY'?'APIキーが無効':res.error==='NET'?'通信エラー':res.error;return '<div style="margin-top:12px;font-size:12px;color:#e8917a;background:rgba(217,96,63,.1);border-radius:8px;padding:9px 11px;">判定失敗（'+em+'）<button onclick="OWN.kinJudge()" style="margin-left:8px;font-size:12px;color:var(--gold);background:none;border:.5px solid rgba(201,162,39,.4);border-radius:6px;padding:3px 9px;">再試行</button></div>';}
+ if(res&&typeof res.score==='number'){var gc=res.score>=8?'#5fc3a8':res.score>=5?'#d8b54a':'#e8917a';return '<div style="margin-top:12px;background:#14171e;border:.5px solid '+gc+'55;border-radius:11px;padding:13px 14px;"><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:9px;flex-wrap:wrap;"><span class="mono" style="font-size:28px;color:'+gc+';font-weight:600;">'+res.score+'</span><span style="font-size:12px;color:var(--muted);">/10</span><span style="font-size:13px;color:#dcdee3;line-height:1.4;">'+res.verdict+'</span><span style="margin-left:auto;font-size:9px;letter-spacing:1px;color:#6c6f77;">CLAUDE判定</span></div><div style="font-size:12px;line-height:1.5;color:#8fc7a8;margin-bottom:5px;">◯ '+res.good+'</div><div style="font-size:12px;line-height:1.5;color:#e0a890;">→ '+res.miss+'</div></div>';}
+ return '<button onclick="OWN.kinJudge()" style="width:100%;margin-top:12px;padding:12px;font-size:13.5px;background:rgba(201,162,39,.12);color:var(--gold);border:.5px solid rgba(201,162,39,.4);border-radius:10px;font-family:inherit;">🤖 Claudeに採点してもらう</button>';
+}
+function renderKin(){
+ var d=KINDRILL[kinIdx];
+ var h=colBack('OWN.kinBack()','マップ');
+ h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">均衡思考ドリル</div><span class="mono" style="font-size:12px;color:var(--muted);">'+(kinIdx+1)+' / '+KINDRILL.length+'</span></div>';
+ h+='<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;">①サイズ→必要fold頻度 ②自レンジを役別%で弱い順に把握 ③自手がfold域か、の3stepでcall/foldを判定する（Amu式）。</div>';
+ h+='<div style="background:var(--surf);border:.5px solid rgba(201,162,39,.3);border-radius:16px;padding:20px;margin-bottom:16px;">';
+ h+='<div style="font-size:12.5px;color:#c7c9cf;line-height:1.6;margin-bottom:10px;">'+d.node+'</div>';
+ h+='<div class="mono" style="font-size:26px;font-weight:600;color:var(--text);margin-bottom:8px;">'+d.hand+'</div>';
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);">'
+   +'<span class="mono" style="border:.5px solid rgba(255,255,255,.14);border-radius:6px;padding:3px 9px;">'+d.board+'</span>'
+   +'<span class="mono" style="border:.5px solid rgba(255,255,255,.14);border-radius:6px;padding:3px 9px;">CB '+d.size+'</span>'
+   +'<span class="mono" style="border:.5px solid rgba(201,162,39,.3);border-radius:6px;padding:3px 9px;color:var(--gold);">必要fold '+d.foldTarget+'</span>'
+   +'</div></div>';
+ h+='<div class="csec" style="margin-top:4px;">Step A ・ 自レンジの役別構成</div>';
+ h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.6;margin-bottom:10px;">このボードでの自レンジの役別構成を%で書け（弱い順に）。</div>';
+ h+='<textarea id="kincompwhy" placeholder="例：trash◯% / Ahi◯% / 1pair以上◯%…" style="width:100%;box-sizing:border-box;min-height:56px;background:#14171e;border:.5px solid rgba(255,255,255,.12);border-radius:11px;padding:11px 13px;font-size:13px;color:var(--text);font-family:inherit;line-height:1.5;resize:vertical;margin-bottom:10px;">'+(kinCompWhy||'')+'</textarea>';
+ if(!kinCompShown){
+  h+='<button class="btn" style="width:100%;padding:13px;font-size:13.5px;background:rgba(201,162,39,.14);color:var(--gold);border-color:rgba(201,162,39,.4);" onclick="OWN.kinShowComp()">模範を見る →</button>';
+ }else{
+  h+='<div style="background:#14171e;border:.5px solid rgba(255,255,255,.08);border-radius:11px;padding:12px 14px;font-size:12.5px;line-height:1.65;color:#dcdee3;">'+d.comp+'</div>';
+  h+='<div class="csec" style="margin-top:22px;">Step B ・ 必要fold頻度→call/fold</div>';
+  h+='<div style="font-size:12.5px;color:#dcdee3;line-height:1.6;margin-bottom:10px;">必要fold頻度を出し、自レンジを役別%で弱い順に並べ、この手がfold域かを判定してcall/foldせよ（3stepで）。</div>';
+  h+='<textarea id="kinwhy" placeholder="①サイズ→必要fold頻度 ②自レンジを弱い順に%で ③この手はfold域か→call/fold" style="width:100%;box-sizing:border-box;min-height:80px;background:#14171e;border:.5px solid rgba(255,255,255,.12);border-radius:11px;padding:11px 13px;font-size:13px;color:var(--text);font-family:inherit;line-height:1.5;resize:vertical;margin-bottom:10px;">'+(kinWhy||'')+'</textarea>';
+  h+=kinJudgeBlockHtml(kinJudge);
+  h+='<div style="margin-top:16px;background:rgba(201,162,39,.06);border-radius:10px;padding:12px 14px;">';
+  h+='<div style="font-size:11px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">模範3step ＆ 正解</div>';
+  h+='<div style="font-size:12.5px;line-height:1.65;color:#dcdee3;margin-bottom:6px;">'+d.model+'</div>';
+  h+='<div style="font-size:13px;color:var(--gold);font-weight:600;">正解＝'+d.action+'</div>';
+  h+='<div style="font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.55;">核心：'+d.drawKey+'</div>';
+  h+='</div>';
+  h+='<button class="btn" style="width:100%;margin-top:16px;padding:15px;font-size:14px;font-weight:500;background:var(--gold);color:#14171e;border:none;" onclick="OWN.kinNext()">次の盤へ →</button>';
+ }
+ h+='<button class="btn" style="width:100%;margin-top:10px;padding:13px;font-size:13px;color:var(--muted);" onclick="OWN.kinBack()">マップへ戻る</button>';
+ root.innerHTML=h;
+}
 function renderColumns(){
  var h=colBack('OWN.home()','マップ');
  h+='<div style="margin-bottom:18px;"><div style="font-size:23px;font-family:var(--serif);color:var(--text);">基礎コラム</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">読んで体系を掴む。カードが「問われて答える」筋トレなら、ここはその土台。</div></div>';
@@ -1001,6 +1088,7 @@ function renderHome(){
  html+='<button class="btn" style="padding:12px 8px;font-size:12.5px;background:rgba(217,96,63,.1);color:#e8917a;border-color:rgba(217,96,63,.35);" onclick="OWN.leakDrill()">🩹 弱点だけ叩く</button>';
  html+='<button class="btn" style="padding:12px 8px;font-size:12.5px;background:rgba(201,162,39,.1);color:var(--gold);border-color:rgba(201,162,39,.35);" onclick="OWN.reads()">👁 サイズ&ライン読み</button>';
  html+='</div>';
+ html+='<button class="btn" style="width:100%;margin-top:8px;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.kinStart()"><span style="font-size:18px;">⚖️</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">均衡思考ドリル</span><br><span style="font-size:11.5px;color:var(--muted);">レンジ構成→call/fold（Amu式）</span></span></button>';
  // 学ぶ（読み物）— クイズと分離
  html+='<div class="sect-label">学ぶ ・ 読み物</div>';
  html+='<button class="btn" style="width:100%;padding:15px 16px;background:var(--surf);text-align:left;display:flex;align-items:center;gap:11px;" onclick="OWN.columns()"><span style="font-size:18px;">📖</span><span style="line-height:1.35;"><span style="font-size:14px;color:var(--text);">基礎コラム</span><br><span style="font-size:11.5px;color:var(--muted);">読んで体系を掴む（全'+COLUMNS.length+'本）</span></span></button>';
