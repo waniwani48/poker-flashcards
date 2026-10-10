@@ -199,9 +199,27 @@ PD.ui.home = (function () {
     );
   }
 
+  /** 未保存の封印票／入力途中の票があれば再開カード（Truth で「設定へ」→戻った時に票を失わせない） */
+  function resumeHtml(ctx) {
+    var sealed = !!(ctx.entry && ctx.entry.spot);
+    var inProgress = !sealed && !!ctx.spot && ctx.mode && ctx.mode !== 'speed';
+    if (!sealed && !inProgress) return '';
+    var view = sealed ? 'truth' : 'drill';
+    var title = sealed ? '未保存の封印票があります' : '入力途中の票があります';
+    var sub = sealed ? '真値と採点を入れて保存するまで、この票は保持されています。' : '続きから埋められます。新しい出題を始めると破棄されます。';
+    return (
+      '<section class="pd-card pd-home-resume" data-resume="' + view + '">' +
+        '<p class="pd-home-resume-title">' + title + '</p>' +
+        '<p class="pd-small pd-mute">' + sub + '</p>' +
+        '<button type="button" class="pd-btn pd-btn-primary" data-go="' + view + '">' + (sealed ? '票に戻る' : '続きを埋める') + '</button>' +
+      '</section>'
+    );
+  }
+
   function html(ctx) {
     return (
       '<div class="pd-home">' +
+        resumeHtml(ctx) +
         startHtml(ctx) +
         unlockCardHtml(ctx) +
         gridHtml(ctx) +
@@ -228,6 +246,11 @@ PD.ui.home = (function () {
     if (btn && typeof btn.addEventListener === 'function') {
       btn.addEventListener('click', function (ev) {
         if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+        // 未保存の封印票／入力途中の票を無警告で破棄しない
+        var pending = (ctx.entry && ctx.entry.spot) ? '未保存の封印票' : ((ctx.spot && ctx.mode && ctx.mode !== 'speed') ? '入力途中の票' : null);
+        if (pending && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+          if (!window.confirm(pending + 'を破棄して新しい出題を始めますか？')) return;
+        }
         if (typeof ctx.next === 'function') ctx.next();
       });
     }

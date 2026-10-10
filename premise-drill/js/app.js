@@ -354,6 +354,11 @@ PD.app = (function () {
     }
     normalizeEntry(entry);
     if (!ctx.state) ctx.state = fallbackState();
+    // slow/live は真値必須（UI の保存ボタン無効化と二重の防御）
+    if (entry.mode !== 'speed' && !(entry.truth && entry.truth.used === true)) {
+      toast('真値（Wizard で見た数字）を入れてから保存してください');
+      return { ok: false, outcome: null };
+    }
 
     var outcome = null;
     var nextState = ctx.state;
