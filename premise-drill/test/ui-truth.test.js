@@ -99,7 +99,7 @@ module.exports = {
     assert.ok(hb.indexOf('gtowizard') < 0, 'コミット前に Wizard リンクを出さない');
     assert.strictEqual(typeof truth.html(), 'string', 'ctx 無しでも文字列');
 
-    // ---- 通常：封印票ヘッダに cls ラベル、Wizard 主（cb・確認済）／副（bbfacing・要確認）----
+    // ---- 通常：封印票ヘッダに cls ラベル、Wizard 主（bbfacing・実機確認済 R1.8）／副（cb）----
     var ctx = ctxWith(mockEntry());
     var h = truth.html(ctx);
     assert.strictEqual(typeof h, 'string');
@@ -107,23 +107,28 @@ module.exports = {
     assert.ok(/<h2 class="pd-truth-cls" data-role="cls">ドライ・ハイカード・レインボー<\/h2>/.test(h), 'cls ラベルを初表示');
     assert.ok(h.indexOf('封印済み') >= 0);
     assert.ok(h.indexOf('Ks7d5c') >= 0 && h.indexOf('Ad4d') >= 0);
-    var mainHref = attrOf(h, /data-wizard="main" data-node="cb" href="([^"]+)"/);
-    assert.ok(mainHref, '主リンクは cb ノード');
+    var mainHref = attrOf(h, /data-wizard="main" data-node="bbfacing" href="([^"]+)"/);
+    assert.ok(mainHref, '主リンクは bbfacing（33/50 は実機確認済）');
     assert.strictEqual(mainHref,
-      'https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&amp;depth=100&amp;soltab=strategy&amp;preflop_actions=F-F-F-R2.5-F-C&amp;flop_actions=X&amp;history_spot=7&amp;board=Ks7d5c',
-      'href は T4 の形式（& はエスケープ）');
+      'https://app.gtowizard.com/solutions?gametype=Cash6m50zGeneral&amp;depth=100&amp;soltab=strategy&amp;preflop_actions=F-F-F-R2.5-F-C&amp;flop_actions=X-R1.8&amp;history_spot=8&amp;board=Ks7d5c',
+      'href は実機確認した形式（& はエスケープ）');
     assert.ok(/data-wizard="main"[^>]*target="_blank" rel="noopener"/.test(h), '新規タブ・noopener');
-    var subHref = attrOf(h, /data-wizard="sub" data-node="bbfacing" href="([^"]+)"/);
-    assert.ok(subHref && subHref.indexOf('flop_actions=X-B1.8&amp;history_spot=8') >= 0, '副は bbfacing（既定1桁）');
-    assert.ok(/data-wizard="sub"[\s\S]*?要確認/.test(h), '副リンクに要確認タグ');
+    var subHref = attrOf(h, /data-wizard="sub" data-node="cb" href="([^"]+)"/);
+    assert.ok(subHref && subHref.indexOf('flop_actions=X&amp;history_spot=7') >= 0, '副は cb ノード');
+    assert.ok(/data-wizard="main"[\s\S]*?確認済/.test(h), '主リンクに確認済タグ');
+    // ng を記録した場合は cb が主に戻る
+    var ctxNg = ctxWith(mockEntry());
+    ctxNg.state.settings.wizardBfacing = 'ng';
+    var hNg = truth.html(ctxNg);
+    assert.ok(attrOf(hNg, /data-wizard="main" data-node="cb" href="([^"]+)"/), 'ng 記録時は主リンクが cb');
 
-    // ---- settings.wizardBfacing==='ok' かつ 2桁 → bbfacing が主・B1.82 ----
+    // ---- settings.wizardBfacing==='ok' → bbfacing が主。33/50 は桁設定に関わらず実ノード表記 R1.8 ----
     var ctxOk = ctxWith(mockEntry());
     ctxOk.state.settings.wizardBfacing = 'ok';
     ctxOk.state.settings.wizardBetDecimals = 2;
     var hOk = truth.html(ctxOk);
     var mainOk = attrOf(hOk, /data-wizard="main" data-node="bbfacing" href="([^"]+)"/);
-    assert.ok(mainOk && mainOk.indexOf('X-B1.82') >= 0, 'ok 設定で bbfacing が主、bet 2桁');
+    assert.ok(mainOk && mainOk.indexOf('X-R1.8&amp;') >= 0, 'ok 設定で bbfacing が主、実ノード表記 R1.8');
     assert.ok(/data-wizard="sub" data-node="cb"/.test(hOk));
 
     // ---- 真値未入力：保存バーは未入力・ボタン disabled ----

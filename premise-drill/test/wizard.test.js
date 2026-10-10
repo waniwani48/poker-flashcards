@@ -37,30 +37,33 @@ module.exports = {
     assert.strictEqual(typeof cb.note, 'string');
     assert.ok(cb.note.length > 0, 'cb の note（手順文）が空');
 
-    // 受入: bbfacing が flop_actions=X-B1.8&history_spot=8 を含み verified===false、note に「要実機確認」
+    // 実機確認 2026-10-11: bbfacing は flop_actions=X-R1.8&history_spot=8 で BB 応答ノードに着地（verified true）
     var bf = W.url(spot33(), 'bbfacing');
-    assert.ok(bf.url.indexOf('flop_actions=X-B1.8&history_spot=8') !== -1, 'bbfacing に X-B1.8&history_spot=8 が無い: ' + bf.url);
-    assert.strictEqual(bf.verified, false, 'bbfacing は verified false');
-    assert.ok(bf.note.indexOf('要実機確認') !== -1, 'bbfacing の note に「要実機確認」が無い');
-    // 既定は1桁（B1.82 ではない）
-    assert.ok(bf.url.indexOf('X-B1.82') === -1, '既定の bbfacing が2桁になっている');
+    assert.ok(bf.url.indexOf('flop_actions=X-R1.8&history_spot=8') !== -1, 'bbfacing に X-R1.8&history_spot=8 が無い: ' + bf.url);
+    assert.strictEqual(bf.verified, true, 'bbfacing(33) は verified true');
+    assert.ok(bf.note.indexOf('実機確認済') !== -1, 'bbfacing の note に「実機確認済」が無い');
+    var bfX = W.url({ board: 'Ks7d5c', villainPos: 'BTN', size: 40 }, 'bbfacing');
+    assert.strictEqual(bfX.verified, false, '既定ノードに無いサイズ(40)は verified false');
+    assert.ok(bfX.url.indexOf('X-R2.2&') !== -1, 'size 40 は toFixed(1) の R2.2: ' + bfX.url);
+    // 既定は1桁（R1.82 ではない）
+    assert.ok(bf.url.indexOf('X-R1.82') === -1, '既定の bbfacing が2桁になっている');
     // 共通部分（base・preflop・board）は cb と同じ
     assert.ok(bf.url.indexOf(W.BASE + '&preflop_actions=F-F-F-R2.5-F-C&') === 0, 'bbfacing の先頭が base+preflop でない');
     assert.ok(/&board=Ks7d5c$/.test(bf.url), 'bbfacing の末尾が board でない');
 
-    // 受入: size 50 の bbfacing が X-B2.8
+    // 実機確認 2026-10-11: size 50 の bbfacing は X-R2.75（Wizard の実ノード。R2.8 は 51% のカスタム解になる）
     var bf50 = W.url(spot50(), 'bbfacing');
-    assert.ok(bf50.url.indexOf('flop_actions=X-B2.8&history_spot=8') !== -1, 'size 50 の bbfacing に X-B2.8 が無い: ' + bf50.url);
+    assert.ok(bf50.url.indexOf('flop_actions=X-R2.75&history_spot=8') !== -1, 'size 50 の bbfacing に X-R2.75 が無い: ' + bf50.url);
+    assert.strictEqual(bf50.verified, true, 'bbfacing(50) は verified true');
 
-    // 受入: betDecimals:2 で X-B1.82
-    var bf2 = W.url(spot33(), 'bbfacing', { betDecimals: 2 });
-    assert.ok(bf2.url.indexOf('flop_actions=X-B1.82&history_spot=8') !== -1, 'betDecimals:2 で X-B1.82 が無い: ' + bf2.url);
-    var bf50x2 = W.url(spot50(), 'bbfacing', { betDecimals: 2 });
-    assert.ok(bf50x2.url.indexOf('flop_actions=X-B2.75&history_spot=8') !== -1, 'size 50 betDecimals:2 で X-B2.75 が無い: ' + bf50x2.url);
-    // betDecimals の既定（1）と不正値は1桁に落ちる
-    assert.ok(W.url(spot33(), 'bbfacing', { betDecimals: 1 }).url.indexOf('X-B1.8&') !== -1);
-    assert.ok(W.url(spot33(), 'bbfacing', {}).url.indexOf('X-B1.8&') !== -1);
-    assert.ok(W.url(spot33(), 'bbfacing', { betDecimals: 3 }).url.indexOf('X-B1.8&') !== -1);
+    // 33/50 は betDecimals に関わらず実ノード表記で固定（R1.82 は 33% のカスタム解になるので出さない）
+    assert.ok(W.url(spot33(), 'bbfacing', { betDecimals: 2 }).url.indexOf('X-R1.8&') !== -1, '33 は betDecimals:2 でも R1.8');
+    assert.ok(W.url(spot50(), 'bbfacing', { betDecimals: 1 }).url.indexOf('X-R2.75&') !== -1, '50 は betDecimals:1 でも R2.75');
+    // 既定ノードに無いサイズだけ betDecimals が効く（既定1桁、不正値は1桁）
+    var s40 = { board: 'Ks7d5c', villainPos: 'BTN', size: 40 };
+    assert.ok(W.url(s40, 'bbfacing', { betDecimals: 2 }).url.indexOf('X-R2.20&') !== -1, 'size 40 betDecimals:2 は R2.20');
+    assert.ok(W.url(s40, 'bbfacing', {}).url.indexOf('X-R2.2&') !== -1);
+    assert.ok(W.url(s40, 'bbfacing', { betDecimals: 3 }).url.indexOf('X-R2.2&') !== -1);
 
     // 受入: betBB
     assert.strictEqual(W.betBB(5.5, 33), 1.82, 'betBB(5.5,33) !== 1.82');
@@ -79,15 +82,15 @@ module.exports = {
     assert.strictEqual(hj.verified, false);
     assert.strictEqual(W.url({ board: 'Ks7d5c', villainPos: 'HJ', size: 33 }, 'bbfacing').url, null, 'HJ の bbfacing url が null でない');
 
-    // 受入: testUrl(2) に B1.82
+    // 受入: testUrl(2) に R1.82
     var t2 = W.testUrl(2);
     assert.strictEqual(typeof t2, 'string');
-    assert.ok(t2.indexOf('B1.82') !== -1, 'testUrl(2) に B1.82 が無い: ' + t2);
+    assert.ok(t2.indexOf('R1.82') !== -1, 'testUrl(2) に R1.82 が無い: ' + t2);
     assert.ok(t2.indexOf('history_spot=8') !== -1, 'testUrl は bbfacing ノード');
     assert.ok(t2.indexOf('board=Ks7d5c') !== -1, 'testUrl は K75r');
     // testUrl() 既定は1桁
     var t1 = W.testUrl();
-    assert.ok(t1.indexOf('B1.8&') !== -1 && t1.indexOf('B1.82') === -1, 'testUrl() 既定が1桁でない: ' + t1);
+    assert.ok(t1.indexOf('R1.8&') !== -1 && t1.indexOf('R1.82') === -1, 'testUrl() 既定が1桁でない: ' + t1);
     assert.strictEqual(W.testUrl(1), t1);
 
     // 形式: gmfs_solution_tab を付けない・depth=100 を常に明示・target 用の余計なクエリ無し
@@ -103,7 +106,7 @@ module.exports = {
 
     // pot 省略時は potOf(villainPos) で補う／size 無しの bbfacing は url null
     var noPot = W.url({ board: 'Ks7d5c', villainPos: 'BTN', size: 33 }, 'bbfacing');
-    assert.ok(noPot.url.indexOf('X-B1.8&') !== -1, 'pot 省略時に potOf で補えていない');
+    assert.ok(noPot.url.indexOf('X-R1.8&') !== -1, 'pot 省略時に potOf で補えていない');
     assert.strictEqual(W.url({ board: 'Ks7d5c', villainPos: 'BTN' }, 'bbfacing').url, null, 'size 無しの bbfacing が null でない');
     assert.strictEqual(W.url({ villainPos: 'BTN', size: 33 }, 'cb').url, null, 'board 無しが null でない');
 

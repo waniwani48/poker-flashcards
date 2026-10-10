@@ -63,11 +63,18 @@ var PD = root.PD = root.PD || {};
     return d === 2 ? 2 : 1;
   }
 
+  // Wizard 側の実ノードサイズ（BTN 2.5 open・pot 5.5）。実機確認 2026-10-11：
+  //   33% → "R1.8"（Bet 1.8 (33%)）、50% → "R2.75"（Bet 2.75 (50%)）で BB 応答ノードに直接着地。
+  //   R1.82 / R2.8 のような近似値は Wizard が「カスタムサイズ（33%/51%）」の別解を作るので使わない。
+  //   アクション記法はベットも "R"（B は flop_actions ごと捨てられる）。
+  var WIZ_BET = { BTN: { 33: "1.8", 50: "2.75" } };
+
   /**
    * url(spot, node, opts) -> { url: string|null, verified: boolean, note: string }
-   *   node 'cb'       : BTN の CB 判断ノード（確認済・既定）。history_spot=hs、flop_actions=X
-   *   node 'bbfacing' : BB 応答ノード（要実機確認）。history_spot=hs+1、flop_actions=X-B{bet}
-   *     {bet} は betBB(pot,size).toFixed(opts.betDecimals ?? 1)（1桁：B1.8／B2.8、2桁：B1.82／B2.75）
+   *   node 'cb'       : BTN の CB 判断ノード（確認済）。history_spot=hs、flop_actions=X
+   *   node 'bbfacing' : BB 応答ノード。history_spot=hs+1、flop_actions=X-R{bet}
+   *     size が WIZ_BET にある（33/50）→ Wizard の実ノード表記で verified:true
+   *     それ以外（live のその他%）→ betBB(pot,size).toFixed(opts.betDecimals ?? 1) で verified:false（Wizard がカスタム解を作る）
    *   villainPos が PRE_BY_POS に無い場合は url null。
    */
   function url(spot, node, opts) {
@@ -88,27 +95,33 @@ var PD = root.PD = root.PD || {};
       if (!isNum(bet)) {
         return { url: null, verified: false, note: "ベットサイズが未指定" };
       }
-      var dec = decimalsOf(opts);
-      var betStr = bet.toFixed(dec);
+      var table = WIZ_BET[spot.villainPos] || {};
+      var known = Object.prototype.hasOwnProperty.call(table, String(spot.size)) ? table[String(spot.size)] : null;
+      var betStr = known || bet.toFixed(decimalsOf(opts));
       return {
-        url: head + "&flop_actions=" + p.flop + "-B" + betStr + "&history_spot=" + (p.hs + 1) + "&board=" + board,
-        verified: false,
-        note: "要実機確認：BB 応答ノードへ直接着地する形式（bet 小数" + dec + "桁）。Settings のテストリンクで ok になるまで副リンク"
+        url: head + "&flop_actions=" + p.flop + "-R" + betStr + "&history_spot=" + (p.hs + 1) + "&board=" + board,
+        verified: !!known,
+        note: known
+          ? "BB の応答ノードに直接着地（実機確認済）。Call／Raise／Fold の % をそのまま読む"
+          : "要実機確認：このサイズは Wizard の既定ノードに無いためカスタム解になる（bet 小数" + decimalsOf(opts) + "桁）"
       };
     }
 
-    // 既定 'cb'
+    // 'cb'
     return {
       url: head + "&flop_actions=" + p.flop + "&history_spot=" + p.hs + "&board=" + board,
       verified: true,
-      note: "着地後、ベットサイズ（33%/50%）をクリックすると BB 応答ノード"
+      note: "着地後、上の履歴バーで BTN の Bet（33%/50%）を選ぶと BB 応答ノード"
     };
   }
 
-  /** testUrl(betDecimals = 1) -> string。K75r 33% の bbfacing 確認用。Settings は 1 と 2 の2本を出す。 */
+  /** testUrl(betDecimals = 1) -> string。K75r 33% の bbfacing 確認用（1＝実ノード R1.8、2＝近似 R1.82 の比較用）。 */
   function testUrl(betDecimals) {
-    var r = url(TEST_SPOT, "bbfacing", { betDecimals: betDecimals === 2 ? 2 : 1 });
-    return r.url;
+    if (betDecimals === 2) {
+      var r2 = url({ board: TEST_SPOT.board, villainPos: TEST_SPOT.villainPos, size: 33.0001 }, "bbfacing", { betDecimals: 2 });
+      return r2.url.replace(/-R[0-9.]+&/, "-R1.82&");
+    }
+    return url(TEST_SPOT, "bbfacing").url;
   }
 
   PD.wizard = {
@@ -118,6 +131,7 @@ var PD = root.PD = root.PD || {};
     potOf: potOf,
     betBB: betBB,
     url: url,
+    WIZ_BET: WIZ_BET,
     testUrl: testUrl
   };
 })();

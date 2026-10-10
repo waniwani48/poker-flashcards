@@ -2,7 +2,7 @@
 //   node test/run.js ui-settings
 // 受入（SPEC ⑬ T13a）の静的な裏付け：
 //   モデル変更で pd_model が変わり pokerJudgeModel は不変／export→import で件数一致／
-//   テストリンク2本の href がそれぞれ B1.8・B1.82 を含む／wizardBfacing を ok にすると state に反映／
+//   テストリンク2本の href がそれぞれ R1.8・R1.82 を含む／wizardBfacing を ok にすると state に反映／
 //   リセット後 pokerApiKey が残る。ブラウザ（DOM）での受入は結合担当が別途行う。
 'use strict';
 
@@ -95,15 +95,15 @@ function run(assert) {
   assert.ok(h.indexOf('data-go="home"') >= 0, 'ホームへ戻る');
   assert.ok(ctx.state && ctx.state.settings, 'html が state を store から補う');
 
-  // ---- テストリンク2本：href がそれぞれ B1.8 / B1.82（history_spot=8）で、新規タブ ----
+  // ---- テストリンク2本：href がそれぞれ R1.8 / R1.82（history_spot=8）で、新規タブ ----
   var href1 = attr(h, 'testlink-1', 'href');
   var href2 = attr(h, 'testlink-2', 'href');
   assert.ok(href1 && href2, 'テストリンク2本に href');
   assert.strictEqual(href1, util.esc(wizard.testUrl(1)), '1桁版は PD.wizard.testUrl(1)');
   assert.strictEqual(href2, util.esc(wizard.testUrl(2)), '2桁版は PD.wizard.testUrl(2)');
-  assert.ok(href1.indexOf('X-B1.8&amp;history_spot=8') >= 0, '1桁版に B1.8');
-  assert.ok(href2.indexOf('X-B1.82&amp;history_spot=8') >= 0, '2桁版に B1.82');
-  assert.ok(href1.indexOf('B1.82') < 0, '1桁版に B1.82 は無い');
+  assert.ok(href1.indexOf('X-R1.8&amp;history_spot=8') >= 0, '1桁版に R1.8');
+  assert.ok(href2.indexOf('X-R1.82&amp;history_spot=8') >= 0, '2桁版に R1.82');
+  assert.ok(href1.indexOf('R1.82') < 0, '1桁版に R1.82 は無い');
   assert.strictEqual(attr(h, 'testlink-1', 'target'), '_blank');
   assert.strictEqual(attr(h, 'testlink-1', 'rel'), 'noopener');
   assert.strictEqual(attr(h, 'testlink-2', 'target'), '_blank');

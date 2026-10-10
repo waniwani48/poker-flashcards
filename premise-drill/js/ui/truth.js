@@ -161,16 +161,16 @@ PD.ui.truth = (function () {
     var dec = s.wizardBetDecimals === 2 ? 2 : 1;
     var cb = W.url(spot, 'cb');
     var bf = W.url(spot, 'bbfacing', { betDecimals: dec });
-    var bfOk = s.wizardBfacing === 'ok';
+    var bfOk = s.wizardBfacing === 'ok' || (bf.verified === true && s.wizardBfacing !== 'ng');
     var cbLink = {
       node: 'cb', url: cb.url, verified: cb.verified === true, tag: '確認済',
       label: 'Wizard で CB ノードを開く', note: cb.note || ''
     };
     var bfLink = {
       node: 'bbfacing', url: bf.url, verified: bfOk,
-      tag: bfOk ? '確認済（設定）' : (s.wizardBfacing === 'ng' ? '要確認（ng 記録あり）' : '要確認'),
+      tag: bfOk ? '確認済' : (s.wizardBfacing === 'ng' ? '要確認（ng 記録あり）' : '要確認'),
       label: 'Wizard で BB 応答ノードを開く',
-      note: bfOk ? 'BB の応答ノードに直接着地する（設定で確認済、bet 小数' + dec + '桁）' : (bf.note || '')
+      note: bfOk ? (bf.note || 'BB の応答ノードに直接着地する') : (bf.note || '')
     };
     return bfOk ? { main: bfLink, sub: cbLink } : { main: cbLink, sub: bfLink };
   }

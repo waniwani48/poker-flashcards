@@ -102,7 +102,7 @@ module.exports = {
     var hMap0 = PD.ui.map.html(ctx);
     assert.ok(typeof hMap0 === 'string' && hMap0.indexOf('まだ格子がありません') >= 0, 'Map 空状態');
     var hSet = PD.ui.settings.html(ctx);
-    assert.ok(typeof hSet === 'string' && hSet.indexOf('B1.8') >= 0 && hSet.indexOf('B1.82') >= 0, 'Settings のテストリンク2本');
+    assert.ok(typeof hSet === 'string' && hSet.indexOf('R1.8') >= 0 && hSet.indexOf('R1.82') >= 0, 'Settings のテストリンク2本');
     var hTruth0 = PD.ui.truth.html(ctx);
     assert.ok(typeof hTruth0 === 'string' && hTruth0.indexOf('gtowizard') < 0, 'コミット前の Truth に Wizard リンク無し');
     var hDrill0 = PD.ui.drill.html(ctx);

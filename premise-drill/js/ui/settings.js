@@ -277,7 +277,7 @@ PD.ui.settings = (function () {
         '<div class="pd-settings-chips" data-role="bfacing">' + chips + '</div>' +
       '</div>' +
       '<div class="pd-settings-group" role="group" aria-label="bet の小数桁">' +
-        '<span class="pd-settings-label">bet の小数桁（URL の B1.8 / B1.82）</span>' +
+        '<span class="pd-settings-label">bet の小数桁（33/50% 以外のサイズ用。URL の R1.8 / R1.82）</span>' +
         '<div class="pd-settings-chips" data-role="decimals">' + decs + '</div>' +
       '</div>' +
       '<p class="pd-settings-status" data-role="wizard-status">' + wizardStatusHTML(bf, dec) + '</p>' +
