@@ -3,7 +3,7 @@
  * 外部（Google Fonts・GTO Wizard・Anthropic API）は触らない＝ネットワーク直通。
  * CACHE 名を上げると旧キャッシュは activate で消える。index.html の ?v= と合わせて更新する。
  */
-var V = '8';
+var V = '9';
 var CACHE = 'pd-v' + V;
 var CORE = [
   './', './index.html', './manifest.webmanifest',

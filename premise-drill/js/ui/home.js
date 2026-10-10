@@ -114,7 +114,7 @@ PD.ui.home = (function () {
       '<a class="pd-card pd-home-grid" href="#map" data-go="map" aria-label="弱点マップを開く">' +
         '<span class="pd-home-grid-head">' +
           '<span class="pd-home-grid-title">弱点マップ</span>' +
-          '<span class="pd-home-grid-hint pd-small pd-mute">タップで開く</span>' +
+          '<span class="pd-home-grid-hint pd-small pd-mute">あなたの弱点をマッピング</span>' +
         '</span>' +
         body +
       '</a>'

@@ -348,7 +348,7 @@ PD.ui.map = (function () {
       '<div class="pd-map">' +
         '<header class="pd-map-top">' +
           '<h2 class="pd-map-title">弱点マップ</h2>' +
-          '<p class="pd-small pd-mute">行＝出題済みの族、列＝5型。セルをタップすると記録が出ます。</p>' +
+          '<p class="pd-small pd-mute">あなたの弱点をマッピングします。行＝出題済みのボード種類、列＝5つの外し方。沈んだマスが再発、輪は連続クリア。タップで記録が出ます。</p>' +
         '</header>' +
         gridHtml(ctx) +
         '<div class="pd-map-logs-slot"></div>' +
