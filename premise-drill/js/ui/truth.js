@@ -53,7 +53,7 @@ PD.ui.truth = (function () {
     TRUNC: '応答が途中で切れた',
     REFUSAL: '採点が拒否された'
   };
-  var SUM_TOL = 5;      // 自手 fold/call/raise と3バケツ実測の合計 100±5
+  var SUM_TOL = 5;      // 自分のハンド fold/call/raise と3バケツ実測の合計 100±5
   var SIZE_TOL_2 = 5;   // ①と暗記値の差 ±5pt → サイズ2点候補
   var SIZE_TOL_1 = 10;  // ±10pt → 1点候補
   var BRANCH_GAP = 3;   // 自己採点と Claude がこれ以上離れたら「どちらを採るか」
@@ -218,10 +218,10 @@ PD.ui.truth = (function () {
     if (!inRange(d.rangeFoldPct, 0, 100)) msgs.push('レンジ全体の fold%（0〜100）');
     var trio = [d.heroFold, d.heroCall, d.heroRaise];
     if (!trio.every(function (v) { return inRange(v, 0, 100); })) {
-      msgs.push('自手の fold／call／raise%（各 0〜100）');
+      msgs.push('自分のハンドの fold／call／raise%（各 0〜100）');
     } else {
       var sum = trio[0] + trio[1] + trio[2];
-      if (Math.abs(sum - 100) > SUM_TOL) msgs.push('自手の合計が 100±' + SUM_TOL + ' でない（現在 ' + sum + '）');
+      if (Math.abs(sum - 100) > SUM_TOL) msgs.push('自分のハンドの合計が 100±' + SUM_TOL + ' でない（現在 ' + sum + '）');
     }
     var bc = bucketsCount(b);
     if (bc > 0 && bc < 3) msgs.push('3バケツ実測は3つ全て入れるか空のままに');
@@ -304,13 +304,13 @@ PD.ui.truth = (function () {
   }
 
   // ---- 表示文字列の計算（純粋。html と in-place 更新の両方がここを使う）----
-  /** 自手 fold/call/raise の合計表示 */
+  /** 自分のハンド fold/call/raise の合計表示 */
   function heroSum(t) {
     t = t || {};
     var trio = [t.heroFold, t.heroCall, t.heroRaise];
-    if (!trio.every(isNum)) return { text: '自手の合計 —（100±' + SUM_TOL + '）', ng: false };
+    if (!trio.every(isNum)) return { text: '自分のハンドの合計 —（100±' + SUM_TOL + '）', ng: false };
     var sum = trio[0] + trio[1] + trio[2];
-    return { text: '自手の合計 ' + sum + '%（100±' + SUM_TOL + '）', ng: Math.abs(sum - 100) > SUM_TOL };
+    return { text: '自分のハンドの合計 ' + sum + '%（100±' + SUM_TOL + '）', ng: Math.abs(sum - 100) > SUM_TOL };
   }
   /** 真値の未充足メッセージ（触っていなければ空） */
   function truthMsg(t, mode) {
@@ -329,7 +329,7 @@ PD.ui.truth = (function () {
     out.sizeFold = { cand: sc.cand, text: text };
     var ac = actionCandidate(entry);
     var t = (entry && entry.truth) || {};
-    if (ac.cand === null) text = '真値（自手 fold%）を入れると候補が出る';
+    if (ac.cand === null) text = '真値（自分のハンド fold%）を入れると候補が出る';
     else text = '○候補 ' + ac.cand + ' 点：⑤=' + (ac.action || '未記入') + '、真値 fold ' + t.heroFold + '% → ' + ac.truthAct;
     out.action = { cand: ac.cand, text: text };
     var c = (entry && entry.commit) || {};
@@ -535,7 +535,7 @@ PD.ui.truth = (function () {
       '<div class="pd-truth-inputs"' + (speed && t.skip ? ' data-off="1"' : '') + '>' +
       '<label class="pd-truth-lab">レンジ全体の fold%' + numInput('rangeFoldPct', t.rangeFoldPct) + '</label>' +
       '<div class="pd-truth-trio">' +
-        '<label>自手 fold%' + numInput('heroFold', t.heroFold) + '</label>' +
+        '<label>自分のハンド fold%' + numInput('heroFold', t.heroFold) + '</label>' +
         '<label>call%' + numInput('heroCall', t.heroCall) + '</label>' +
         '<label>raise%' + numInput('heroRaise', t.heroRaise) + '</label></div>' +
       '<p class="pd-small pd-mute pd-truth-sum' + (hs.ng ? ' pd-truth-sum-ng' : '') + '" data-role="hero-sum">' + esc(hs.text) + '</p>' +

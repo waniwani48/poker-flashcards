@@ -134,13 +134,13 @@ module.exports = {
     // ---- 真値未入力：保存バーは未入力・ボタン disabled ----
     assert.ok(/data-role="save-msg"[^>]*data-ok="0">未入力：真値・自己採点（残り 4 項目）/.test(h), '未入力の内訳');
     assert.ok(/data-act="save" disabled>/.test(h), '保存ボタン disabled');
-    assert.ok(h.indexOf('data-role="hero-sum">自手の合計 —') >= 0);
+    assert.ok(h.indexOf('data-role="hero-sum">自分のハンドの合計 —') >= 0);
     assert.ok(/data-role="truth-msg" aria-live="polite"><\/p>/.test(h), '触っていなければ未充足メッセージは空');
 
     // ---- 自己採点：○候補（暗記値基準）と真値差（参考）、合計 ----
     assert.ok(/data-score="sizeFold" data-val="2" aria-pressed="false" data-cand="1"/.test(h), '①＝暗記値 → サイズ2候補');
     assert.ok(h.indexOf('真値との差 —（真値未入力）') >= 0);
-    assert.ok(h.indexOf('data-role="cand-action">真値（自手 fold%）を入れると候補が出る') >= 0);
+    assert.ok(h.indexOf('data-role="cand-action">真値（自分のハンド fold%）を入れると候補が出る') >= 0);
     assert.ok(h.indexOf('data-role="self-total">—/10') >= 0);
     assert.ok(h.indexOf('入力順 f1→f2→f3→f4→f5') >= 0);
 
@@ -187,7 +187,7 @@ module.exports = {
     var h2 = truth.html(ctx2);
     assert.ok(/data-role="save-msg"[^>]*data-ok="1">保存できる</.test(h2), '保存できる');
     assert.ok(/data-act="save">保存</.test(h2), '保存ボタン enabled');
-    assert.ok(h2.indexOf('data-role="hero-sum">自手の合計 100%') >= 0);
+    assert.ok(h2.indexOf('data-role="hero-sum">自分のハンドの合計 100%') >= 0);
     assert.ok(/data-score="action" data-val="1" aria-pressed="true" data-cand="1"/.test(h2), '⑤fold と真値 fold60 → 答え1候補');
     assert.ok(h2.indexOf('真値との差 ±0 pt（参考）') >= 0);
     assert.ok(h2.indexOf('data-role="self-total">10/10') >= 0);
@@ -197,8 +197,8 @@ module.exports = {
     // ---- 真値の合計が 100±5 を外れる → 未充足表示・保存不可 ----
     var e3 = mockEntry({ truth: { used: true, rangeFoldPct: 30, heroFold: 60, heroCall: 60, heroRaise: 0, buckets: {}, note: '' } });
     var h3 = truth.html(ctxWith(e3));
-    assert.ok(/pd-truth-sum pd-truth-sum-ng" data-role="hero-sum">自手の合計 120%/.test(h3));
-    assert.ok(/data-role="truth-msg" aria-live="polite">未充足：自手の合計が 100±5 でない（現在 120）/.test(h3));
+    assert.ok(/pd-truth-sum pd-truth-sum-ng" data-role="hero-sum">自分のハンドの合計 120%/.test(h3));
+    assert.ok(/data-role="truth-msg" aria-live="polite">未充足：自分のハンドの合計が 100±5 でない（現在 120）/.test(h3));
     assert.ok(/data-act="save" disabled>/.test(h3));
 
     // ---- Claude done：結果表示・自己採点と3点以上離れたら分岐カード ----
@@ -242,7 +242,7 @@ module.exports = {
     assert.strictEqual(truth._pure.outcomeCardHtml({ added: null, pending: null, retired: [], promoted: null }, mockEntry()), '', '何も無ければ空');
 
     // ---- 純粋ヘルパ ----
-    assert.deepStrictEqual(truth._pure.heroSum({ heroFold: 60, heroCall: 40, heroRaise: 0 }), { text: '自手の合計 100%（100±5）', ng: false });
+    assert.deepStrictEqual(truth._pure.heroSum({ heroFold: 60, heroCall: 40, heroRaise: 0 }), { text: '自分のハンドの合計 100%（100±5）', ng: false });
     assert.strictEqual(truth._pure.validateTruth({ rangeFoldPct: 30, heroFold: 50, heroCall: 50, heroRaise: 0, buckets: {} }, 'drill').ok, true);
     assert.strictEqual(truth._pure.validateTruth({ rangeFoldPct: 30, heroFold: 50, heroCall: 50, heroRaise: 0, buckets: { trash: 50 } }, 'drill').ok, false, '3バケツは3つ全てか空');
     assert.strictEqual(truth._pure.validateTruth({}, 'speed').truth.used, false, 'speed は未入力なら used:false');
