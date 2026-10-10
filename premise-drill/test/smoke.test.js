@@ -62,8 +62,8 @@ module.exports = {
     install(makeStub());
 
     // ---- 1. 読込順どおり require（document / window 無し） ----
-    var order = ['util', 'cards', 'generator', 'sheet', 'wizard', 'gaps', 'store', 'judge',
-      'ui/home', 'ui/drill', 'ui/truth', 'ui/map', 'ui/settings', 'app'];
+    var order = ['util', 'cards', 'generator', 'sheet', 'wizard', 'gaps', 'store', 'judge', 'memo',
+      'ui/memo', 'ui/home', 'ui/drill', 'ui/truth', 'ui/map', 'ui/settings', 'app'];
     order.forEach(function (m) {
       assert.doesNotThrow(function () { require(path.join(JS, m + '.js')); }, 'require ' + m);
     });
@@ -71,14 +71,16 @@ module.exports = {
     // 他テストがモックを差して戻している可能性があるので、本物を明示的に置き直す
     PD.gaps = require(path.join(JS, 'gaps.js'));
     PD.store = require(path.join(JS, 'store.js'));
-    ['util', 'cards', 'gen', 'sheet', 'wizard', 'gaps', 'store', 'judge', 'app'].forEach(function (k) {
+    PD.memo = require(path.join(JS, 'memo.js'));
+    ['util', 'cards', 'gen', 'sheet', 'wizard', 'gaps', 'store', 'judge', 'memo', 'app'].forEach(function (k) {
       assert.ok(PD[k], 'PD.' + k + ' がある');
     });
-    ['home', 'drill', 'truth', 'map', 'settings'].forEach(function (v) {
+    ['home', 'drill', 'truth', 'map', 'settings', 'memo'].forEach(function (v) {
       assert.strictEqual(typeof PD.ui[v].render, 'function', 'PD.ui.' + v + '.render');
       assert.strictEqual(typeof PD.ui[v].html, 'function', 'PD.ui.' + v + '.html');
     });
-    ['init', 'go', 'start', 'commit', 'saveOutcome', 'next', 'toast'].forEach(function (k) {
+    ['init', 'go', 'start', 'commit', 'saveOutcome', 'next', 'toast',
+      'memoStart', 'memoAnswer', 'memoGrade', 'memoNext', 'memoFinish', 'todayPlan'].forEach(function (k) {
       assert.strictEqual(typeof PD.app[k], 'function', 'PD.app.' + k);
     });
 
@@ -327,6 +329,39 @@ module.exports = {
     assert.strictEqual(rf2.ok, true, 'やり直しで保存できる');
     assert.strictEqual(PD.store.loadLog().length, 5);
     assert.strictEqual(ctx.state.recurrence['rule|dry_high_50'].count, 1);
+
+    // ---- 8. 暗記レーン：todayPlan の形、saveOutcome(gap:'baseline') で memo の alpha due が動く ----
+    function addDaysSmoke(ymd, n) {
+      var mm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd || ''));
+      var t = Date.UTC(+mm[1], +mm[2] - 1, +mm[3]) + (Number(n) || 0) * 86400000;
+      var dd = new Date(t);
+      function p2(x) { x = String(x); return x.length < 2 ? '0' + x : x; }
+      return dd.getUTCFullYear() + '-' + p2(dd.getUTCMonth() + 1) + '-' + p2(dd.getUTCDate());
+    }
+
+    var hMemoEmpty = PD.ui.memo.html({ memo: null });
+    assert.strictEqual(typeof hMemoEmpty, 'string', 'PD.ui.memo.html が document 無しで文字列を返す');
+
+    var plan0 = PD.app.todayPlan();
+    assert.ok(plan0 && plan0.memo &&
+      typeof plan0.memo.due === 'number' && typeof plan0.memo.newAvail === 'number' &&
+      typeof plan0.memo.boardLeft === 'number' && typeof plan0.memo.finished === 'boolean', 'todayPlan().memo の形');
+    assert.ok(plan0.drill && typeof plan0.drill.committedToday === 'number', 'todayPlan().drill の形');
+    assert.ok(plan0.live && typeof plan0.live.n === 'number' && plan0.live.max === 3, 'todayPlan().live の形');
+
+    var todayD = PD.util.today();
+    var tomorrowD = addDaysSmoke(todayD, 1);
+    var farDue = addDaysSmoke(todayD, 365);
+    var ms0 = PD.memo.defaultState();
+    ms0.cards.alpha_33 = { box: 2, due: farDue, reps: 2, lapses: 0, lastAt: null, note: '' };
+    PD.memo.saveState(ms0);
+    assert.strictEqual(PD.memo.loadState().cards.alpha_33.due, farDue, 'alpha_33 に未来 due を仕込む');
+
+    var r4 = cycle(20, 'baseline');
+    assert.strictEqual(r4.ok, true, 'baseline での saveOutcome も ok');
+    var msAfter = PD.memo.loadState();
+    assert.strictEqual(msAfter.cards.alpha_33.due, tomorrowD, 'saveOutcome(gap:baseline) 後、memo の alpha due が明日に前倒し');
+    assert.ok(msAfter.cards.alpha_33.due <= tomorrowD, 'alpha due は明日以前');
 
     // ---- 用語：生成した HTML にカタカナ正典に反する語が無い（語そのものは文字コードで組む） ----
     var all = hHome0 + hHome1 + hMap1 + hSet + hDrillX + hts;

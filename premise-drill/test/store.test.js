@@ -497,7 +497,14 @@ module.exports = {
     store.setModel('');
     store.resetAll();
     var touched = Object.keys(stub._touched).sort();
-    assert.deepStrictEqual(touched, ALLOWED_KEYS.slice().sort(), '触ったキー: ' + touched.join(','));
+    // PD.memo が読み込まれている環境（memo.js を先に require した全件実行）では exportJSON/importJSON/resetAll が
+    // pd_memo_v1 にも触る（SPEC-memo §5）。store 単体実行では PD.memo が無く、触れない
+    var expectedKeys = ALLOWED_KEYS.slice();
+    if (globalThis.PD && globalThis.PD.memo && typeof globalThis.PD.memo.KEY === 'string') {
+      expectedKeys.push(globalThis.PD.memo.KEY);
+    }
+    expectedKeys.sort();
+    assert.deepStrictEqual(touched, expectedKeys, '触ったキー: ' + touched.join(','));
     for (i = 0; i < OWN_KEYS.length; i++) {
       assert.ok(!stub._touched[OWN_KEYS[i]], OWN_KEYS[i] + ' に触っていない');
     }

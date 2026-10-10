@@ -1,0 +1,102 @@
+/* premise-drill: ui-memo（M2）。暗記レーン（Memo）画面の固有スタイル。.pd-memo-* 接頭辞のみ。
+   トークンのみ使用し、格子の再発膜専用の色は使わない（補助照合バッジは一致／不一致を強調差で示さない）。
+   下部固定バー・44px タップ領域は .pd-bar／.pd-btn／.pd-input（app.css）をそのまま継承する。
+   1画面1問：ここでは配置とタイポグラフィのみ追加する。 */
+
+.pd-memo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+
+.pd-memo-progress {
+  margin: 0;
+  text-align: right;
+}
+
+.pd-memo-deck {
+  margin: 0 0 4px;
+}
+
+.pd-memo-question {
+  font-size: 22px;
+  line-height: 1.4;
+  margin: 0 0 var(--gap-2);
+}
+
+.pd-memo-q .pd-memo-input {
+  margin-top: var(--gap-1);
+}
+
+.pd-memo-textarea {
+  min-height: 120px;
+}
+
+/* ---------- reveal ---------- */
+.pd-memo-yourinput {
+  margin: 0 0 var(--gap-1);
+  font-weight: 600;
+}
+
+.pd-memo-prevnote {
+  margin: 0 0 var(--gap-1);
+}
+
+.pd-memo-wizard {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-1);
+  flex-wrap: wrap;
+  margin: 0 0 var(--gap-1);
+}
+
+.pd-memo-note {
+  margin-top: var(--gap-1);
+}
+
+/* 補助照合バッジ：一致／不一致は同じ見た目で出す（確定は本人のタップ。片方を強調しない） */
+.pd-memo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--gap-1);
+  padding: 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: var(--surface);
+  font-size: 14px;
+}
+
+.pd-memo-list {
+  margin: 4px 0 var(--gap-1);
+  padding-left: 1.2em;
+}
+
+.pd-memo-list li {
+  margin: 2px 0;
+}
+
+.pd-memo-expect {
+  margin-top: var(--gap-1);
+  padding-top: var(--gap-1);
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- 下部固定バー：ボタンは常に等分 ---------- */
+.pd-memo-bar > .pd-btn {
+  flex: 1 1 0;
+}
+
+/* ---------- done ---------- */
+.pd-memo-counts {
+  list-style: none;
+  margin: var(--gap-1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pd-memo-empty {
+  text-align: center;
+}

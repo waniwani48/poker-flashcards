@@ -223,9 +223,14 @@ PD.store = (function () {
   // Export / Import
   // ---------------------------------------------------------------------------
 
-  /** { v:1, exportedAt, state, log }。pokerApiKey と pd_model は含めない */
+  /** { v:1, exportedAt, state, log, memo? }。pokerApiKey と pd_model は含めない。memo は PD.memo が居れば含める */
   function exportJSON() {
-    return JSON.stringify({ v: 1, exportedAt: new Date().toISOString(), state: loadState(), log: loadLog() });
+    var out = { v: 1, exportedAt: new Date().toISOString(), state: loadState(), log: loadLog() };
+    var memo = root.PD && root.PD.memo;
+    if (memo && typeof memo.exportState === 'function') {
+      try { out.memo = memo.exportState(); } catch (e) { /* 暗記レーンが読めなければ省く */ }
+    }
+    return JSON.stringify(out);
   }
 
   function byAt(a, b) {
@@ -445,6 +450,10 @@ PD.store = (function () {
     var r = saveLog(cur);
     if (!r.ok) return { ok: false, added: 0, skipped: skipped, msg: '保存できませんでした。エクスポートして整理してください' };
     saveState(state);
+    var memo = root.PD && root.PD.memo;
+    if (memo && typeof memo.importState === 'function' && isObj(data) && isObj(data.memo)) {
+      try { memo.importState(data.memo); } catch (e) { /* 失敗しても本体のインポートは成功扱い */ }
+    }
     var msg = added + '件を追加、' + skipped + '件は重複のためスキップ';
     if (r.trimmed) msg += '（上限超過で古い' + r.trimmed + '件を間引き）';
     return { ok: true, added: added, skipped: skipped, msg: msg };
@@ -454,11 +463,13 @@ PD.store = (function () {
   // Reset / API key / Model
   // ---------------------------------------------------------------------------
 
-  /** pd_ のキーだけ消す。pokerApiKey（own.html と共有）は消さない */
+  /** pd_ のキーだけ消す。pokerApiKey（own.html と共有）は消さない。PD.memo が居れば暗記レーンの保存先も消す */
   function resetAll() {
     removeItem(KEYS.state);
     removeItem(KEYS.log);
     removeItem(KEYS.model);
+    var memo = root.PD && root.PD.memo;
+    if (memo && typeof memo.KEY === 'string') removeItem(memo.KEY);
   }
 
   function getApiKey() {

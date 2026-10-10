@@ -264,7 +264,7 @@ function run(assert) {
   assert.strictEqual(ctx.state.settings.extraFields.length, 0, 'ctx.state は既定に戻る');
   assert.strictEqual(ctx.state.settings.wizardBfacing, 'unknown', 'リセットで wizardBfacing も既定に');
   assert.strictEqual(ctx.state.settings.wizardBetDecimals, 1);
-  assert.deepStrictEqual(r.cards.slice().sort(), ['claude', 'data', 'extra', 'reset', 'wizard'], 'リセットは全カードを作り直す');
+  assert.deepStrictEqual(r.cards.slice().sort(), ['claude', 'data', 'extra', 'memo', 'reset', 'wizard'], 'リセットは全カードを作り直す');
   assert.ok(/data-role="log-count">0</.test(settings.html(ctx)));
 
   r = settings.apply(ctx, 'import', text);
@@ -292,7 +292,7 @@ function run(assert) {
   assert.strictEqual(stub._data.pokerJudgeModel, 'own-model');
   assert.strictEqual(stub._data.pokerSRS_v1, '[{"own":1}]');
   Object.keys(stub._data).forEach(function (k) {
-    assert.ok(['pd_state_v1', 'pd_log_v1', 'pd_model', 'pokerApiKey', 'pokerJudgeModel', 'pokerSRS_v1'].indexOf(k) >= 0, '想定外のキー: ' + k);
+    assert.ok(['pd_state_v1', 'pd_log_v1', 'pd_model', 'pd_memo_v1', 'pokerApiKey', 'pokerJudgeModel', 'pokerSRS_v1'].indexOf(k) >= 0, '想定外のキー: ' + k);
   });
 
   // ---- store が無い環境でも html / apply が例外にならない ----

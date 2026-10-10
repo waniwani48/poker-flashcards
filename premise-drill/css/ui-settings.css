@@ -316,6 +316,28 @@
   outline-offset: 2px;
 }
 
+/* ---- 暗記レーン（デッキ4トグル） ---- */
+.pd-settings-memo-list {
+  list-style: none;
+  margin: 0 0 var(--gap-1);
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.pd-settings-memo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-1);
+  min-height: var(--tap);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.pd-settings-memo-label {
+  font-weight: 600;
+}
+
 /* ---- リセット（ink の枠だけ。umber は使わない） ---- */
 .pd-settings-danger {
   margin-top: var(--gap-1);

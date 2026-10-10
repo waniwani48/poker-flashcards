@@ -72,6 +72,14 @@ PD.ui.home = (function () {
     return !!(PD.ui && PD.ui[name] && typeof PD.ui[name].render === 'function');
   }
 
+  /** PD.app.todayPlan()（無ければ既定値）。暗記 due／今日のコミット数／実戦 n/3 */
+  function todayPlan() {
+    if (PD.app && typeof PD.app.todayPlan === 'function') {
+      try { return PD.app.todayPlan(); } catch (e) { /* 既定値へ */ }
+    }
+    return { memo: { due: 0, newAvail: 0, boardLeft: 0, finished: false }, drill: { committedToday: 0 }, live: { n: 0, max: LIVE_PER_DAY } };
+  }
+
   function miniHtml(ctx) {
     if (PD.ui && PD.ui.map && typeof PD.ui.map.mini === 'function') {
       try { return PD.ui.map.mini(ctx) || ''; } catch (e) { return ''; }
@@ -199,6 +207,71 @@ PD.ui.home = (function () {
     );
   }
 
+  // ---- 今日の順番カード（暗記 → 出題 → 実戦）----
+
+  function orderMemoRow(plan) {
+    var memo = (plan && plan.memo) || {};
+    var done = !!memo.finished;
+    var sub = done
+      ? '完了✓'
+      : ('due <span class="pd-mono">' + (memo.due || 0) + '</span>枚／新規 <span class="pd-mono">' + (memo.newAvail || 0) + '</span>');
+    var action = done
+      ? '<span class="pd-home-row-done pd-small pd-mute" aria-label="完了">済</span>'
+      : '<button type="button" class="pd-btn pd-btn-primary" data-act="memo">暗記</button>';
+    return (
+      '<li class="pd-home-row pd-home-order-row" data-order="memo">' +
+        '<span class="pd-home-row-main">' +
+          '<span class="pd-home-row-title">① 暗記</span>' +
+          '<span class="pd-home-row-sub pd-small pd-mute">' + sub + '</span>' +
+        '</span>' +
+        action +
+      '</li>'
+    );
+  }
+
+  function orderDrillRow(plan) {
+    var n = (plan && plan.drill && plan.drill.committedToday) || 0;
+    return (
+      '<li class="pd-home-row pd-home-order-row" data-order="drill">' +
+        '<span class="pd-home-row-main">' +
+          '<span class="pd-home-row-title">② 出題</span>' +
+          '<span class="pd-home-row-sub pd-small pd-mute">今日 <span class="pd-mono">' + n + '</span>件</span>' +
+        '</span>' +
+        '<button type="button" class="pd-btn pd-btn-ghost" data-act="today">始める</button>' +
+      '</li>'
+    );
+  }
+
+  function orderLiveRow(plan) {
+    var live = (plan && plan.live) || { n: 0, max: LIVE_PER_DAY };
+    var ready = hasView('import');
+    return (
+      '<li class="pd-home-row pd-home-order-row" data-order="live">' +
+        '<span class="pd-home-row-main">' +
+          '<span class="pd-home-row-title">③ 実戦</span>' +
+          '<span class="pd-home-row-sub pd-small pd-mute"><span class="pd-mono">' + live.n + '/' + live.max + '</span></span>' +
+        '</span>' +
+        (ready
+          ? '<button type="button" class="pd-btn pd-btn-ghost" data-go="import">登録</button>'
+          : '<span class="pd-home-row-soon pd-small pd-mute">Phase B</span>') +
+      '</li>'
+    );
+  }
+
+  function orderCardHtml(ctx) {
+    var plan = todayPlan();
+    return (
+      '<section class="pd-card pd-home-order" aria-label="今日の順番">' +
+        '<p class="pd-home-order-title pd-small pd-mute">今日の順番</p>' +
+        '<ul class="pd-home-rows pd-home-order-rows">' +
+          orderMemoRow(plan) +
+          orderDrillRow(plan) +
+          orderLiveRow(plan) +
+        '</ul>' +
+      '</section>'
+    );
+  }
+
   /** 未保存の封印票／入力途中の票があれば再開カード（Truth で「設定へ」→戻った時に票を失わせない） */
   function resumeHtml(ctx) {
     var sealed = !!(ctx.entry && ctx.entry.spot);
@@ -220,6 +293,7 @@ PD.ui.home = (function () {
     return (
       '<div class="pd-home">' +
         resumeHtml(ctx) +
+        orderCardHtml(ctx) +
         startHtml(ctx) +
         unlockCardHtml(ctx) +
         gridHtml(ctx) +
@@ -238,6 +312,15 @@ PD.ui.home = (function () {
    * @param {HTMLElement} rootEl
    * @param {Ctx} ctx
    */
+  /** 今日の出題を開始（未保存の封印票／入力途中の票を無警告で破棄しない） */
+  function startToday(ctx) {
+    var pending = (ctx.entry && ctx.entry.spot) ? '未保存の封印票' : ((ctx.spot && ctx.mode && ctx.mode !== 'speed') ? '入力途中の票' : null);
+    if (pending && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+      if (!window.confirm(pending + 'を破棄して新しい出題を始めますか？')) return;
+    }
+    if (typeof ctx.next === 'function') ctx.next();
+  }
+
   function render(rootEl, ctx) {
     if (!rootEl) return;
     ctx = ctx || {};
@@ -246,12 +329,23 @@ PD.ui.home = (function () {
     if (btn && typeof btn.addEventListener === 'function') {
       btn.addEventListener('click', function (ev) {
         if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
-        // 未保存の封印票／入力途中の票を無警告で破棄しない
-        var pending = (ctx.entry && ctx.entry.spot) ? '未保存の封印票' : ((ctx.spot && ctx.mode && ctx.mode !== 'speed') ? '入力途中の票' : null);
-        if (pending && typeof window !== 'undefined' && typeof window.confirm === 'function') {
-          if (!window.confirm(pending + 'を破棄して新しい出題を始めますか？')) return;
+        startToday(ctx);
+      });
+    }
+    if (typeof rootEl.addEventListener === 'function') {
+      rootEl.addEventListener('click', function (ev) {
+        var t = ev && ev.target;
+        if (!t || typeof t.closest !== 'function') return;
+        var a = t.closest('[data-act]');
+        if (!a || (typeof rootEl.contains === 'function' && !rootEl.contains(a))) return;
+        var act = a.getAttribute('data-act');
+        if (act === 'memo') {
+          ev.preventDefault();
+          if (typeof ctx.memoStart === 'function') ctx.memoStart();
+        } else if (act === 'today') {
+          ev.preventDefault();
+          startToday(ctx);
         }
-        if (typeof ctx.next === 'function') ctx.next();
       });
     }
   }

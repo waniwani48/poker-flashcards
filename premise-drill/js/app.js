@@ -14,7 +14,7 @@ PD.ui = PD.ui || {};
 PD.app = (function () {
   'use strict';
 
-  var VIEWS = ['home', 'drill', 'truth', 'map', 'settings', 'speed', 'import', 'review'];
+  var VIEWS = ['home', 'drill', 'truth', 'map', 'settings', 'speed', 'import', 'review', 'memo'];
   var TOAST_MS = 2400;
   var SAVE_FAIL_MSG = '保存できませんでした。エクスポートして整理してください';
   var BASE_FIELDS = ['f1', 'f2', 'f3', 'f4', 'f5'];
@@ -101,12 +101,18 @@ PD.app = (function () {
     judgeState: 'nokey', // 'nokey'|'idle'|'loading'|'error'|'done'
     live: null,          // Phase B（Import）が入れる { villainPos, myAction, memo }。A では null
     lastOutcome: null,   // 直前の saveOutcome の recordOutcome 結果（added 等）。UI の「欄が増えました」表示用
+    memo: null,          // 暗記レーン（Memo）が使う { state, items, idx, phase, input, result }。home 以外では go で保持
     // メソッドは PD.app に委譲
     go: function (view) { return PD.app.go(view); },
     commit: function (opts) { return PD.app.commit(opts); },
     saveOutcome: function () { return PD.app.saveOutcome(); },
     next: function () { return PD.app.next(); },
-    toast: function (msg) { return PD.app.toast(msg); }
+    toast: function (msg) { return PD.app.toast(msg); },
+    memoStart: function () { return PD.app.memoStart(); },
+    memoAnswer: function (input) { return PD.app.memoAnswer(input); },
+    memoGrade: function (ok) { return PD.app.memoGrade(ok); },
+    memoNext: function () { return PD.app.memoNext(); },
+    memoFinish: function () { return PD.app.memoFinish(); }
   };
 
   function rootEl() {
@@ -387,6 +393,7 @@ PD.app = (function () {
     if (has(PD.store, 'saveState')) PD.store.saveState(ctx.state);
     ctx.log = has(PD.store, 'loadLog') ? (PD.store.loadLog() || []) : ctx.log.concat([entry]);
     ctx.lastOutcome = outcome;
+    applyMemoGapOnSave(entry);
 
     clearDrill();
     go('home');
@@ -419,6 +426,179 @@ PD.app = (function () {
     return r;
   }
 
+  // ---- 暗記レーン（PD.memo を薄く結ぶ。PD.memo 不在なら no-op） ----
+
+  function memoApi() { return PD.memo || null; }
+
+  function kindOfMemoItem(item) {
+    return (item && (item.kind || (item.card && item.card.kind))) || '';
+  }
+
+  /** ctx.memo.input は常にオブジェクト。board は {cls,ranks}、他は {value}（pf は reveal で note も持つ） */
+  function freshMemoInput(kind) {
+    return kind === 'board' ? { cls: '', ranks: '' } : { value: '' };
+  }
+
+  function memoCurrentItem() {
+    var m = ctx.memo;
+    if (!m || !Array.isArray(m.items)) return null;
+    var idx = (typeof m.idx === 'number') ? m.idx : 0;
+    return m.items[idx] || null;
+  }
+
+  /** alpha（number）／board の補助照合結果。pf・eqgap は ui 側が自分で算出するので null のまま */
+  function memoComputeResult(api, item, input) {
+    if (!api || !item) return null;
+    var kind = kindOfMemoItem(item);
+    if (kind === 'number' && item.card) {
+      var raw = input && input.value;
+      var n = Number(raw);
+      if (raw === undefined || raw === null || raw === '' || !isFinite(n) || !has(api, 'checkAlpha')) return null;
+      return { ok: !!api.checkAlpha(item.card.id, n) };
+    }
+    if (kind === 'board' && item.boardSpot && has(api, 'checkBoard')) {
+      try { return api.checkBoard(item.boardSpot.board, input && input.cls, input && input.ranks, PD.cards); } catch (e) { return null; }
+    }
+    return null;
+  }
+
+  /** 今日のセットを作って memo 画面へ（PD.memo 不在ならトーストして何もしない） */
+  function memoStart() {
+    var api = memoApi();
+    if (!has(api, 'loadState') || !has(api, 'todaySet')) {
+      toast('暗記レーンが読み込まれていません');
+      return;
+    }
+    var state = api.loadState();
+    var items;
+    try { items = api.todaySet(state, todayStr()) || []; } catch (e) { items = []; }
+    var firstKind = items.length ? kindOfMemoItem(items[0]) : null;
+    ctx.memo = {
+      state: state,
+      items: items,
+      idx: 0,
+      phase: 'ask',
+      input: freshMemoInput(firstKind),
+      result: null
+    };
+    go('memo');
+  }
+
+  /** 入力を ctx.memo.input に確定し phase を 'reveal' に。alpha/board は補助照合結果を ctx.memo.result に */
+  function memoAnswer(input) {
+    var m = ctx.memo;
+    if (!m) return;
+    m.input = (input && typeof input === 'object') ? input : (m.input && typeof m.input === 'object' ? m.input : {});
+    var api = memoApi();
+    var item = memoCurrentItem();
+    m.result = memoComputeResult(api, item, m.input);
+    m.phase = 'reveal';
+    go('memo');
+  }
+
+  /** pf の note（本人の自作メモ）を ctx.memo.input.note から読んで永続化する */
+  function memoPersistNoteIfAny(api, item, state) {
+    var m = ctx.memo;
+    if (!m || kindOfMemoItem(item) !== 'text' || !item.card) return state;
+    var note = m.input && typeof m.input.note === 'string' ? m.input.note : null;
+    if (note === null || !has(api, 'setNote')) return state;
+    try { return api.setNote(state, item.card.id, note); } catch (e) { return state; }
+  }
+
+  /** PD.memo.grade（board は gradeBoard）→ save。idx は進めない（memoNext が進める） */
+  function memoGrade(ok) {
+    var m = ctx.memo;
+    var api = memoApi();
+    var item = memoCurrentItem();
+    if (!m || !api || !item) return;
+    var today = todayStr();
+    var state = m.state;
+    var kind = kindOfMemoItem(item);
+    try {
+      if (kind === 'board') {
+        if (has(api, 'gradeBoard')) state = api.gradeBoard(state, !!ok, today);
+      } else {
+        state = memoPersistNoteIfAny(api, item, state);
+        if (has(api, 'grade') && item.card && item.card.id) state = api.grade(state, item.card.id, !!ok, today);
+      }
+    } catch (e) { /* 採点に失敗しても進行は止めない */ }
+    m.state = state;
+    if (has(api, 'saveState')) {
+      try { api.saveState(state); } catch (e) { /* 保存できなくても進行は止めない */ }
+    }
+  }
+
+  /** 次の item へ（無ければ phase 'done'） */
+  function memoNext() {
+    var m = ctx.memo;
+    if (!m) return;
+    var nextIdx = ((typeof m.idx === 'number') ? m.idx : 0) + 1;
+    if (Array.isArray(m.items) && nextIdx < m.items.length) {
+      m.idx = nextIdx;
+      m.phase = 'ask';
+      m.input = freshMemoInput(kindOfMemoItem(m.items[nextIdx]));
+      m.result = null;
+    } else {
+      m.phase = 'done';
+    }
+    go('memo');
+  }
+
+  /** finishDay → save → ctx.memo 破棄 → home */
+  function memoFinish() {
+    var m = ctx.memo;
+    var api = memoApi();
+    if (m && has(api, 'finishDay')) {
+      try {
+        var state = api.finishDay(m.state, todayStr());
+        if (has(api, 'saveState')) api.saveState(state);
+      } catch (e) { /* 失敗しても home には戻す */ }
+    }
+    ctx.memo = null;
+    go('home');
+  }
+
+  /** saveOutcome 成功後に呼ぶ。対応する暗記デッキの due を翌日に前倒し（PD.memo 不在なら無視） */
+  function applyMemoGapOnSave(entry) {
+    var api = memoApi();
+    var gap = entry && typeof entry.gap === 'string' ? entry.gap : null;
+    if (!gap || !has(api, 'loadState') || !has(api, 'onGap') || !has(api, 'saveState')) return;
+    try {
+      var state = api.loadState();
+      var next = api.onGap(state, gap, todayStr());
+      api.saveState(next);
+    } catch (e) { /* 失敗しても drill 側の保存自体は成功のまま */ }
+  }
+
+  /** Home 用：暗記 due・今日のコミット数・実戦 n/3 をまとめて返す */
+  function todayPlan() {
+    var today = todayStr();
+    var api = memoApi();
+    var memoInfo = { due: 0, newAvail: 0, boardLeft: 0, finished: false };
+    if (has(api, 'loadState') && has(api, 'dueCount')) {
+      try {
+        var ms = api.loadState();
+        var dc = api.dueCount(ms, today) || {};
+        memoInfo = {
+          due: Number(dc.due) || 0,
+          newAvail: Number(dc.newAvail) || 0,
+          boardLeft: Number(dc.boardLeft) || 0,
+          finished: !!(ms.daily && ms.daily.date === today && ms.daily.finished)
+        };
+      } catch (e) { /* 既定値のまま */ }
+    }
+    var log = Array.isArray(ctx.log) ? ctx.log : [];
+    var committedToday = 0;
+    for (var i = 0; i < log.length; i++) {
+      var e = log[i];
+      if (!e || e.mode === 'speed') continue;
+      if (String(e.at || '').slice(0, 10) === today) committedToday++;
+    }
+    var lt = ctx.state && ctx.state.counters && ctx.state.counters.liveToday;
+    var liveN = (lt && lt.date === today && typeof lt.n === 'number') ? lt.n : 0;
+    return { memo: memoInfo, drill: { committedToday: committedToday }, live: { n: liveN, max: 3 } };
+  }
+
   // ---- トースト ----
   function toast(msg) {
     var text = String(msg == null ? '' : msg);
@@ -449,6 +629,12 @@ PD.app = (function () {
     saveOutcome: saveOutcome,
     next: next,
     toast: toast,
+    memoStart: memoStart,
+    memoAnswer: memoAnswer,
+    memoGrade: memoGrade,
+    memoNext: memoNext,
+    memoFinish: memoFinish,
+    todayPlan: todayPlan,
     // 契約外（結合・検証用）
     reload: reload,
     activeExtraIds: activeExtraIds

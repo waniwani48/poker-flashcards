@@ -31,6 +31,7 @@ PD.ui.settings = (function () {
   dep('judge', '../judge');
   dep('sheet', '../sheet');
   dep('gaps', '../gaps');
+  dep('memo', '../memo');
 
   // ---- 定数 ----
   var BFACING = [
@@ -42,7 +43,14 @@ PD.ui.settings = (function () {
     { id: 1, label: '小数1桁' },
     { id: 2, label: '小数2桁' }
   ];
-  var CARDS = ['claude', 'wizard', 'extra', 'data', 'reset'];
+  var CARDS = ['claude', 'wizard', 'extra', 'memo', 'data', 'reset'];
+  var MEMO_DECKS = [
+    { id: 'alpha', label: 'α表' },
+    { id: 'eqgap', label: 'EQ差' },
+    { id: 'pf', label: 'PF境界' },
+    { id: 'board', label: 'ボード' }
+  ];
+  var MEMO_RESET_CONFIRM = '暗記の記録（SRS の進み具合）を消す。デッキの有効/無効は残る。\n本当に消す？';
   var DEFAULT_MAX_EXTRA = 2;
   var DEFAULT_LOG_CAP = 600;
   var DEFAULT_MODEL = 'claude-opus-5';
@@ -270,7 +278,7 @@ PD.ui.settings = (function () {
     return '<section class="pd-card pd-settings-card" data-card="wizard">' +
       kicker('GTO Wizard') +
       '<h2>BB 応答ノードの直リンク確認</h2>' +
-      '<p class="pd-small pd-mute">BB 応答ノードへ直接着地する形式はまだ実機で未確認。下の2本を開き、BB の応答ノードに着地したら「ok」、CB ノードや別の場所へ戻されたら「ng」を記録する。ok になった桁を小数桁に選ぶ。</p>' +
+      '<p class="pd-small pd-mute">33%／50% の直リンクは実機確認済み（通常は触らなくてよい）。もし Truth の主リンクで BB 応答ノードに着地しなくなったら、下の2本で確認し「ng」を記録すると CB ノード経由に戻る。小数桁は 33/50 以外のサイズにだけ効く。</p>' +
       '<div class="pd-settings-links">' + testLink(1, u1) + testLink(2, u2) + '</div>' +
       '<div class="pd-settings-group" role="group" aria-label="確認結果">' +
         '<span class="pd-settings-label">確認結果</span>' +
@@ -355,6 +363,39 @@ PD.ui.settings = (function () {
     '</section>';
   }
 
+  // ---- 暗記レーン（デッキ4トグル・記録リセット） ----
+  function memoDecksOf() {
+    var m = PD.memo;
+    if (!has(m, 'loadState')) return { alpha: true, eqgap: true, pf: true, board: true };
+    try { return (m.loadState().decks) || {}; } catch (e) { return {}; }
+  }
+
+  function cardMemo(ctx) {
+    var decks = memoDecksOf();
+    var i, items = '';
+    for (i = 0; i < MEMO_DECKS.length; i++) {
+      var d = MEMO_DECKS[i];
+      var on = decks[d.id] !== false;
+      items += (
+        '<li class="pd-settings-memo-item">' +
+          '<span class="pd-settings-memo-label">' + esc(d.label) + '</span>' +
+          '<label class="pd-settings-switch">' +
+            '<input type="checkbox" data-act="memo-deck" data-id="' + esc(d.id) + '"' + (on ? ' checked' : '') + '>' +
+            '<span class="pd-settings-track" aria-hidden="true"></span>' +
+            '<span class="pd-sr">このデッキを有効にする</span>' +
+          '</label>' +
+        '</li>'
+      );
+    }
+    return '<section class="pd-card pd-settings-card" data-card="memo">' +
+      kicker('暗記レーン') +
+      '<h2>暗記デッキ</h2>' +
+      '<ul class="pd-settings-memo-list">' + items + '</ul>' +
+      '<p class="pd-small pd-mute pd-settings-note">エクスポート JSON には暗記の記録（SRS の進み具合）も含まれる。</p>' +
+      '<button type="button" class="pd-btn pd-settings-danger" data-act="memo-reset">暗記の記録をリセット</button>' +
+    '</section>';
+  }
+
   // ---- データ（エクスポート・インポート） ----
   function cardData(ctx) {
     var n = Array.isArray(ctx.log) ? ctx.log.length : 0;
@@ -402,6 +443,7 @@ PD.ui.settings = (function () {
       case 'claude': return cardClaude(ctx);
       case 'wizard': return cardWizard(ctx);
       case 'extra': return cardExtra(ctx);
+      case 'memo': return cardMemo(ctx);
       case 'data': return cardData(ctx);
       case 'reset': return cardReset(ctx);
       default: return '';
@@ -490,6 +532,32 @@ PD.ui.settings = (function () {
     return result(true, '「' + extraLabel(id) + '」を再有効化した', ['extra']);
   }
 
+  /** val = { id, enabled } */
+  function actMemoDeck(ctx, val) {
+    var m = PD.memo;
+    if (!has(m, 'loadState') || !has(m, 'saveState')) return result(false, '暗記レーンが見つからない');
+    var id = val && val.id;
+    var known = false;
+    for (var i = 0; i < MEMO_DECKS.length; i++) if (MEMO_DECKS[i].id === id) known = true;
+    if (!known) return result(false, '未知の暗記デッキ');
+    var state = m.loadState();
+    if (!state.decks || typeof state.decks !== 'object') state.decks = {};
+    state.decks[id] = !!(val && val.enabled);
+    m.saveState(state);
+    return result(true, '暗記デッキ「' + id + '」を' + (state.decks[id] ? '有効' : '無効') + 'にした');
+  }
+
+  /** cards／daily だけを既定へ戻す。デッキの有効/無効（decks）は残す */
+  function actMemoReset(ctx) {
+    var m = PD.memo;
+    if (!has(m, 'loadState') || !has(m, 'saveState') || !has(m, 'defaultState')) return result(false, '暗記レーンが見つからない');
+    var cur = m.loadState();
+    var fresh = m.defaultState();
+    fresh.decks = cur.decks;
+    m.saveState(fresh);
+    return result(true, '暗記の記録をリセットした', ['memo']);
+  }
+
   function actExport(ctx) {
     var st = store();
     if (!has(st, 'exportJSON')) return result(false, 'エクスポート先（store）が見つからない');
@@ -534,6 +602,8 @@ PD.ui.settings = (function () {
       case 'decimals': return actDecimals(ctx, val);
       case 'extra-toggle': return actExtraToggle(ctx, val);
       case 'extra-revive': return actExtraRevive(ctx, val);
+      case 'memo-deck': return actMemoDeck(ctx, val);
+      case 'memo-reset': return actMemoReset(ctx);
       case 'export': return actExport(ctx);
       case 'import': return actImport(ctx, val);
       case 'reset': return actReset(ctx);
@@ -696,6 +766,14 @@ PD.ui.settings = (function () {
     toast(ctx, r.msg);
   }
 
+  function onMemoReset(el, ctx) {
+    var ok = (typeof root.confirm === 'function') ? root.confirm(MEMO_RESET_CONFIRM) : false;
+    if (!ok) return;
+    var r = apply(ctx, 'memo-reset');
+    if (r.ok) applyCards(el, ctx, r.cards);
+    toast(ctx, r.msg);
+  }
+
   function onClick(el, ctx, act, target) {
     var r;
     switch (act) {
@@ -734,6 +812,7 @@ PD.ui.settings = (function () {
         return;
       }
       case 'reset': onReset(el, ctx); return;
+      case 'memo-reset': onMemoReset(el, ctx); return;
       default: return;
     }
   }
@@ -748,13 +827,17 @@ PD.ui.settings = (function () {
       if (r.ok) syncExtraCount(el, ctx);
       else target.checked = !target.checked;
       toast(ctx, r.msg);
+    } else if (act === 'memo-deck') {
+      r = apply(ctx, 'memo-deck', { id: target.getAttribute('data-id'), enabled: target.checked });
+      if (!r.ok) target.checked = !target.checked;
+      toast(ctx, r.msg);
     } else if (act === 'import-file') {
       onImportFile(el, ctx, target);
     }
   }
 
   // change で扱う data-act（click では素通しして既定動作を残す）
-  var CHANGE_ACTS = { model: true, 'extra-toggle': true, 'import-file': true };
+  var CHANGE_ACTS = { model: true, 'extra-toggle': true, 'import-file': true, 'memo-deck': true };
 
   function bind(el, ctx) {
     el.addEventListener('click', function (ev) {

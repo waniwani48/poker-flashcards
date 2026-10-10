@@ -3,13 +3,13 @@
  * 外部（Google Fonts・GTO Wizard・Anthropic API）は触らない＝ネットワーク直通。
  * CACHE 名を上げると旧キャッシュは activate で消える。index.html の ?v= と合わせて更新する。
  */
-var V = '5';
+var V = '7';
 var CACHE = 'pd-v' + V;
 var CORE = [
   './', './index.html', './manifest.webmanifest',
-  './css/tokens.css', './css/app.css', './css/ui-home.css', './css/ui-drill.css', './css/ui-truth.css', './css/ui-map.css', './css/ui-settings.css',
-  './js/util.js', './js/cards.js', './js/generator.js', './js/sheet.js', './js/wizard.js', './js/gaps.js', './js/store.js', './js/judge.js',
-  './js/ui/home.js', './js/ui/drill.js', './js/ui/truth.js', './js/ui/map.js', './js/ui/settings.js', './js/app.js',
+  './css/tokens.css', './css/app.css', './css/ui-home.css', './css/ui-drill.css', './css/ui-truth.css', './css/ui-map.css', './css/ui-settings.css', './css/ui-memo.css',
+  './js/util.js', './js/cards.js', './js/generator.js', './js/sheet.js', './js/wizard.js', './js/gaps.js', './js/store.js', './js/judge.js', './js/memo.js',
+  './js/ui/memo.js', './js/ui/home.js', './js/ui/drill.js', './js/ui/truth.js', './js/ui/map.js', './js/ui/settings.js', './js/app.js',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-192.png', './icons/maskable-512.png', './icons/apple-touch-icon.png'
 ];
 
@@ -41,10 +41,25 @@ self.addEventListener('fetch', function (ev) {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.indexOf(self.registration.scope.replace(self.location.origin, '')) !== 0) return;
 
+  // ナビゲーション（index.html）はネットワーク優先：オンラインなら常に最新、オフラインだけキャッシュ
+  if (req.mode === 'navigate') {
+    ev.respondWith(
+      fetch(req).then(function (res) {
+        if (res && res.ok) caches.open(CACHE).then(function (c) { c.put(req, res.clone()); });
+        return res;
+      }).catch(function () {
+        return caches.open(CACHE).then(function (c) {
+          return c.match(req, { ignoreSearch: true }).then(function (hit) { return hit || c.match('./index.html'); });
+        });
+      })
+    );
+    return;
+  }
+
   ev.respondWith(
     caches.open(CACHE).then(function (c) {
-      // ナビゲーション（index.html?cb=… 等）だけクエリを無視。js/css は ?v= を含めて照合＝版上げが効く
-      var opts = req.mode === 'navigate' ? { ignoreSearch: true } : undefined;
+      // js/css は ?v= を含めて照合＝版上げが効く（キャッシュ優先＋裏で更新）
+      var opts = undefined;
       return c.match(req, opts).then(function (hit) {
         var fetching = fetch(req).then(function (res) {
           if (res && res.ok) c.put(req, res.clone());
