@@ -502,11 +502,22 @@ PD.ui.truth = (function () {
       '<span class="pd-truth-tag">' + esc(link.tag) + '</span></a>' +
       '<p class="pd-truth-note pd-small' + (isMain ? '' : ' pd-mute') + '">' + esc(link.note) + '</p>';
   }
+  /** リンクが効かない時（未ログインで /login に飛ぶとパラメータが消える）の手動ナビ：ボードのコピーと3手順 */
+  function manualHtml(spot) {
+    var board = spot && spot.board ? String(spot.board) : '';
+    var size = spot && isNum(spot.size) ? spot.size : '';
+    return '<details class="pd-truth-manual"><summary>リンクで着地しない時（手動で3タップ）</summary>' +
+      '<p class="pd-small pd-mute">Wizard に<strong>未ログイン</strong>だとログイン画面に飛んでボード等が消える。先に Wizard へログインしてからリンクを開く。それでも駄目なら：</p>' +
+      '<ol class="pd-small"><li>Wizard の Cash 6max 100bb で <strong>BTN 2.5bb open → BB call</strong> を選ぶ</li>' +
+      '<li>SELECT BOARD に <code class="pd-mono">' + esc(board) + '</code> を入れる' +
+      '<button type="button" class="pd-btn pd-btn-ghost pd-truth-copy" data-copy="' + esc(board) + '">ボードをコピー</button></li>' +
+      '<li>BB x → BTN の <strong>' + esc(size) + '%</strong> をタップ → BB の応答（Call／Raise／Fold の %）を読む</li></ol></details>';
+  }
   function wizardHtml(entry, ctx) {
     var links = wizardLinks(entry.spot, ctx.state && ctx.state.settings);
     return '<article class="pd-card pd-truth-wizard" data-role="wizard"><h2>真値を見る</h2>' +
       '<p class="pd-small pd-mute">Wizard で BB の応答を見て、見た数字を下に申告する。</p>' +
-      linkHtml(links.main, true) + linkHtml(links.sub, false) + '</article>';
+      linkHtml(links.main, true) + linkHtml(links.sub, false) + manualHtml(entry.spot) + '</article>';
   }
 
   function numInput(name, value) {
@@ -903,6 +914,17 @@ PD.ui.truth = (function () {
     var entry = ctx.entry;
     if (!entry) return;
     var s = sessionFor(entry);
+    var cp = t.closest('[data-copy]');
+    if (cp) {
+      var text = cp.getAttribute('data-copy') || '';
+      var done = function () { if (typeof ctx.toast === 'function') ctx.toast('コピーしました：' + text); };
+      if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        navigator.clipboard.writeText(text).then(done, function () { window.prompt('ボード（手でコピー）', text); });
+      } else if (typeof window !== 'undefined' && typeof window.prompt === 'function') {
+        window.prompt('ボード（手でコピー）', text);
+      }
+      return;
+    }
     var act = t.closest('[data-act]');
     if (act) {
       var a = act.getAttribute('data-act');

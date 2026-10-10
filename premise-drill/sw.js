@@ -3,7 +3,8 @@
  * 外部（Google Fonts・GTO Wizard・Anthropic API）は触らない＝ネットワーク直通。
  * CACHE 名を上げると旧キャッシュは activate で消える。index.html の ?v= と合わせて更新する。
  */
-var CACHE = 'pd-v2';
+var V = '3';
+var CACHE = 'pd-v' + V;
 var CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/tokens.css', './css/app.css', './css/ui-home.css', './css/ui-drill.css', './css/ui-truth.css', './css/ui-map.css', './css/ui-settings.css',
@@ -12,11 +13,14 @@ var CORE = [
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-192.png', './icons/maskable-512.png', './icons/apple-touch-icon.png'
 ];
 
+/** index.html が参照する実 URL（js/css は ?v= 付き）に揃えてプリキャッシュする */
+function versioned(u) { return /\.(js|css)$/.test(u) ? u + '?v=' + V : u; }
+
 self.addEventListener('install', function (ev) {
   ev.waitUntil(
     caches.open(CACHE).then(function (c) {
       // 1件失敗しても install を落とさない（CDN 反映待ちの間に開かれても良いように）
-      return Promise.all(CORE.map(function (u) { return c.add(u).catch(function () {}); }));
+      return Promise.all(CORE.map(versioned).map(function (u) { return c.add(u).catch(function () {}); }));
     }).then(function () { return self.skipWaiting(); })
   );
 });
@@ -39,7 +43,9 @@ self.addEventListener('fetch', function (ev) {
 
   ev.respondWith(
     caches.open(CACHE).then(function (c) {
-      return c.match(req, { ignoreSearch: true }).then(function (hit) {
+      // ナビゲーション（index.html?cb=… 等）だけクエリを無視。js/css は ?v= を含めて照合＝版上げが効く
+      var opts = req.mode === 'navigate' ? { ignoreSearch: true } : undefined;
+      return c.match(req, opts).then(function (hit) {
         var fetching = fetch(req).then(function (res) {
           if (res && res.ok) c.put(req, res.clone());
           return res;

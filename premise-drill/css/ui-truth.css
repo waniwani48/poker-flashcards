@@ -427,3 +427,11 @@
 .pd-truth-blocked {
   text-align: center;
 }
+
+/* ---------- 手動ナビ（リンクで着地しない時） ---------- */
+.pd-truth-manual { margin-top: var(--gap-1, 8px); }
+.pd-truth-manual summary { cursor: pointer; color: var(--mute); font-size: 13px; }
+.pd-truth-manual ol { padding-left: 1.2em; margin: var(--gap-1, 8px) 0 0; }
+.pd-truth-manual li { margin: 4px 0; }
+.pd-truth-manual code { padding: 1px 6px; border-radius: 6px; background: var(--bg); color: var(--ink); }
+.pd-truth-copy { margin-left: 8px; padding: 2px 10px; font-size: 12px; vertical-align: middle; }
