@@ -1,0 +1,55 @@
+/* premise-drill デザイントークン（SPEC ⑫「観測ノート」）。T0 が所有。値の変更は T0 への申請 */
+:root {
+  color-scheme: dark;
+
+  /* 色 */
+  --bg: #141C27;        /* 墨青。ページ地 */
+  --surface: #1E2836;   /* カード・欄の面 */
+  --ink: #ECE6DA;       /* 本文 */
+  --mute: #8E97A3;      /* 補足・無効 */
+  --lamp: #E3A95B;      /* 進行・コミット可・灯る輪。強調の主役 */
+  --umber: #D97A6A;     /* 格子の再発膜と「欄が増えました」カードのみ。単独アクセントにしない */
+  --truth: #6BBBD0;     /* Wizard・真値・外へ出る操作 */
+  --settle: #8CC49A;    /* 安定バッジのみ */
+
+  /* 派生（境界線・影）。ink / lamp の半透明 */
+  --line: rgba(236, 230, 218, 0.12);
+  --line-strong: rgba(236, 230, 218, 0.28);
+  --lamp-soft: rgba(227, 169, 91, 0.45);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* 書体。Google Fonts が落ちても後続のフォールバックで表示できる */
+  --font-display: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  --font-body: system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* 形・間隔 */
+  --r: 10px;
+  --gap-1: 8px;
+  --gap-2: 16px;
+  --gap-3: 24px;
+  --tap: 44px;
+
+  /* モーション。reduced-motion では 0 */
+  --dur: 240ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur: 0ms;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--lamp);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

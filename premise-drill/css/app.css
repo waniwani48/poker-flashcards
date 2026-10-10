@@ -1,0 +1,446 @@
+/* premise-drill 共通スタイル（SPEC ⑫ CSS 契約）。T0 が全て定義し、以後変更しない。
+   契約クラス：.pd-btn .pd-btn-primary .pd-btn-truth .pd-btn-ghost .pd-chip .pd-chip.on .pd-card
+              .pd-field[data-state=locked|open|passed] .pd-stepper .pd-bar .pd-keypad .pd-input .pd-toast
+   各画面の固有スタイルは css/ui-<view>.css に .pd-<view>-* 接頭辞で書く。 */
+
+/* ---------- ベース ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 var(--gap-1);
+}
+
+h1 { font-size: 20px; }
+h2 { font-size: 17px; }
+h3 { font-size: 15px; }
+
+p {
+  margin: 0 0 var(--gap-1);
+}
+
+a {
+  color: var(--truth);
+  text-underline-offset: 3px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+code,
+kbd,
+.pd-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+/* ---------- レイアウト（1カラム 480px・16px ガター・safe-area） ---------- */
+.pd-app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-top: env(safe-area-inset-top);
+  padding-right: calc(16px + env(safe-area-inset-right));
+  padding-bottom: calc(var(--gap-3) + env(safe-area-inset-bottom));
+  padding-left: calc(16px + env(safe-area-inset-left));
+}
+
+/* PC では Drill のみ2カラム（票｜スポットカード）。横幅だけここで広げ、段組は ui-drill.css が持つ */
+@media (min-width: 900px) {
+  body[data-view="drill"] .pd-app {
+    max-width: 920px;
+  }
+}
+
+.pd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-1);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--gap-2);
+}
+
+.pd-title {
+  font-size: 18px;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.pd-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.pd-nav .pd-btn {
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+#pd-root {
+  display: block;
+}
+
+/* 下部固定バーがある画面では、その分だけ本文の下を空ける */
+#pd-root:has(.pd-bar) {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+/* ---------- ユーティリティ ---------- */
+.pd-mute {
+  color: var(--mute);
+}
+
+.pd-small {
+  font-size: 13px;
+}
+
+.pd-stack > * + * {
+  margin-top: var(--gap-2);
+}
+
+.pd-row {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-1);
+  flex-wrap: wrap;
+}
+
+.pd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- ボタン ---------- */
+.pd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--tap);
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color var(--dur), border-color var(--dur), opacity var(--dur), transform 80ms;
+}
+
+.pd-btn:active {
+  transform: translateY(1px);
+}
+
+.pd-btn:disabled,
+.pd-btn[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 主ボタン：コミット・次へ。lamp 地に墨青文字 */
+.pd-btn-primary {
+  background: var(--lamp);
+  border-color: var(--lamp);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+/* 外へ出る操作：Wizard・真値 */
+.pd-btn-truth {
+  background: var(--truth);
+  border-color: var(--truth);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+/* 控えめ：ナビ・戻る・補助操作 */
+.pd-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.pd-btn-ghost:hover {
+  border-color: var(--line-strong);
+}
+
+.pd-btn-block {
+  display: flex;
+  width: 100%;
+}
+
+/* ---------- チップ（選択トグル） ---------- */
+.pd-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  transition: background-color var(--dur), border-color var(--dur), color var(--dur);
+}
+
+.pd-chip.on,
+.pd-chip[aria-pressed="true"] {
+  background: var(--lamp);
+  border-color: var(--lamp);
+  color: var(--bg);
+}
+
+.pd-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- カード ---------- */
+.pd-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: var(--gap-2);
+}
+
+.pd-card + .pd-card {
+  margin-top: var(--gap-2);
+}
+
+/* ---------- ステッパー・欄（順序ロックは罫線の開閉で示す） ---------- */
+.pd-stepper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-1);
+}
+
+.pd-field {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  transition: border-color var(--dur), opacity var(--dur), box-shadow var(--dur);
+}
+
+/* 未到達：薄く、破線、操作不可 */
+.pd-field[data-state="locked"] {
+  opacity: 0.45;
+  border-style: dashed;
+  pointer-events: none;
+}
+
+/* 開いている欄：lamp の枠。開いている欄は常に1つ */
+.pd-field[data-state="open"] {
+  border-color: var(--lamp);
+  box-shadow: inset 0 0 0 1px var(--lamp);
+}
+
+/* 通過した欄：折りたたみ・再編集可。lamp の薄い枠 */
+.pd-field[data-state="passed"] {
+  border-color: var(--lamp-soft);
+}
+
+/* ---------- 下部固定バー（進捗ドット・確信度・コミット・残り時間） ---------- */
+.pd-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-1);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--line-strong);
+  border-radius: var(--r) var(--r) 0 0;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3);
+}
+
+@media (min-width: 900px) {
+  body[data-view="drill"] .pd-bar {
+    max-width: 920px;
+  }
+}
+
+/* ---------- キーパッド（13ランク＋s/o＋削除） ---------- */
+.pd-keypad {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.pd-keypad > button,
+.pd-keypad > .pd-key {
+  min-height: var(--tap);
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color var(--dur), border-color var(--dur);
+}
+
+.pd-keypad > button.on,
+.pd-keypad > button[aria-pressed="true"] {
+  background: var(--lamp);
+  border-color: var(--lamp);
+  color: var(--bg);
+}
+
+.pd-keypad > button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- 入力 ---------- */
+.pd-input {
+  display: block;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.4;
+  transition: border-color var(--dur);
+}
+
+.pd-input[type="number"],
+.pd-input[inputmode="numeric"],
+.pd-input[inputmode="decimal"] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.pd-input:focus {
+  border-color: var(--lamp);
+  outline: none;
+}
+
+.pd-input::placeholder {
+  color: var(--mute);
+}
+
+.pd-input:disabled,
+.pd-input[readonly] {
+  opacity: 0.6;
+}
+
+textarea.pd-input {
+  min-height: 88px;
+  resize: vertical;
+}
+
+select.pd-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 32px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--mute) 50%),
+    linear-gradient(135deg, var(--mute) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+/* ---------- トースト ---------- */
+.pd-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 60;
+  max-width: min(92vw, 440px);
+  padding: 10px 14px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--lamp);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  font-size: 14px;
+  line-height: 1.4;
+  animation: pd-toast-in var(--dur) ease-out;
+  transition: opacity var(--dur);
+}
+
+body:has(.pd-bar) .pd-toast {
+  bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+.pd-toast-out {
+  opacity: 0;
+}
+
+@keyframes pd-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

@@ -1,0 +1,429 @@
+/* premise-drill: Truth 画面（T10）。.pd-truth-* 接頭辞のみ。
+   差し戻し・差分・警告・○候補は lamp（または ink の太字）で示す。この画面では再発色（umber）を使わない。
+   外へ出る操作（Wizard）は app.css の .pd-btn-truth。 */
+
+.pd-truth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+
+.pd-truth > .pd-card + .pd-card {
+  margin-top: 0; /* 間隔は gap で */
+}
+
+/* ---------- 封印票 ---------- */
+.pd-truth-seal {
+  border-color: var(--lamp-soft);
+}
+
+.pd-truth-seal-top {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-1);
+  margin-bottom: 6px;
+}
+
+.pd-truth-sealtag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1px solid var(--lamp-soft);
+  border-radius: 999px;
+  color: var(--lamp);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.pd-truth-cls {
+  font-size: 19px;
+  margin: 0 0 2px;
+}
+
+.pd-truth-family {
+  margin: 0 0 6px;
+}
+
+.pd-truth-spotline {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+
+.pd-truth-meta {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.pd-truth-sheet {
+  margin-top: var(--gap-1);
+}
+
+.pd-truth-sheet > summary,
+.pd-truth-opt > summary {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  color: var(--mute);
+  font-size: 13px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.pd-truth-sheet > summary::before,
+.pd-truth-opt > summary::before {
+  content: '▸';
+  margin-right: 6px;
+  color: var(--lamp);
+  transition: transform var(--dur);
+}
+
+.pd-truth-sheet[open] > summary::before,
+.pd-truth-opt[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.pd-truth-pre {
+  margin: 6px 0 0;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Wizard 主・副リンク ---------- */
+.pd-truth-link {
+  justify-content: space-between;
+  gap: var(--gap-1);
+  padding: 10px 14px;
+  text-align: left;
+  white-space: normal;
+}
+
+.pd-truth-link > span:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.pd-truth-link-sub {
+  margin-top: var(--gap-1);
+  border: 1px dashed var(--line-strong);
+}
+
+.pd-truth-tag {
+  flex: none;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.pd-truth-note {
+  margin: 6px 0 0;
+}
+
+/* ---------- 真値入力 ---------- */
+.pd-truth-lab {
+  display: block;
+  margin-top: var(--gap-1);
+  font-size: 14px;
+}
+
+.pd-truth-lab > .pd-input {
+  margin-top: 4px;
+}
+
+.pd-truth-trio {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap-1);
+  margin-top: var(--gap-1);
+}
+
+.pd-truth-trio > label {
+  display: block;
+  min-width: 0;
+  color: var(--mute);
+  font-size: 13px;
+}
+
+.pd-truth-trio .pd-input {
+  margin-top: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.pd-truth-sum {
+  margin: 6px 0 0;
+}
+
+.pd-truth-sum-ng {
+  color: var(--lamp);
+  font-weight: 600;
+}
+
+.pd-truth-opt {
+  margin-top: var(--gap-1);
+}
+
+.pd-truth-skip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+}
+
+.pd-truth-inputs[data-off="1"] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* 未充足・差し戻し：lamp の太字 */
+.pd-truth-warn {
+  margin: 6px 0 0;
+  color: var(--lamp);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pd-truth-warn:empty {
+  display: none;
+}
+
+/* ---------- 事後検算 ---------- */
+.pd-truth-post ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pd-truth-post li {
+  padding-left: 12px;
+  border-left: 3px solid var(--lamp);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.pd-truth-post li[data-kind="ok"] {
+  border-left-color: var(--line-strong);
+  color: var(--mute);
+}
+
+/* ---------- 自己採点 ---------- */
+.pd-truth-total {
+  margin-left: 6px;
+  color: var(--lamp);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pd-truth-item {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.pd-truth-item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap-1);
+}
+
+.pd-truth-item-label {
+  font-weight: 700;
+}
+
+.pd-truth-pts {
+  color: var(--mute);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.pd-truth-cond {
+  margin: 2px 0 6px;
+  color: var(--mute);
+}
+
+.pd-truth-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pd-truth-chips .pd-chip {
+  min-width: 44px;
+  min-height: 40px;
+  font-family: var(--font-mono);
+}
+
+/* 機械的な○候補：提示のみ（破線の lamp 枠）。選択すると通常の .on */
+.pd-truth-chips .pd-chip[data-cand="1"]:not(.on) {
+  border-style: dashed;
+  border-color: var(--lamp);
+  color: var(--lamp);
+}
+
+.pd-truth-cand {
+  margin: 6px 0 0;
+  color: var(--mute);
+}
+
+/* ---------- Claude ブロック ---------- */
+.pd-truth-claude[data-state="loading"] {
+  border-color: var(--lamp-soft);
+}
+
+.pd-truth-claude-busy {
+  color: var(--lamp);
+  font-weight: 600;
+}
+
+.pd-truth-claude-err {
+  color: var(--lamp);
+  font-weight: 600;
+}
+
+.pd-truth-claude-top {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--gap-1) var(--gap-2);
+}
+
+.pd-truth-claude-score {
+  color: var(--truth);
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.pd-truth-claude-score > small {
+  margin-left: 2px;
+  color: var(--mute);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.pd-truth-claude-items {
+  color: var(--mute);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.pd-truth-verdict {
+  margin: var(--gap-1) 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.pd-truth-claude dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 10px;
+  margin: var(--gap-1) 0;
+  font-size: 14px;
+}
+
+.pd-truth-claude dt {
+  color: var(--mute);
+}
+
+.pd-truth-claude dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- 自己採点と Claude の分岐 ---------- */
+.pd-truth-branch {
+  border-color: var(--lamp);
+}
+
+.pd-truth-branch label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+}
+
+/* ---------- 型選択 ---------- */
+.pd-truth-gapchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--gap-1);
+}
+
+.pd-truth-cue {
+  margin: 6px 0 0;
+  color: var(--mute);
+}
+
+.pd-truth-reasons {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--mute);
+}
+
+.pd-truth-reasons:empty {
+  display: none;
+}
+
+.pd-truth-reasons b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------- 下部固定バー（保存） ---------- */
+.pd-truth-bar {
+  justify-content: space-between;
+}
+
+.pd-truth-bar-msg {
+  flex: 1;
+  min-width: 0;
+  color: var(--lamp);
+  overflow-wrap: anywhere;
+}
+
+.pd-truth-bar-msg[data-ok="1"] {
+  color: var(--mute);
+}
+
+/* ---------- 欄が増えました（保存前の先読みカード）---------- */
+.pd-truth-outcome {
+  border-color: var(--lamp);
+  box-shadow: inset 0 0 0 1px var(--lamp);
+}
+
+.pd-truth-outcome-slot {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.pd-truth-outcome .pd-btn {
+  margin-top: var(--gap-1);
+}
+
+/* 保存後は入力を閉じる（カード確認待ち） */
+.pd-truth[data-saved="1"] .pd-truth-values,
+.pd-truth[data-saved="1"] .pd-truth-self,
+.pd-truth[data-saved="1"] .pd-truth-claude,
+.pd-truth[data-saved="1"] .pd-truth-branch,
+.pd-truth[data-saved="1"] .pd-truth-gap {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ---------- コミット前の案内 ---------- */
+.pd-truth-blocked {
+  text-align: center;
+}

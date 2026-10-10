@@ -1,0 +1,389 @@
+/* premise-drill: Map 画面の固有スタイル（T11）。.pd-map-* 接頭辞。
+   signature「淀みが晴れる格子」：セルは2層。
+     下層 ::before ＝ 再発膜（umber）。data-film 1 で薄く、2 で濃く沈む。＋は欄追加済み
+     上層 box-shadow ＝ 灯る輪（lamp）。data-streak 1〜4 で太く明るく。count 0 のセルは素地（輪も出さない）
+   数字は描かない。count / streak は data 属性で受け取り、見た目はここだけで決める。
+   膜・輪のフェードは --dur（240ms）、prefers-reduced-motion では transition none。 */
+
+.pd-map {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  --pd-map-cell: 40px;
+  --pd-map-gap: 4px;
+}
+
+.pd-map-top {
+  padding-top: var(--gap-1);
+}
+
+.pd-map-title {
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- 格子 ---------- */
+.pd-map-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pd-map-gap);
+}
+
+.pd-map-head,
+.pd-map-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(5, var(--pd-map-cell));
+  gap: var(--pd-map-gap);
+  align-items: end;
+}
+
+.pd-map-row {
+  align-items: center;
+}
+
+/* 列見出し：5型を縦書きで。狭い幅でも5列が崩れない */
+.pd-map-col {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 72px;
+}
+
+.pd-map-col-text {
+  writing-mode: vertical-rl;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--mute);
+  line-height: 1;
+}
+
+.pd-map-rowlabel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
+  padding-right: 6px;
+}
+
+.pd-map-fam {
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* 行末「安定」バッジ：settle はここだけに使う */
+.pd-map-stable {
+  display: inline-block;
+  padding: 1px 7px;
+  border: 1px solid var(--settle);
+  border-radius: 999px;
+  color: var(--settle);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+}
+
+/* ---------- セル（2層） ---------- */
+.pd-map-cell {
+  position: relative;
+  display: block;
+  width: var(--pd-map-cell);
+  height: var(--pd-map-cell);
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+  transition: box-shadow var(--dur), border-color var(--dur), background-color var(--dur);
+}
+
+button.pd-map-cell {
+  cursor: pointer;
+}
+
+button.pd-map-cell[aria-pressed="true"] {
+  border-color: var(--ink);
+}
+
+/* 下層：再発膜 */
+.pd-map-cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--umber);
+  opacity: 0;
+  transition: opacity var(--dur);
+}
+
+.pd-map-cell[data-film="1"]::before {
+  opacity: 0.38;
+}
+
+.pd-map-cell[data-film="2"]::before {
+  opacity: 0.74;
+}
+
+/* 上層：灯る輪（count 0 のセルは素地。輪を出さない） */
+.pd-map-cell:not([data-count="0"])[data-streak="1"] {
+  box-shadow: inset 0 0 0 2px var(--lamp-soft);
+}
+
+.pd-map-cell:not([data-count="0"])[data-streak="2"] {
+  box-shadow: inset 0 0 0 3px var(--lamp-soft);
+}
+
+.pd-map-cell:not([data-count="0"])[data-streak="3"] {
+  box-shadow: inset 0 0 0 3px var(--lamp);
+}
+
+.pd-map-cell:not([data-count="0"])[data-streak="4"] {
+  box-shadow: inset 0 0 0 4px var(--lamp), 0 0 10px rgba(227, 169, 91, 0.45);
+}
+
+/* ＋印：欄追加済み（count 2 以上） */
+.pd-map-plus {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+/* 実戦の別記号：truth の点 */
+.pd-map-live {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--truth);
+  pointer-events: none;
+}
+
+/* ---------- 凡例 ---------- */
+.pd-map-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pd-map-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pd-map-key {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+}
+
+.pd-map-key-film {
+  background: color-mix(in srgb, var(--umber) 55%, var(--bg));
+}
+
+.pd-map-key-ring {
+  box-shadow: inset 0 0 0 2px var(--lamp);
+}
+
+.pd-map-key-live {
+  position: relative;
+}
+
+.pd-map-key-live::after {
+  content: "";
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--truth);
+}
+
+/* ---------- セルのログ一覧 ---------- */
+.pd-map-logs-x {
+  color: var(--mute);
+  font-weight: 400;
+}
+
+.pd-map-log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pd-map-log {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.pd-map-log-date {
+  color: var(--mute);
+  font-size: 12px;
+}
+
+.pd-map-log-live {
+  padding: 0 6px;
+  border: 1px solid var(--truth);
+  border-radius: 999px;
+  color: var(--truth);
+  font-size: 11px;
+}
+
+.pd-map-log-score {
+  margin-left: auto;
+}
+
+.pd-map-log-note {
+  flex-basis: 100%;
+}
+
+/* ---------- 追加欄の履歴 ---------- */
+.pd-map-extra-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pd-map-extra {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.pd-map-extra-label {
+  font-weight: 600;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.pd-map-extra-meta {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pd-map-extra-dates {
+  font-size: 12px;
+}
+
+.pd-map-extra-status {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  padding: 2px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.pd-map-extra[data-status="on"] .pd-map-extra-status {
+  border-color: var(--lamp-soft);
+  color: var(--lamp);
+}
+
+.pd-map-extra[data-status="retired"] .pd-map-extra-label,
+.pd-map-extra[data-status="off"] .pd-map-extra-label {
+  color: var(--mute);
+  font-weight: 500;
+}
+
+/* ---------- Home 用の縮小版（行ラベル無し） ---------- */
+.pd-map-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pd-map-mini-row {
+  display: grid;
+  grid-template-columns: repeat(5, 18px);
+  gap: 3px;
+}
+
+.pd-map-mini .pd-map-cell {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.pd-map-mini .pd-map-plus {
+  font-size: 11px;
+}
+
+.pd-map-mini .pd-map-live {
+  width: 4px;
+  height: 4px;
+  right: 2px;
+  bottom: 2px;
+}
+
+.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="1"],
+.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="2"] {
+  box-shadow: inset 0 0 0 1.5px var(--lamp-soft);
+}
+
+.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="3"],
+.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="4"] {
+  box-shadow: inset 0 0 0 2px var(--lamp);
+}
+
+/* ---------- PC：同じ格子を広げるだけ。列見出しは横書きに ---------- */
+@media (min-width: 900px) {
+  .pd-map {
+    --pd-map-cell: 48px;
+    --pd-map-gap: 6px;
+  }
+
+  .pd-map-col {
+    height: auto;
+    justify-content: center;
+  }
+
+  .pd-map-col-text {
+    writing-mode: horizontal-tb;
+    letter-spacing: 0.04em;
+  }
+
+  .pd-map-fam {
+    font-size: 13px;
+  }
+}
+
+/* ---------- motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .pd-map-cell,
+  .pd-map-cell::before,
+  .pd-map-cell::after {
+    transition: none;
+  }
+}

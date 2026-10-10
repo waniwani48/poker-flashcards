@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#141C27">
+<meta name="description" content="BB が BTN の CB に直面した場面を、前提票5欄を順に埋めてから判定する訓練フォーム。">
+<title>前提票ドリル</title>
+
+<!-- Google Fonts は1本だけ。取得失敗時は css/tokens.css の font-family フォールバックが効く -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;family=Zen+Kaku+Gothic+New:wght@500;700&amp;display=swap">
+
+<!-- CSS 読込順（SPEC ⑫）：tokens → app → ui-* -->
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/ui-home.css">
+<link rel="stylesheet" href="css/ui-drill.css">
+<link rel="stylesheet" href="css/ui-truth.css">
+<link rel="stylesheet" href="css/ui-map.css">
+<link rel="stylesheet" href="css/ui-settings.css">
+</head>
+<body data-view="home">
+<div class="pd-app">
+  <header class="pd-header">
+    <h1 class="pd-title">前提票ドリル</h1>
+    <nav class="pd-nav" aria-label="画面">
+      <button type="button" class="pd-btn pd-btn-ghost" data-go="home">ホーム</button>
+      <button type="button" class="pd-btn pd-btn-ghost" data-go="map">格子</button>
+      <button type="button" class="pd-btn pd-btn-ghost" data-go="settings">設定</button>
+    </nav>
+  </header>
+  <main id="pd-root"></main>
+</div>
+<noscript><p class="pd-card">このアプリは JavaScript が必要です。</p></noscript>
+
+<!-- JS 読込順（SPEC ⑫）：util → cards → generator → sheet → wizard → gaps → store → judge → ui/* → app -->
+<script src="js/util.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/generator.js"></script>
+<script src="js/sheet.js"></script>
+<script src="js/wizard.js"></script>
+<script src="js/gaps.js"></script>
+<script src="js/store.js"></script>
+<script src="js/judge.js"></script>
+<script src="js/ui/home.js"></script>
+<script src="js/ui/drill.js"></script>
+<script src="js/ui/truth.js"></script>
+<script src="js/ui/map.js"></script>
+<script src="js/ui/settings.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
