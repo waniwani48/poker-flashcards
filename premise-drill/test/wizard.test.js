@@ -94,7 +94,7 @@ module.exports = {
     assert.strictEqual(W.testUrl(1), t1);
 
     // 形式: gmfs_solution_tab を付けない・depth=100 を常に明示・target 用の余計なクエリ無し
-    [cb.url, bf.url, bf2.url, t1, t2].forEach(function (u) {
+    [cb.url, bf.url, bf50.url, t1, t2].forEach(function (u) {
       assert.ok(u.indexOf('gmfs_solution_tab') === -1, 'gmfs_solution_tab が付いている: ' + u);
       assert.ok(u.indexOf('&depth=100&') !== -1, 'depth=100 が無い: ' + u);
       assert.ok(u.indexOf(' ') === -1, 'URL にスペースがある: ' + u);
