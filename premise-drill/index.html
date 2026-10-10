@@ -8,6 +8,15 @@
 <meta name="description" content="BB が BTN の CB に直面した場面を、前提票5欄を順に埋めてから判定する訓練フォーム。">
 <title>前提票ドリル</title>
 
+<!-- PWA：ホーム画面に追加→スタンドアロン起動・オフライン動作（sw.js はアプリ本体のみキャッシュ） -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="前提票">
+
 <!-- Google Fonts は1本だけ。取得失敗時は css/tokens.css の font-family フォールバックが効く -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,5 +60,13 @@
 <script src="js/ui/map.js?v=2"></script>
 <script src="js/ui/settings.js?v=2"></script>
 <script src="js/app.js?v=2"></script>
+<script>
+// service worker 登録（https / localhost のみ。file:// では何もしない）
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () { /* 登録失敗はアプリ動作に影響しない */ });
+  });
+}
+</script>
 </body>
 </html>
