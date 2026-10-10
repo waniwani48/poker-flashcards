@@ -627,7 +627,7 @@ PD.ui.truth = (function () {
     var cs = claudeScore(entry);
     var used = entry.scoreUsed === 'claude' ? 'claude' : 'self';
     return '<article class="pd-card pd-truth-branch" data-role="branch-card"><h2>採点が ' + Math.abs(st - cs) + ' 点離れている</h2>' +
-      '<p class="pd-small pd-mute">どちらを格子と安定判定に使うか選ぶ。両方とも保存される。</p>' +
+      '<p class="pd-small pd-mute">どちらを弱点マップと安定判定に使うか選ぶ。両方とも保存される。</p>' +
       '<label><input type="radio" name="scoreUsed" value="self"' + (used === 'self' ? ' checked' : '') + '> 自己採点 ' + st + ' 点</label>' +
       '<label><input type="radio" name="scoreUsed" value="claude"' + (used === 'claude' ? ' checked' : '') + '> Claude ' + cs + ' 点</label></article>';
   }

@@ -102,7 +102,7 @@ module.exports = {
     assert.ok(hHome0.indexOf('まだ記録がありません') >= 0, 'ログ0件は空状態');
     hasNoLabel(assert, hHome0, labels, 'Home');
     var hMap0 = PD.ui.map.html(ctx);
-    assert.ok(typeof hMap0 === 'string' && hMap0.indexOf('まだ格子がありません') >= 0, 'Map 空状態');
+    assert.ok(typeof hMap0 === 'string' && hMap0.indexOf('まだ弱点マップがありません') >= 0, 'Map 空状態');
     var hSet = PD.ui.settings.html(ctx);
     assert.ok(typeof hSet === 'string' && hSet.indexOf('R1.8') >= 0 && hSet.indexOf('R1.82') >= 0, 'Settings のテストリンク2本');
     var hTruth0 = PD.ui.truth.html(ctx);

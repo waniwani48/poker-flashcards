@@ -172,7 +172,7 @@ PD.ui.map = (function () {
     var list = cells(ctx);
     if (!list.length) return '';
     var rs = rows(list);
-    var out = '<div class="pd-map-mini" role="img" aria-label="格子の縮小版">';
+    var out = '<div class="pd-map-mini" role="img" aria-label="弱点マップの縮小版">';
     for (var i = 0; i < rs.length; i++) {
       out += '<div class="pd-map-mini-row">';
       for (var j = 0; j < rs[i].cells.length; j++) out += cellHtml(rs[i].cells[j], { interactive: false });
@@ -198,7 +198,7 @@ PD.ui.map = (function () {
     if (!list.length) {
       return (
         '<section class="pd-card pd-map-empty">' +
-          '<h2>まだ格子がありません</h2>' +
+          '<h2>まだ弱点マップがありません</h2>' +
           '<p class="pd-mute">1問コミットして保存すると、その族の行が生まれます。再発は膜として沈み、連続クリアで輪が灯って晴れていきます。</p>' +
           '<p><button type="button" class="pd-btn pd-btn-ghost" data-go="home">ホームへ</button></p>' +
         '</section>'
@@ -206,7 +206,7 @@ PD.ui.map = (function () {
     }
     var stable = stableSet(ctx);
     var rs = rows(list);
-    var out = '<div class="pd-map-grid" role="group" aria-label="型×族の格子">' + headerHtml();
+    var out = '<div class="pd-map-grid" role="group" aria-label="型×ボード種類の弱点マップ">' + headerHtml();
     for (var i = 0; i < rs.length; i++) {
       var fam = rs[i].family;
       out +=
@@ -347,7 +347,7 @@ PD.ui.map = (function () {
     return (
       '<div class="pd-map">' +
         '<header class="pd-map-top">' +
-          '<h2 class="pd-map-title">格子</h2>' +
+          '<h2 class="pd-map-title">弱点マップ</h2>' +
           '<p class="pd-small pd-mute">行＝出題済みの族、列＝5型。セルをタップすると記録が出ます。</p>' +
         '</header>' +
         gridHtml(ctx) +
