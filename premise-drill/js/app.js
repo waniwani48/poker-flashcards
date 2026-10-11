@@ -14,7 +14,7 @@ PD.ui = PD.ui || {};
 PD.app = (function () {
   'use strict';
 
-  var VIEWS = ['home', 'drill', 'truth', 'map', 'settings', 'speed', 'import', 'review', 'memo'];
+  var VIEWS = ['home', 'drill', 'truth', 'map', 'settings', 'speed', 'import', 'review', 'memo', 'guide'];
   var TOAST_MS = 2400;
   var SAVE_FAIL_MSG = '保存できませんでした。エクスポートして整理してください';
   var BASE_FIELDS = ['f1', 'f2', 'f3', 'f4', 'f5'];
@@ -112,7 +112,9 @@ PD.app = (function () {
     memoAnswer: function (input) { return PD.app.memoAnswer(input); },
     memoGrade: function (ok) { return PD.app.memoGrade(ok); },
     memoNext: function () { return PD.app.memoNext(); },
-    memoFinish: function () { return PD.app.memoFinish(); }
+    memoFinish: function () { return PD.app.memoFinish(); },
+    guideFirst: false,
+    guideSeen: function () { return PD.app.guideSeen(); }
   };
 
   function rootEl() {
@@ -201,10 +203,28 @@ PD.app = (function () {
     ctx.live = null;
   }
 
+  /** 「はじめに」を見た印（state.settings.guideSeenAt）。初回起動だけ自動表示する */
+  function guideSeen() {
+    ctx.guideFirst = false;
+    var st = ctx.state;
+    if (!st || !st.settings) return;
+    if (!st.settings.guideSeenAt) {
+      st.settings.guideSeenAt = new Date().toISOString();
+      if (has(PD.store, 'saveState')) PD.store.saveState(st);
+    }
+  }
+
   function init() {
     reload();
     clearDrill();
     bindNav();
+    var seen = !!(ctx.state && ctx.state.settings && ctx.state.settings.guideSeenAt);
+    var hasLog = Array.isArray(ctx.log) && ctx.log.length > 0;
+    if (!seen && !hasLog && PD.ui.guide && typeof PD.ui.guide.render === 'function') {
+      ctx.guideFirst = true;
+      go('guide');
+      return;
+    }
     go('home');
   }
 
@@ -637,6 +657,7 @@ PD.app = (function () {
     todayPlan: todayPlan,
     // 契約外（結合・検証用）
     reload: reload,
+    guideSeen: guideSeen,
     activeExtraIds: activeExtraIds
   };
 })();

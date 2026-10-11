@@ -199,6 +199,13 @@ PD.ui.home = (function () {
       '</li>' +
       '<li class="pd-home-row">' +
         '<span class="pd-home-row-main">' +
+          '<span class="pd-home-row-title">はじめに</span>' +
+          '<span class="pd-home-row-sub pd-small pd-mute">このアプリの触り方・毎日の順番</span>' +
+        '</span>' +
+        '<button type="button" class="pd-btn pd-btn-ghost" data-go="guide">開く</button>' +
+      '</li>' +
+      '<li class="pd-home-row">' +
+        '<span class="pd-home-row-main">' +
           '<span class="pd-home-row-title">設定</span>' +
           '<span class="pd-home-row-sub pd-small pd-mute">キー・Wizard 確認・追加欄・エクスポート</span>' +
         '</span>' +
