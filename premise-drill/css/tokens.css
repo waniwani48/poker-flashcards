@@ -1,37 +1,62 @@
-/* premise-drill デザイントークン（SPEC ⑫「観測ノート」）。T0 が所有。値の変更は T0 への申請 */
+/* premise-drill デザイントークン。GTO Wizard のトーン＆マナーに合わせる（2026-10-15 実測値ベース）。
+   役割名（--lamp 等）は据え置き、値だけ Wizard の色に差し替えている。 */
 :root {
   color-scheme: dark;
 
-  /* 色 */
-  --bg: #141C27;        /* 墨青。ページ地 */
-  --surface: #1E2836;   /* カード・欄の面 */
-  --ink: #ECE6DA;       /* 本文 */
-  --mute: #8E97A3;      /* 補足・無効 */
-  --lamp: #E3A95B;      /* 進行・コミット可・灯る輪。強調の主役 */
-  --umber: #D97A6A;     /* 格子の再発膜と「欄が増えました」カードのみ。単独アクセントにしない */
-  --truth: #6BBBD0;     /* Wizard・真値・外へ出る操作 */
-  --settle: #8CC49A;    /* 安定バッジのみ */
+  /* 色：面 */
+  --bg: #121212;        /* ページ地 */
+  --surface: #1f1f1f;   /* カード・欄の面 */
+  --surface-2: #292929; /* 面の上の面（入力・キー・チップ） */
+  --surface-3: #363636; /* ホバー・押下 */
 
-  /* 派生（境界線・影）。ink / lamp の半透明 */
-  --line: rgba(236, 230, 218, 0.12);
-  --line-strong: rgba(236, 230, 218, 0.28);
-  --lamp-soft: rgba(227, 169, 91, 0.45);
-  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  /* 色：文字 */
+  --ink: #f5f5f5;
+  --mute: #9f9f9f;
+  --dim: #6f6f6f;
 
-  /* 書体。Google Fonts が落ちても後続のフォールバックで表示できる */
-  --font-display: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
-  --font-body: system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* 色：役割 */
+  --lamp: #aafbb2;      /* ブランドのミント。進行・コミット可・開いている欄・主ボタン */
+  --lamp-ink: #121212;  /* ミント地の上の文字 */
+  --lamp-deep: #69b671; /* ミントの沈んだ側。通過欄の枠・補助強調 */
+  --umber: #f03c3c;     /* Raise の赤。再発膜と「欄が増えました」だけに使う */
+  --truth: #23b5ef;     /* 青。Wizard・真値・外へ出る操作 */
+  --settle: #68c973;    /* Call の緑。安定バッジ・完了 */
+
+  /* 色：アクション（Wizard の Fold/Call/Raise） */
+  --act-fold: #3d7cb8;
+  --act-call: #68c973;
+  --act-raise: #f03c3c;
+
+  /* 色：スート（Wizard の4色デッキ） */
+  --suit-s: #bdbdbd;
+  --suit-h: #ef5350;
+  --suit-d: #448aff;
+  --suit-c: #43a047;    /* Wizard の #66bb6a は白文字が 2.4:1 なので、同系で一段濃く（3.3:1） */
+
+  /* 派生（境界線・影） */
+  --line: rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.24);
+  --lamp-soft: rgba(170, 251, 178, 0.45);
+  --lamp-ring: rgba(170, 251, 178, 0.75); /* 弱点マップの輪。再発膜の上でも 3:1 を保つ濃さ */
+  --lamp-tint: rgba(170, 251, 178, 0.08);
+  --umber-tint: rgba(240, 60, 60, 0.12);
+  --shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+
+  /* 書体：本文 Inter、見出し Poppins、和文は Noto Sans JP。数字は Inter の等幅数字 */
+  --font-display: 'Poppins', 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-body: 'Inter', 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
+  --font-mono: 'Inter', 'Noto Sans JP', 'Hiragino Sans', system-ui, sans-serif;
 
   /* 形・間隔 */
-  --r: 10px;
+  --r: 8px;
+  --r-sm: 4px;
   --gap-1: 8px;
   --gap-2: 16px;
   --gap-3: 24px;
   --tap: 44px;
 
   /* モーション。reduced-motion では 0 */
-  --dur: 240ms;
+  --dur: 200ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -51,5 +76,5 @@
 :focus-visible {
   outline: 2px solid var(--lamp);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }

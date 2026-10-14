@@ -187,7 +187,7 @@
   display: inline-block;
   padding: 2px 8px;
   border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  border-radius: var(--r-sm);
   font-size: 11px;
   color: var(--mute);
   white-space: nowrap;
@@ -274,7 +274,7 @@
   padding: 8px 12px;
   border-left: 3px solid var(--lamp);
   border-radius: 0 var(--r) var(--r) 0;
-  background: rgba(227, 169, 91, 0.08);
+  background: var(--lamp-tint);
   font-size: 13px;
   line-height: 1.5;
 }

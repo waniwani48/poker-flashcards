@@ -1,5 +1,5 @@
 /* はじめに（ガイド） */
-.pd-guide { display: flex; flex-direction: column; gap: var(--gap-2, 12px); padding-bottom: 24px; }
+.pd-guide { display: flex; flex-direction: column; gap: var(--gap-2); padding-bottom: 24px; }
 .pd-guide-eyebrow { margin: 0; font-size: 12px; color: var(--mute); letter-spacing: 0.08em; }
 .pd-guide-title { margin: 0; font-family: var(--font-display); font-size: 22px; line-height: 1.35; color: var(--ink); }
 .pd-guide-lead { margin: 0 0 4px; color: var(--ink); line-height: 1.7; }

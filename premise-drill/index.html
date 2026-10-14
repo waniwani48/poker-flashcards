@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#141C27">
+<meta name="theme-color" content="#121212">
 <meta name="description" content="BB が BTN の CB に直面した場面を、前提票5欄を順に埋めてから判定する訓練フォーム。">
 <title>前提票ドリル</title>
 
@@ -20,18 +20,18 @@
 <!-- Google Fonts は1本だけ。取得失敗時は css/tokens.css の font-family フォールバックが効く -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;family=Zen+Kaku+Gothic+New:wght@500;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Poppins:wght@500;600;700&amp;family=Noto+Sans+JP:wght@400;500;700&amp;display=swap">
 
 <!-- CSS 読込順（SPEC ⑫）：tokens → app → ui-* -->
-<link rel="stylesheet" href="css/tokens.css?v=10">
-<link rel="stylesheet" href="css/app.css?v=10">
-<link rel="stylesheet" href="css/ui-home.css?v=10">
-<link rel="stylesheet" href="css/ui-guide.css?v=10">
-<link rel="stylesheet" href="css/ui-drill.css?v=10">
-<link rel="stylesheet" href="css/ui-truth.css?v=10">
-<link rel="stylesheet" href="css/ui-map.css?v=10">
-<link rel="stylesheet" href="css/ui-settings.css?v=10">
-<link rel="stylesheet" href="css/ui-memo.css?v=10">
+<link rel="stylesheet" href="css/tokens.css?v=11">
+<link rel="stylesheet" href="css/app.css?v=11">
+<link rel="stylesheet" href="css/ui-home.css?v=11">
+<link rel="stylesheet" href="css/ui-guide.css?v=11">
+<link rel="stylesheet" href="css/ui-drill.css?v=11">
+<link rel="stylesheet" href="css/ui-truth.css?v=11">
+<link rel="stylesheet" href="css/ui-map.css?v=11">
+<link rel="stylesheet" href="css/ui-settings.css?v=11">
+<link rel="stylesheet" href="css/ui-memo.css?v=11">
 </head>
 <body data-view="home">
 <div class="pd-app">
@@ -48,23 +48,23 @@
 <noscript><p class="pd-card">このアプリは JavaScript が必要です。</p></noscript>
 
 <!-- JS 読込順（SPEC ⑫・SPEC-memo ⑦）：util → cards → generator → sheet → wizard → gaps → store → judge → memo → ui/* → app -->
-<script src="js/util.js?v=10"></script>
-<script src="js/cards.js?v=10"></script>
-<script src="js/generator.js?v=10"></script>
-<script src="js/sheet.js?v=10"></script>
-<script src="js/wizard.js?v=10"></script>
-<script src="js/gaps.js?v=10"></script>
-<script src="js/store.js?v=10"></script>
-<script src="js/judge.js?v=10"></script>
-<script src="js/memo.js?v=10"></script>
-<script src="js/ui/memo.js?v=10"></script>
-<script src="js/ui/guide.js?v=10"></script>
-<script src="js/ui/home.js?v=10"></script>
-<script src="js/ui/drill.js?v=10"></script>
-<script src="js/ui/truth.js?v=10"></script>
-<script src="js/ui/map.js?v=10"></script>
-<script src="js/ui/settings.js?v=10"></script>
-<script src="js/app.js?v=10"></script>
+<script src="js/util.js?v=11"></script>
+<script src="js/cards.js?v=11"></script>
+<script src="js/generator.js?v=11"></script>
+<script src="js/sheet.js?v=11"></script>
+<script src="js/wizard.js?v=11"></script>
+<script src="js/gaps.js?v=11"></script>
+<script src="js/store.js?v=11"></script>
+<script src="js/judge.js?v=11"></script>
+<script src="js/memo.js?v=11"></script>
+<script src="js/ui/memo.js?v=11"></script>
+<script src="js/ui/guide.js?v=11"></script>
+<script src="js/ui/home.js?v=11"></script>
+<script src="js/ui/drill.js?v=11"></script>
+<script src="js/ui/truth.js?v=11"></script>
+<script src="js/ui/map.js?v=11"></script>
+<script src="js/ui/settings.js?v=11"></script>
+<script src="js/app.js?v=11"></script>
 <script>
 // service worker 登録（https / localhost のみ。file:// では何もしない）
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {

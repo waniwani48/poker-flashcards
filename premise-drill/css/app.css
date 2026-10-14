@@ -32,8 +32,9 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.3;
+  letter-spacing: 0.005em;
   margin: 0 0 var(--gap-1);
 }
 
@@ -187,20 +188,32 @@ svg {
   transform: none;
 }
 
-/* 主ボタン：コミット・次へ。lamp 地に墨青文字 */
+.pd-btn:hover {
+  background: var(--surface-3);
+}
+
+/* 主ボタン：コミット・次へ。ミント地に黒文字（Wizard の primary） */
 .pd-btn-primary {
   background: var(--lamp);
   border-color: var(--lamp);
-  color: var(--bg);
+  color: var(--lamp-ink);
   font-weight: 700;
+}
+
+.pd-btn-primary:hover {
+  background: #c2fcc8;
 }
 
 /* 外へ出る操作：Wizard・真値 */
 .pd-btn-truth {
   background: var(--truth);
   border-color: var(--truth);
-  color: var(--bg);
+  color: var(--lamp-ink);
   font-weight: 700;
+}
+
+.pd-btn-truth:hover {
+  background: #4fc6f3;
 }
 
 /* 控えめ：ナビ・戻る・補助操作 */
@@ -212,7 +225,7 @@ svg {
 }
 
 .pd-btn-ghost:hover {
-  border-color: var(--line-strong);
+  background: var(--surface-2);
 }
 
 .pd-btn-block {
@@ -228,9 +241,9 @@ svg {
   min-height: 36px;
   min-width: 36px;
   padding: 0 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
   color: var(--ink);
   font-size: 14px;
   font-weight: 600;
@@ -238,11 +251,15 @@ svg {
   transition: background-color var(--dur), border-color var(--dur), color var(--dur);
 }
 
+.pd-chip:hover {
+  background: var(--surface-3);
+}
+
 .pd-chip.on,
 .pd-chip[aria-pressed="true"] {
   background: var(--lamp);
   border-color: var(--lamp);
-  color: var(--bg);
+  color: var(--lamp-ink);
 }
 
 .pd-chip:disabled {
@@ -285,15 +302,16 @@ svg {
   pointer-events: none;
 }
 
-/* 開いている欄：lamp の枠。開いている欄は常に1つ */
+/* 開いている欄：ミントの枠＋左の帯。開いている欄は常に1つ */
 .pd-field[data-state="open"] {
   border-color: var(--lamp);
-  box-shadow: inset 0 0 0 1px var(--lamp);
+  box-shadow: inset 3px 0 0 0 var(--lamp);
 }
 
-/* 通過した欄：折りたたみ・再編集可。lamp の薄い枠 */
+/* 通過した欄：折りたたみ・再編集可。沈んだミントの帯 */
 .pd-field[data-state="passed"] {
-  border-color: var(--lamp-soft);
+  border-color: var(--line);
+  box-shadow: inset 3px 0 0 0 var(--lamp-deep);
 }
 
 /* ---------- 下部固定バー（進捗ドット・確信度・コミット・残り時間） ---------- */
@@ -310,9 +328,8 @@ svg {
   gap: var(--gap-1);
   padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
   background: var(--surface);
-  border-top: 1px solid var(--line-strong);
-  border-radius: var(--r) var(--r) 0 0;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
 }
 
 @media (min-width: 900px) {
@@ -332,9 +349,9 @@ svg {
 .pd-keypad > .pd-key {
   min-height: var(--tap);
   padding: 0;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r);
-  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
   color: var(--ink);
   font-family: var(--font-mono);
   font-size: 16px;
@@ -342,11 +359,15 @@ svg {
   transition: background-color var(--dur), border-color var(--dur);
 }
 
+.pd-keypad > button:hover {
+  background: var(--surface-3);
+}
+
 .pd-keypad > button.on,
 .pd-keypad > button[aria-pressed="true"] {
   background: var(--lamp);
   border-color: var(--lamp);
-  color: var(--bg);
+  color: var(--lamp-ink);
 }
 
 .pd-keypad > button:disabled {
@@ -360,9 +381,9 @@ svg {
   width: 100%;
   min-height: var(--tap);
   padding: 8px 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r);
-  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
   color: var(--ink);
   font-family: var(--font-body);
   line-height: 1.4;
@@ -415,9 +436,10 @@ select.pd-input {
   z-index: 60;
   max-width: min(92vw, 440px);
   padding: 10px 14px;
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--ink);
-  border: 1px solid var(--lamp);
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--lamp);
   border-radius: var(--r);
   box-shadow: var(--shadow);
   font-size: 14px;

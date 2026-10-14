@@ -30,9 +30,9 @@
   justify-content: space-between;
   padding: 0 20px;
   font-family: var(--font-display);
-  font-size: 22px;
-  letter-spacing: 0.04em;
-  box-shadow: 0 10px 28px rgba(227, 169, 91, 0.22);
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 28px rgba(170, 251, 178, 0.18);
 }
 
 .pd-home-start-arrow {
@@ -118,7 +118,7 @@
   flex: none;
   padding: 4px 10px;
   border: 1px dashed var(--line-strong);
-  border-radius: 999px;
+  border-radius: var(--r-sm);
 }
 
 .pd-home-row[data-speed="unlocked"] .pd-home-row-title {
@@ -142,7 +142,10 @@
 }
 
 /* 再開カード（未保存の封印票／入力途中の票） */
-.pd-home-resume { display: flex; flex-direction: column; gap: var(--gap-1, 8px); margin-bottom: var(--gap-2, 12px); border: 1px solid var(--lamp); }
+.pd-home-resume { display: flex; flex-direction: column; gap: var(--gap-1); border: 1px solid var(--lamp); }
+
+/* 間隔は .pd-home の flex gap で持つ（app.css の隣接マージンを打ち消す） */
+.pd-home > .pd-card + .pd-card { margin-top: 0; }
 .pd-home-resume-title { margin: 0; font-weight: 700; color: var(--ink); }
 .pd-home-resume .pd-btn { align-self: flex-start; }
 
@@ -159,6 +162,6 @@
   flex: none;
   padding: 4px 10px;
   border: 1px dashed var(--settle);
-  border-radius: 999px;
+  border-radius: var(--r-sm);
   color: var(--settle);
 }

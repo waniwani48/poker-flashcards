@@ -1,9 +1,10 @@
 /* premise-drill: Map 画面の固有スタイル（T11）。.pd-map-* 接頭辞。
    signature「淀みが晴れる格子」：セルは2層。
      下層 ::before ＝ 再発膜（umber）。data-film 1 で薄く、2 で濃く沈む。＋は欄追加済み
-     上層 box-shadow ＝ 灯る輪（lamp）。data-streak 1〜4 で太く明るく。count 0 のセルは素地（輪も出さない）
+     上層 ::after の inset box-shadow ＝ 灯る輪（lamp）。data-streak 1〜4 で太く明るく。count 0 のセルは素地（輪も出さない）
+     ::before より後に描かれる ::after に置くので、膜の上に輪が乗る。
    数字は描かない。count / streak は data 属性で受け取り、見た目はここだけで決める。
-   膜・輪のフェードは --dur（240ms）、prefers-reduced-motion では transition none。 */
+   膜・輪のフェードは --dur（値は tokens.css）、prefers-reduced-motion では transition none。 */
 
 .pd-map {
   display: flex;
@@ -73,12 +74,12 @@
   overflow-wrap: anywhere;
 }
 
-/* 行末「安定」バッジ：settle はここだけに使う */
+/* 行末「安定」バッジ：settle（Call の緑）は安定・完了の意味に限って使う */
 .pd-map-stable {
   display: inline-block;
   padding: 1px 7px;
   border: 1px solid var(--settle);
-  border-radius: 999px;
+  border-radius: var(--r-sm);
   color: var(--settle);
   font-size: 10px;
   letter-spacing: 0.1em;
@@ -98,7 +99,7 @@
   background: var(--bg);
   color: var(--ink);
   overflow: hidden;
-  transition: box-shadow var(--dur), border-color var(--dur), background-color var(--dur);
+  transition: box-shadow var(--dur), border-color var(--dur);
 }
 
 button.pd-map-cell {
@@ -107,6 +108,16 @@ button.pd-map-cell {
 
 button.pd-map-cell[aria-pressed="true"] {
   border-color: var(--ink);
+}
+
+@media (hover: hover) {
+  button.pd-map-cell:hover:not([aria-pressed="true"]) {
+    border-color: var(--line-strong);
+  }
+}
+
+button.pd-map-cell:active:not([aria-pressed="true"]) {
+  border-color: var(--mute);
 }
 
 /* 下層：再発膜 */
@@ -127,21 +138,34 @@ button.pd-map-cell[aria-pressed="true"] {
   opacity: 0.74;
 }
 
-/* 上層：灯る輪（count 0 のセルは素地。輪を出さない） */
-.pd-map-cell:not([data-count="0"])[data-streak="1"] {
-  box-shadow: inset 0 0 0 2px var(--lamp-soft);
+/* 上層：灯る輪（count 0 のセルは素地。輪を出さない）。膜より上に乗せるため ::after に描く */
+.pd-map-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: box-shadow var(--dur);
 }
 
-.pd-map-cell:not([data-count="0"])[data-streak="2"] {
-  box-shadow: inset 0 0 0 3px var(--lamp-soft);
+.pd-map-cell:not([data-count="0"])[data-streak="1"]::after {
+  box-shadow: inset 0 0 0 2px var(--lamp-ring);
 }
 
-.pd-map-cell:not([data-count="0"])[data-streak="3"] {
+.pd-map-cell:not([data-count="0"])[data-streak="2"]::after {
+  box-shadow: inset 0 0 0 3px var(--lamp-ring);
+}
+
+.pd-map-cell:not([data-count="0"])[data-streak="3"]::after {
   box-shadow: inset 0 0 0 3px var(--lamp);
 }
 
+.pd-map-cell:not([data-count="0"])[data-streak="4"]::after {
+  box-shadow: inset 0 0 0 4px var(--lamp);
+}
+
 .pd-map-cell:not([data-count="0"])[data-streak="4"] {
-  box-shadow: inset 0 0 0 4px var(--lamp), 0 0 10px rgba(227, 169, 91, 0.45);
+  box-shadow: 0 0 10px var(--lamp-soft);
 }
 
 /* ＋印：欄追加済み（count 2 以上） */
@@ -168,6 +192,7 @@ button.pd-map-cell[aria-pressed="true"] {
   height: 6px;
   border-radius: 50%;
   background: var(--truth);
+  box-shadow: 0 0 0 1.5px var(--bg);
   pointer-events: none;
 }
 
@@ -249,7 +274,7 @@ button.pd-map-cell[aria-pressed="true"] {
 .pd-map-log-live {
   padding: 0 6px;
   border: 1px solid var(--truth);
-  border-radius: 999px;
+  border-radius: var(--r-sm);
   color: var(--truth);
   font-size: 11px;
 }
@@ -300,7 +325,7 @@ button.pd-map-cell[aria-pressed="true"] {
   align-self: start;
   padding: 2px 8px;
   border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  border-radius: var(--r-sm);
   font-size: 11px;
   letter-spacing: 0.08em;
   white-space: nowrap;
@@ -345,16 +370,21 @@ button.pd-map-cell[aria-pressed="true"] {
   height: 4px;
   right: 2px;
   bottom: 2px;
+  box-shadow: 0 0 0 1px var(--bg);
 }
 
-.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="1"],
-.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="2"] {
-  box-shadow: inset 0 0 0 1.5px var(--lamp-soft);
+.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="1"]::after,
+.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="2"]::after {
+  box-shadow: inset 0 0 0 1.5px var(--lamp-ring);
 }
 
-.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="3"],
-.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="4"] {
+.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="3"]::after,
+.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="4"]::after {
   box-shadow: inset 0 0 0 2px var(--lamp);
+}
+
+.pd-map-mini .pd-map-cell:not([data-count="0"])[data-streak="4"] {
+  box-shadow: none;
 }
 
 /* ---------- PC：同じ格子を広げるだけ。列見出しは横書きに ---------- */
