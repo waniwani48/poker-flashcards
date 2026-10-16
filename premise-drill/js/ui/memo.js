@@ -1,6 +1,6 @@
 // premise-drill: PD.ui.memo（M2）。暗記レーン（Memo）画面。
-// 1問1画面。html(ctx) は純粋（document 不使用）。入力は全て自由記述（テキスト／数値）。
-// チップ・選択肢は出さない（選ぶのではなく思い出す練習にするため）。
+// 1問1画面。html(ctx) は純粋（document 不使用）。
+// alpha／pf／eqgap は自由記述（選ぶのではなく思い出す練習）。board だけは選択式＋自動判定（2026-10-16 SHO 指示）。
 // ctx.memo = { state, items, idx, phase:'ask'|'reveal'|'done', input, result } は app が所有。
 // view 遷移で保持、finishDay で破棄。
 // render は innerHTML を書き込み、input/change を ctx.memo.input へ退避（再描画で消えない）。
@@ -20,7 +20,14 @@ if (typeof require === 'function') {
 PD.ui.memo = (function () {
   'use strict';
 
-  var DECK_LABEL = { alpha: 'α表', pf: 'PF境界', eqgap: 'EQ差', board: 'ボード' };
+  var DECK_LABEL = { alpha: '必要fold%（α）', pf: 'PF境界', eqgap: 'EQ差', board: 'ボード' };
+  var CLS_ORDER_FALLBACK = ['dry_high', 'bw_sd', 'mid', 'low', 'paired', 'mono', 'trips'];
+  var CLS_LABEL_FALLBACK = {
+    dry_high: 'ドライ・ハイ', bw_sd: 'ブロードウェイSD', mid: 'ミドル', low: 'ロー',
+    paired: 'ペア', mono: 'モノトーン', trips: 'トリップス'
+  };
+  var RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+  var NONE = '無し';
 
   // ---- 小道具 --------------------------------------------------------------
 
@@ -39,6 +46,17 @@ PD.ui.memo = (function () {
   function memoApi() { return PD.memo || null; }
 
   function cardsApi() { return PD.cards || null; }
+
+  function clsOrder() {
+    var api = memoApi();
+    return (api && Array.isArray(api.CLS_ORDER)) ? api.CLS_ORDER : CLS_ORDER_FALLBACK;
+  }
+
+  function clsLabel(key) {
+    var api = memoApi();
+    var table = (api && api.CLS_LABELS) ? api.CLS_LABELS : CLS_LABEL_FALLBACK;
+    return table[key] || key || '';
+  }
 
   function currentItem(m) {
     if (!m || !Array.isArray(m.items)) return null;
@@ -76,7 +94,42 @@ PD.ui.memo = (function () {
     return !trim(fieldVal(m, 'value'));
   }
 
+  /** ranks 入力（'KT8'／'無し'／''）→ 選択中ランクの配列 */
+  function pickedRanks(ranksText) {
+    var t = trim(ranksText);
+    if (!t || t === NONE) return [];
+    return t.split('').filter(function (ch) { return RANKS.indexOf(ch) >= 0; });
+  }
+
+  function joinRanks(arr) {
+    return RANKS.filter(function (r) { return arr.indexOf(r) >= 0; }).join('');
+  }
+
   // ---- 入力部（ask） --------------------------------------------------------
+
+  function chipHtml(pick, v, label, on) {
+    return (
+      '<button type="button" class="pd-chip' + (on ? ' on' : '') + '" data-pick="' + esc(pick) + '" data-v="' + esc(v) + '"' +
+        ' aria-pressed="' + (on ? 'true' : 'false') + '">' + esc(label) + '</button>'
+    );
+  }
+
+  function boardInputHtml(m) {
+    var cls = trim(fieldVal(m, 'cls'));
+    var ranksText = trim(fieldVal(m, 'ranks'));
+    var picked = pickedRanks(ranksText);
+    return (
+      '<p class="pd-memo-sublabel">① ボードの種類</p>' +
+      '<div class="pd-memo-chips" role="group" aria-label="ボードの種類">' +
+        clsOrder().map(function (k) { return chipHtml('cls', k, clsLabel(k), cls === k); }).join('') +
+      '</div>' +
+      '<p class="pd-memo-sublabel">② 手札に1枚あればストレートドロー（4枚）が付くランク（複数可）</p>' +
+      '<div class="pd-memo-chips pd-memo-ranks" role="group" aria-label="ランク">' +
+        RANKS.map(function (r) { return chipHtml('rank', r, r, picked.indexOf(r) >= 0); }).join('') +
+        chipHtml('rank', NONE, NONE, ranksText === NONE) +
+      '</div>'
+    );
+  }
 
   function inputHtml(kind, m) {
     if (kind === 'number') {
@@ -91,14 +144,7 @@ PD.ui.memo = (function () {
           'placeholder="1行に1項目でタイプ" aria-label="回答（複数行）">' + esc(fieldVal(m, 'value')) + '</textarea>'
       );
     }
-    if (kind === 'board') {
-      return (
-        '<input class="pd-input pd-memo-input" type="text" data-k="cls" ' +
-          'value="' + esc(fieldVal(m, 'cls')) + '" placeholder="クラス（例：ドライ）" aria-label="クラス">' +
-        '<input class="pd-input pd-memo-input pd-memo-ranks" type="text" data-k="ranks" ' +
-          'value="' + esc(fieldVal(m, 'ranks')) + '" placeholder="ランク列（例：KT8、無ければ「無し」）" aria-label="ランク列">'
-      );
-    }
+    if (kind === 'board') return boardInputHtml(m);
     // 'text'（pf）既定
     return (
       '<input class="pd-input pd-memo-input" type="text" data-k="value" ' +
@@ -127,6 +173,13 @@ PD.ui.memo = (function () {
       var n = Number(raw);
       var ok = (raw !== '' && isFinite(n)) ? !!api.checkAlpha(cardId, n) : false;
       out += badgeHtml(ok);
+    }
+    var mm = /^alpha_(\d+)$/.exec(str(cardId));
+    if (mm && api && api.ALPHA_MEMO && api.ALPHA_MEMO[Number(mm[1])] !== undefined) {
+      var expect = api.ALPHA_MEMO[Number(mm[1])];
+      var pure = (typeof api.pureAlpha === 'function') ? api.pureAlpha(Number(mm[1])) : null;
+      out += '<p class="pd-memo-expect-line">暗記値：<span class="pd-mono">' + esc(expect) + '%</span>' +
+        (pure !== null && pure !== undefined ? '<span class="pd-small pd-mute">（純α ' + esc(pure) + '%）</span>' : '') + '</p>';
     }
     return out;
   }
@@ -168,22 +221,60 @@ PD.ui.memo = (function () {
     );
   }
 
-  function revealBoard(m, cardId, item) {
-    var cls = fieldVal(m, 'cls');
-    var ranks = fieldVal(m, 'ranks');
-    var board = item && item.boardSpot && item.boardSpot.board;
+  /** board の照合結果。app が ctx.memo.result に入れていればそれ、無ければここで計算 */
+  function boardResult(m, item) {
+    if (m && m.result && typeof m.result === 'object' && 'clsOk' in m.result) return m.result;
     var api = memoApi();
-    var res = null;
-    if (api && typeof api.checkBoard === 'function' && board) {
-      try { res = api.checkBoard(board, cls, ranks, cardsApi()); } catch (e) { res = null; }
+    var board = item && item.boardSpot && item.boardSpot.board;
+    if (!api || typeof api.checkBoard !== 'function' || !board) return null;
+    try { return api.checkBoard(board, fieldVal(m, 'cls'), fieldVal(m, 'ranks'), cardsApi()); } catch (e) { return null; }
+  }
+
+  function boardOk(m, item) {
+    var res = boardResult(m, item);
+    return !!(res && res.clsOk && res.ranksOk);
+  }
+
+  /** 正解のドロー表示：'T（OESD）・K・8（ガット）' ／ '無し' */
+  function expectRanksLabel(board, expectRanks) {
+    var api = cardsApi();
+    var dr = null;
+    if (api && typeof api.drawRanks === 'function' && board) {
+      try { dr = api.drawRanks(board); } catch (e) { dr = null; }
     }
+    if (dr && (dr.oesd || dr.gut)) {
+      var parts = [];
+      if (dr.oesd && dr.oesd.length) parts.push(dr.oesd.join('・') + '（OESD）');
+      if (dr.gut && dr.gut.length) parts.push(dr.gut.join('・') + '（ガット）');
+      return parts.length ? parts.join('　') : NONE;
+    }
+    var arr = Array.isArray(expectRanks) ? expectRanks : [];
+    return arr.length ? joinRanks(arr).split('').join('・') : NONE;
+  }
+
+  function revealBoard(m, cardId, item) {
+    var cls = trim(fieldVal(m, 'cls'));
+    var ranksText = trim(fieldVal(m, 'ranks'));
+    var picked = pickedRanks(ranksText);
+    var board = item && item.boardSpot && item.boardSpot.board;
+    var res = boardResult(m, item);
+    var yourRanks = ranksText === NONE ? NONE : (picked.length ? picked.join('・') : '（未選択）');
     var out = (
-      '<p class="pd-memo-yourinput">本人の入力：<span>クラス ' + (esc(cls) || '（未記入）') +
-        '／ランク ' + (esc(ranks) || '（未記入）') + '</span></p>'
+      '<p class="pd-memo-yourinput">本人の答え：<span>種類 ' + (cls ? esc(clsLabel(cls)) : '（未選択）') +
+        '／ドロー ' + esc(yourRanks) + '</span></p>'
     );
     if (res) {
-      out += badgeHtml(!!res.clsOk, 'クラス');
-      out += badgeHtml(!!res.ranksOk, 'ランク');
+      var ex = res.expect || {};
+      out += (
+        '<div class="pd-memo-expect"><p class="pd-small pd-mute">正解：</p>' +
+          '<ul class="pd-memo-list">' +
+            '<li>種類：' + esc(clsLabel(ex.cls)) + (res.clsOk ? '' : '<span class="pd-memo-miss">（ここが違う）</span>') + '</li>' +
+            '<li>ドロー：' + esc(expectRanksLabel(board, ex.ranks)) + (res.ranksOk ? '' : '<span class="pd-memo-miss">（ここが違う）</span>') + '</li>' +
+          '</ul>' +
+        '</div>'
+      );
+      var ok = !!(res.clsOk && res.ranksOk);
+      out += '<p class="pd-memo-verdict" data-ok="' + (ok ? '1' : '0') + '">' + (ok ? '○ 正解' : '× 不正解') + '</p>';
     }
     return out;
   }
@@ -207,7 +298,8 @@ PD.ui.memo = (function () {
   function questionHeadHtml(card) {
     return (
       '<p class="pd-memo-deck pd-small pd-mute">' + esc(DECK_LABEL[card.deck] || card.deck || '') + '</p>' +
-      '<h2 class="pd-memo-question">' + esc(card.q) + '</h2>'
+      '<h2 class="pd-memo-question">' + esc(card.q) + '</h2>' +
+      (card.hint ? '<p class="pd-memo-hint pd-small">' + esc(card.hint) + '</p>' : '')
     );
   }
 
@@ -232,18 +324,20 @@ PD.ui.memo = (function () {
   function revealHtml(m, item) {
     var card = (item && item.card) || {};
     var cardId = card.id;
+    var kind = kindOf(item);
+    var bar = (kind === 'board')
+      ? '<button type="button" class="pd-btn pd-btn-primary" data-act="auto">次へ</button>'
+      : '<button type="button" class="pd-btn pd-btn-ghost" data-act="ng">× 忘れた</button>' +
+        '<button type="button" class="pd-btn pd-btn-primary" data-act="ok">○ 覚えてた</button>';
     return (
       '<div class="pd-memo pd-memo-reveal" data-phase="reveal">' +
         progressHtml(m) +
-        '<section class="pd-card pd-memo-q" data-kind="' + esc(kindOf(item)) + '">' +
+        '<section class="pd-card pd-memo-q" data-kind="' + esc(kind) + '">' +
           questionHeadHtml(card) +
           revealBody(m, item, cardId) +
         '</section>' +
       '</div>' +
-      '<div class="pd-bar pd-memo-bar">' +
-        '<button type="button" class="pd-btn pd-btn-ghost" data-act="ng">× 忘れた</button>' +
-        '<button type="button" class="pd-btn pd-btn-primary" data-act="ok">○ 覚えてた</button>' +
-      '</div>'
+      '<div class="pd-bar pd-memo-bar">' + bar + '</div>'
     );
   }
 
@@ -251,7 +345,7 @@ PD.ui.memo = (function () {
     var daily = (m && m.state && m.state.daily) || {};
     var ok = daily.ok || 0;
     var ng = daily.ng || 0;
-    var boardOk = daily.boardOk || 0;
+    var boardOkN = daily.boardOk || 0;
     var boardN = daily.boardN || 0;
     return (
       '<div class="pd-memo pd-memo-done" data-phase="done">' +
@@ -260,7 +354,7 @@ PD.ui.memo = (function () {
           '<ul class="pd-memo-counts pd-mono">' +
             '<li>○ 覚えてた：' + ok + '</li>' +
             '<li>× 忘れた：' + ng + '</li>' +
-            '<li>ボード正答：' + boardOk + '/' + boardN + '</li>' +
+            '<li>ボード正答：' + boardOkN + '/' + boardN + '</li>' +
           '</ul>' +
         '</section>' +
       '</div>' +
@@ -321,6 +415,43 @@ PD.ui.memo = (function () {
     btn.disabled = isEmptyInput(item, m);
   }
 
+  function setChip(btn, on) {
+    if (!btn) return;
+    if (btn.classList) btn.classList.toggle('on', !!on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+
+  /** board の選択チップ：DOM を直接更新して再描画しない（listener の二重登録を避ける） */
+  function onPick(ctx, el, btn) {
+    var m = ctx && ctx.memo;
+    if (!m || !btn) return;
+    var pick = btn.getAttribute('data-pick');
+    var v = btn.getAttribute('data-v');
+    var all = el.querySelectorAll('[data-pick="' + pick + '"]');
+    var i;
+    if (pick === 'cls') {
+      setInputField(ctx, 'cls', v);
+      for (i = 0; i < all.length; i++) setChip(all[i], all[i].getAttribute('data-v') === v);
+    } else if (pick === 'rank') {
+      var cur = trim(fieldVal(m, 'ranks'));
+      var next;
+      if (v === NONE) {
+        next = cur === NONE ? '' : NONE;
+      } else {
+        var set = pickedRanks(cur);
+        var at = set.indexOf(v);
+        if (at >= 0) set.splice(at, 1); else set.push(v);
+        next = joinRanks(set);
+      }
+      setInputField(ctx, 'ranks', next);
+      for (i = 0; i < all.length; i++) {
+        var bv = all[i].getAttribute('data-v');
+        setChip(all[i], bv === NONE ? next === NONE : (next !== NONE && next.indexOf(bv) >= 0));
+      }
+    }
+    refreshReveal(el, ctx);
+  }
+
   function callIf(fn, args) {
     if (typeof fn === 'function') fn.apply(null, args || []);
   }
@@ -332,6 +463,9 @@ PD.ui.memo = (function () {
       callIf(ctx.memoAnswer, [m.input]);
     } else if (act === 'ok' || act === 'ng') {
       callIf(ctx.memoGrade, [act === 'ok']);
+      callIf(ctx.memoNext, []);
+    } else if (act === 'auto') {
+      callIf(ctx.memoGrade, [boardOk(m, currentItem(m))]);
       callIf(ctx.memoNext, []);
     } else if (act === 'to-drill') {
       callIf(ctx.memoFinish, []);
@@ -356,6 +490,12 @@ PD.ui.memo = (function () {
     el.addEventListener('click', function (ev) {
       var t = ev && ev.target;
       if (!t || typeof t.closest !== 'function') return;
+      var p = t.closest('[data-pick]');
+      if (p && (typeof el.contains !== 'function' || el.contains(p))) {
+        if (typeof ev.preventDefault === 'function') ev.preventDefault();
+        onPick(ctx, el, p);
+        return;
+      }
       var a = t.closest('[data-act]');
       if (!a || (typeof el.contains === 'function' && !el.contains(a))) return;
       if (a.disabled || a.getAttribute('aria-disabled') === 'true') return;

@@ -37,8 +37,22 @@ PD.memo = (function (cardsDep, wizardDep) {
 
   var FALLBACK_BOARDS = ['Ks7d5c', 'QsJd9c', 'Ts9h6c', '8h7d4c', 'Ah9h6c'];
 
+  /** ボードの種類（PD.cards.classifyBoard の cls）の表示名。選択肢の並び順も兼ねる */
+  var CLS_ORDER = ['dry_high', 'bw_sd', 'mid', 'low', 'paired', 'mono', 'trips'];
+  var CLS_LABELS = {
+    dry_high: 'ドライ・ハイ', bw_sd: 'ブロードウェイSD', mid: 'ミドル', low: 'ロー',
+    paired: 'ペア', mono: 'モノトーン', trips: 'トリップス'
+  };
+
+  var ALPHA_HINT = 'α（アルファ）＝相手のベットサイズから決まる「自レンジの何%まで降りてよいか」の基準。' +
+    '純粋な α は ベット÷(ベット＋ポット)（33%ベットなら25%）。ここで暗記するのは、それより少し多めに降りる実践値。';
+  var EQGAP_HINT = 'EQ差＝自レンジが相手レンジよりエクイティで劣るほど、暗記値を超えて降りてよい（overfold）。' +
+    'レンジ差が小さい対面では暗記値どおり。';
+  var BOARD_HINT = '②は「このランクを手札に1枚持っていれば、ボード3枚と合わせて4枚のストレートドロー（OESD かガット）になる」ランク。' +
+    '完成カードではない。例：QJ9 なら T（OESD）、K と 8（ガット）。無ければ「無し」。';
+
   var DECKS = [
-    { id: 'alpha', label: 'α表' },
+    { id: 'alpha', label: '必要fold%（α）' },
     { id: 'eqgap', label: 'EQ差' },
     { id: 'pf', label: 'PF境界' },
     { id: 'board', label: 'ボード' }
@@ -46,13 +60,13 @@ PD.memo = (function (cardsDep, wizardDep) {
 
   /** 固定カード（alpha 4／eqgap 2／pf 8）。問いは自作要約。記事名・著者名は書かない */
   var CARDS = [
-    { id: 'alpha_33', deck: 'alpha', kind: 'number', q: '33% ベットに対して、自レンジの何%を降りる？（暗記値）' },
-    { id: 'alpha_50', deck: 'alpha', kind: 'number', q: '50% ベットに対して、自レンジの何%を降りる？（暗記値）' },
-    { id: 'alpha_75', deck: 'alpha', kind: 'number', q: '75% ベットに対して、自レンジの何%を降りる？（暗記値）' },
-    { id: 'alpha_125', deck: 'alpha', kind: 'number', q: '125% ベットに対して、自レンジの何%を降りる？（暗記値）' },
+    { id: 'alpha_33', deck: 'alpha', kind: 'number', q: '相手が 33% ポットを打ってきた。自レンジの何%まで降りてよい？（暗記値）', hint: ALPHA_HINT },
+    { id: 'alpha_50', deck: 'alpha', kind: 'number', q: '相手が 50% ポットを打ってきた。自レンジの何%まで降りてよい？（暗記値）', hint: ALPHA_HINT },
+    { id: 'alpha_75', deck: 'alpha', kind: 'number', q: '相手が 75% ポットを打ってきた。自レンジの何%まで降りてよい？（暗記値）', hint: ALPHA_HINT },
+    { id: 'alpha_125', deck: 'alpha', kind: 'number', q: '相手が 125% ポットを打ってきた。自レンジの何%まで降りてよい？（暗記値）', hint: ALPHA_HINT },
 
-    { id: 'eqgap_more', deck: 'eqgap', kind: 'lines', q: 'サイズ→fold% を α より多めに降りるスポットを全部挙げよ（1行1項目）' },
-    { id: 'eqgap_alpha', deck: 'eqgap', kind: 'lines', q: 'α 通りに戻るのはどんな時か、全部挙げよ（1行1項目）' },
+    { id: 'eqgap_more', deck: 'eqgap', kind: 'lines', q: '暗記値より多く降りる（overfold する）スポットを全部挙げよ（1行1項目）', hint: EQGAP_HINT },
+    { id: 'eqgap_alpha', deck: 'eqgap', kind: 'lines', q: '暗記値どおりでよい（overfold しない）のはどんな時か、全部挙げよ（1行1項目）', hint: EQGAP_HINT },
 
     { id: 'pf_As', deck: 'pf', kind: 'text', q: 'BB が BTN 2.5bb オープンにコールする境界：スーテッド A の底は？' },
     { id: 'pf_Ks', deck: 'pf', kind: 'text', q: 'BB が BTN 2.5bb オープンにコールする境界：スーテッド K の底は？' },
@@ -279,7 +293,14 @@ PD.memo = (function (cardsDep, wizardDep) {
   }
 
   function boardQuestion(boardStr) {
-    return boardStr + '：クラスは？ 1枚でストレートドローになるランクは？（無ければ「無し」）';
+    return boardStr + '：① ボードの種類は？ ② 手札に1枚あればストレートドロー（4枚）が付くランクは？';
+  }
+
+  /** 純粋な α（%）。size はポットに対するベット%。33 → 25 */
+  function pureAlpha(size) {
+    var s = Number(size);
+    if (!isFinite(s) || s <= 0) return null;
+    return Math.round(s / (100 + s) * 100);
   }
 
   /** due 順（alpha→eqgap→pf）＋ board を BOARD_PER_DAY 件。新規は deck ごと NEW_PER_DAY まで */
@@ -312,7 +333,8 @@ PD.memo = (function (cardsDep, wizardDep) {
           id: 'board_' + String(today || '').replace(/-/g, '') + '_' + i,
           deck: 'board',
           kind: 'board',
-          q: boardQuestion(boardStr)
+          q: boardQuestion(boardStr),
+          hint: BOARD_HINT
         };
         out.push({ card: card, kind: 'board', boardSpot: { board: boardStr } });
       });
@@ -484,6 +506,9 @@ PD.memo = (function (cardsDep, wizardDep) {
   return {
     KEY: KEY,
     ALPHA_MEMO: ALPHA_MEMO,
+    CLS_ORDER: CLS_ORDER,
+    CLS_LABELS: CLS_LABELS,
+    pureAlpha: pureAlpha,
     EQGAP_MEMO: EQGAP_MEMO,
     MEMO_INTERVALS: MEMO_INTERVALS,
     NEW_PER_DAY: NEW_PER_DAY,

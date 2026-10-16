@@ -62,17 +62,22 @@ function run(assert) {
   var hEq = memoUi.html(ctxWith({ idx: 2, phase: 'ask' }));
   assert.ok(/<textarea[^>]*data-k="value"/.test(hEq), 'eqgap は textarea');
 
-  // board：クラス／ランクの2つの text input
+  // board：選択式（種類7択＋ランク13択＋「無し」）。text input は無い
   var hBoard = memoUi.html(ctxWith({ idx: 3, phase: 'ask' }));
-  assert.ok(/data-k="cls"/.test(hBoard) && /data-k="ranks"/.test(hBoard), 'board はクラス／ランクの2入力');
-  assert.strictEqual((hBoard.match(/<input/g) || []).length, 2, 'board の input は2つだけ');
-  assert.ok(hBoard.indexOf('<textarea') < 0, 'board に textarea は無い');
+  assert.strictEqual((hBoard.match(/data-pick="cls"/g) || []).length, 7, 'board の種類チップは7つ');
+  assert.strictEqual((hBoard.match(/data-pick="rank"/g) || []).length, 14, 'board のランクチップは13＋「無し」');
+  assert.ok(hBoard.indexOf('<input') < 0 && hBoard.indexOf('<textarea') < 0, 'board に自由入力は無い');
+  assert.ok(hBoard.indexOf('モノトーン') >= 0 && hBoard.indexOf('ドライ・ハイ') >= 0, '種類は日本語ラベル');
 
-  // board：片方だけ入力では disabled のまま
-  var hBoardHalf = memoUi.html(ctxWith({ idx: 3, phase: 'ask', input: { cls: 'ドライ', ranks: '' } }));
-  assert.ok(/data-act="reveal"[^>]*disabled/.test(hBoardHalf), 'board は片方未入力で disabled');
-  var hBoardFull = memoUi.html(ctxWith({ idx: 3, phase: 'ask', input: { cls: 'ドライ', ranks: '無し' } }));
-  assert.ok(!/data-act="reveal"[^>]*disabled/.test(hBoardFull), 'board は両方入力で押せる');
+  // board：片方だけ選択では disabled のまま。選択済みチップは aria-pressed=true
+  var hBoardHalf = memoUi.html(ctxWith({ idx: 3, phase: 'ask', input: { cls: 'dry_high', ranks: '' } }));
+  assert.ok(/data-act="reveal"[^>]*disabled/.test(hBoardHalf), 'board は片方未選択で disabled');
+  assert.ok(/data-pick="cls" data-v="dry_high" aria-pressed="true"/.test(hBoardHalf), '選択中の種類チップが押下表示');
+  var hBoardFull = memoUi.html(ctxWith({ idx: 3, phase: 'ask', input: { cls: 'dry_high', ranks: 'KT' } }));
+  assert.ok(!/data-act="reveal"[^>]*disabled/.test(hBoardFull), 'board は両方選択で押せる');
+  assert.strictEqual((hBoardFull.match(/data-pick="rank" data-v="[KT]" aria-pressed="true"/g) || []).length, 2, 'K と T が押下表示');
+  var hBoardNone = memoUi.html(ctxWith({ idx: 3, phase: 'ask', input: { cls: 'dry_high', ranks: '無し' } }));
+  assert.ok(/data-v="無し" aria-pressed="true"/.test(hBoardNone), '「無し」が押下表示');
 
   // ================= reveal =================
   // 本物の PD.memo（M1）が読み込まれていても、ここでは差し替えて検証する（終了時に必ず元へ戻す）
@@ -80,8 +85,10 @@ function run(assert) {
   PD.memo = {
     checkAlpha: function (id, v) { return id === 'alpha_33' && v === 30; },
     checkBoard: function (board, cls, ranks) {
-      return { clsOk: cls === 'ドライ', ranksOk: ranks === '無し', expect: { cls: 'dry_high', ranks: [] } };
+      return { clsOk: cls === 'dry_high', ranksOk: ranks === '無し', expect: { cls: 'dry_high', ranks: [] } };
     },
+    ALPHA_MEMO: { 33: 30 },
+    pureAlpha: function (s) { return Math.round(s / (100 + s) * 100); },
     eqgapAnswer: function (id) {
       return id === 'eqgap_more' ? ['4bp', 'utg', 'capped', 'wide'] : ['btn', 'turn'];
     },
@@ -120,13 +127,18 @@ function run(assert) {
   var hRevealEq = memoUi.html(ctxWith({ idx: 2, phase: 'reveal', input: { value: '4bp\nutg' } }));
   assert.ok(hRevealEq.indexOf('4bp') >= 0 && hRevealEq.indexOf('capped') >= 0, 'eqgap の暗記一覧（EQGAP_MEMO 由来）が出る');
 
-  // board：クラス／ランクそれぞれにバッジ
-  var hRevealBoard = memoUi.html(ctxWith({ idx: 3, phase: 'reveal', input: { cls: 'ドライ', ranks: '無し' } }));
-  assert.ok(hRevealBoard.indexOf('クラス：') >= 0 && hRevealBoard.indexOf('ランク：') >= 0, 'board は2つのバッジ');
-  assert.strictEqual((hRevealBoard.match(/一致/g) || []).length, 2, 'board 両方一致');
+  // alpha：暗記値と純αを併記
+  assert.ok(hRevealOk.indexOf('暗記値：') >= 0 && hRevealOk.indexOf('純α 25%') >= 0, 'alpha の reveal に暗記値と純α');
 
-  var hRevealBoardNg = memoUi.html(ctxWith({ idx: 3, phase: 'reveal', input: { cls: 'ウェット', ranks: 'KT8' } }));
-  assert.ok(hRevealBoardNg.indexOf('不一致') >= 0, 'board 不一致バッジ');
+  // board：正解を表示し、自動判定（○／×）。下部バーは「次へ」のみ
+  var hRevealBoard = memoUi.html(ctxWith({ idx: 3, phase: 'reveal', input: { cls: 'dry_high', ranks: '無し' } }));
+  assert.ok(hRevealBoard.indexOf('正解：') >= 0 && hRevealBoard.indexOf('種類：ドライ・ハイ') >= 0, 'board は正解を表示');
+  assert.ok(/data-ok="1"/.test(hRevealBoard) && hRevealBoard.indexOf('○ 正解') >= 0, 'board 両方正解で ○');
+  assert.ok(/data-act="auto"/.test(hRevealBoard) && !/data-act="ok"/.test(hRevealBoard), 'board の下部バーは自動判定の「次へ」だけ');
+
+  var hRevealBoardNg = memoUi.html(ctxWith({ idx: 3, phase: 'reveal', input: { cls: 'mono', ranks: 'KT8' } }));
+  assert.ok(/data-ok="0"/.test(hRevealBoardNg) && hRevealBoardNg.indexOf('× 不正解') >= 0, 'board どちらか違えば ×');
+  assert.ok(hRevealBoardNg.indexOf('ここが違う') >= 0, '違った項目に印');
 
   delete PD.memo;
 
@@ -149,13 +161,14 @@ function run(assert) {
   var hEmpty = memoUi.html(ctxWith({ items: [] }));
   assert.ok(hEmpty.indexOf('ありません') >= 0 && /data-go="home"/.test(hEmpty), '出題なしの案内');
 
-  // ================= 全フェーズを通じてチップ要素が無い =================
-  var all = [h0, hFilled, hPf, hEq, hBoard, hBoardHalf, hBoardFull,
-    hRevealOk, hRevealNg, hRevealPf, hRevealPfNote, hRevealEq, hRevealBoard, hRevealBoardNg,
+  // ================= board 以外はチップ・選択肢を出さない（思い出す練習） =================
+  var nonBoard = [h0, hFilled, hPf, hEq,
+    hRevealOk, hRevealNg, hRevealPf, hRevealPfNote, hRevealEq,
     hNoMemoApi, hDone, hEmpty].join('');
-  assert.ok(all.indexOf('pd-chip') < 0, 'どのフェーズにも .pd-chip が無い（チップ・選択肢を出さない）');
-  assert.ok(all.indexOf('pd-keypad') < 0, 'キーパッドも無い（自由記述のみ）');
-  assert.ok(all.indexOf('<select') < 0, 'select も無い（自由記述のみ）');
+  assert.ok(nonBoard.indexOf('pd-chip') < 0, 'board 以外のフェーズに .pd-chip が無い');
+  var all = nonBoard + [hBoard, hBoardHalf, hBoardFull, hRevealBoard, hRevealBoardNg].join('');
+  assert.ok(all.indexOf('pd-keypad') < 0, 'キーパッドは無い');
+  assert.ok(all.indexOf('<select') < 0, 'select は無い');
 
   // ================= render：DOM が無くても／簡易 DOM でも例外にならない =================
   assert.strictEqual(typeof memoUi.render, 'function', 'render は関数');

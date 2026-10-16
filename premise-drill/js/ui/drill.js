@@ -430,7 +430,7 @@ PD.ui.drill = (function () {
     var v = sheet.f3 || {};
     var noDraw = v.noDraw === true;
     return (
-      '<p class="pd-drill-numlabel pd-small">(a) 1枚でストレートドローになるランク（複数可）</p>' +
+      '<p class="pd-drill-numlabel pd-small">(a) 手札に1枚あれば、ボード3枚と合わせて4枚のストレートドロー（OESD／ガット）になるランク（複数可。完成カードではない）</p>' +
       rankChips(v.drawRanks, noDraw) +
       checkInput('f3', 'noDraw', noDraw, 'ドロー無しと宣言する') +
       numInput('f3', 'shiftPct', v.shiftPct, { label: '(b) 守る側に移る量（レンジ全体に対する%。ドロー無しなら 0）', unit: '%' }) +

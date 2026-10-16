@@ -45,7 +45,7 @@ PD.ui.settings = (function () {
   ];
   var CARDS = ['claude', 'wizard', 'extra', 'memo', 'data', 'reset'];
   var MEMO_DECKS = [
-    { id: 'alpha', label: 'α表' },
+    { id: 'alpha', label: '必要fold%（α）' },
     { id: 'eqgap', label: 'EQ差' },
     { id: 'pf', label: 'PF境界' },
     { id: 'board', label: 'ボード' }

@@ -28,6 +28,63 @@
   margin-top: var(--gap-1);
 }
 
+/* 問いの下の説明（α の定義・ドローの意味など） */
+.pd-memo-hint {
+  margin: calc(-1 * var(--gap-1)) 0 var(--gap-2);
+  padding: 8px 12px;
+  border-left: 3px solid var(--lamp);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: var(--lamp-tint);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+/* ---------- board：選択式 ---------- */
+.pd-memo-sublabel {
+  margin: var(--gap-1) 0 6px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.pd-memo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pd-memo-ranks .pd-chip {
+  min-width: 40px;
+  padding: 0 8px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.pd-memo-verdict {
+  margin: var(--gap-1) 0 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--settle);
+}
+
+.pd-memo-verdict[data-ok="0"] {
+  color: var(--umber);
+}
+
+.pd-memo-miss {
+  margin-left: 6px;
+  font-size: 12px;
+  color: var(--umber);
+}
+
+.pd-memo-expect-line {
+  margin: 0 0 var(--gap-1);
+}
+
+.pd-memo-expect-line .pd-small {
+  margin-left: 6px;
+}
+
 .pd-memo-textarea {
   min-height: 120px;
 }

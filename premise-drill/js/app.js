@@ -155,6 +155,13 @@ PD.app = (function () {
     }
     var el = rootEl();
     if (!el) return;
+    // 各 UI の render は root に listener を足すので、再描画のたびに積み重ならないよう空の同一ノードへ差し替える
+    // （トグル系の操作が2回発火して打ち消し合うのを防ぐ）
+    if (el.parentNode && typeof el.cloneNode === 'function') {
+      var fresh = el.cloneNode(false);
+      el.parentNode.replaceChild(fresh, el);
+      el = fresh;
+    }
 
     var ui = PD.ui[ctx.view];
     if (ui && typeof ui.render === 'function') {
