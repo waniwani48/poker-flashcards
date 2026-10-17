@@ -230,6 +230,10 @@ PD.store = (function () {
     if (memo && typeof memo.exportState === 'function') {
       try { out.memo = memo.exportState(); } catch (e) { /* 暗記レーンが読めなければ省く */ }
     }
+    var range = root.PD && root.PD.range;
+    if (range && typeof range.exportState === 'function') {
+      try { out.range = range.exportState(); } catch (e) { /* レンジ表が読めなければ省く */ }
+    }
     return JSON.stringify(out);
   }
 
@@ -453,6 +457,13 @@ PD.store = (function () {
     var memo = root.PD && root.PD.memo;
     if (memo && typeof memo.importState === 'function' && isObj(data) && isObj(data.memo)) {
       try { memo.importState(data.memo); } catch (e) { /* 失敗しても本体のインポートは成功扱い */ }
+    }
+    var range = root.PD && root.PD.range;
+    if (range && typeof range.importState === 'function' && isObj(data) && isObj(data.range)) {
+      try {
+        var rr = range.importState(data.range);
+        if (rr && rr.ok && rr.range && typeof range.save === 'function') range.save(rr.range);
+      } catch (e) { /* レンジ表の取り込み失敗も本体は成功扱い */ }
     }
     var msg = added + '件を追加、' + skipped + '件は重複のためスキップ';
     if (r.trimmed) msg += '（上限超過で古い' + r.trimmed + '件を間引き）';

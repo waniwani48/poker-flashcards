@@ -82,6 +82,9 @@ function run(assert) {
   // ================= reveal =================
   // 本物の PD.memo（M1）が読み込まれていても、ここでは差し替えて検証する（終了時に必ず元へ戻す）
   var realMemo = PD.memo;
+  // PD.range（レンジ表）は「未入力」のスタブにして、pf の従来表示（Wizard リンク＋本人 ○×）を検証する
+  var realRange = PD.range;
+  PD.range = { load: function () { return { v: 1, cells: {} }; }, isFilled: function () { return false; } };
   PD.memo = {
     checkAlpha: function (id, v) { return id === 'alpha_33' && v === 30; },
     checkBoard: function (board, cls, ranks) {
@@ -147,7 +150,26 @@ function run(assert) {
   assert.ok(hNoMemoApi.indexOf('本人の入力') >= 0, 'PD.memo 無しでも reveal は描画される');
 
   // 元の PD.memo（本物があれば本物）に戻す。他のテストファイルの状態を汚さない
+  // pf：レンジ表が埋まっていれば自動判定（PD.range を埋まったスタブに差し替え）
+  PD.range = {
+    load: function () { return { v: 1, cells: { A2s: 'call' } }; },
+    isFilled: function () { return true; },
+    checkPf: function (range, id, text) {
+      if (!/^pf_/.test(String(id)) || /3bet/.test(String(id))) return null;
+      var got = String(text || '').trim();
+      return { ok: got === 'A2s', expect: ['A2s'], got: [got] };
+    },
+    pfAnswer: function (range, id) { return /3bet/.test(String(id)) ? { expect: ['A5s', 'A4s'], kind: 'list' } : { expect: ['A2s'], kind: 'hand' }; }
+  };
+  var hPfAuto = memoUi.html(ctxWith({ idx: 1, phase: 'reveal', input: { value: 'A2s' } }));
+  assert.ok(hPfAuto.indexOf('○ 正解') >= 0 && /data-act="auto"/.test(hPfAuto) && !/data-act="ok"/.test(hPfAuto), 'pf はレンジ表があれば自動判定で「次へ」');
+  assert.ok(hPfAuto.indexOf('レンジ表の答え') >= 0, 'レンジ表の答えを表示');
+  assert.ok(!/<a[^>]*app\.gtowizard\.com/.test(hPfAuto), '自動判定のときは Wizard リンクを出さない');
+  var hPfAutoNg = memoUi.html(ctxWith({ idx: 1, phase: 'reveal', input: { value: 'A5s' } }));
+  assert.ok(hPfAutoNg.indexOf('× 不正解') >= 0 && /data-ok="0"/.test(hPfAutoNg), 'pf 不正解');
+
   if (realMemo === undefined) { delete PD.memo; } else { PD.memo = realMemo; }
+  if (realRange === undefined) { delete PD.range; } else { PD.range = realRange; }
 
   // ================= done =================
   var hDone = memoUi.html(ctxWith({ phase: 'done' }));

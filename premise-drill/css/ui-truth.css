@@ -439,6 +439,48 @@
 }
 
 /* ---------- 手動ナビ（リンクで着地しない時） ---------- */
+/* ---------- アプリ判定 ---------- */
+.pd-truth-local-rows {
+  list-style: none;
+  margin: var(--gap-1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pd-truth-local-row {
+  display: flex;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+
+.pd-truth-local-mark {
+  flex: 0 0 24px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--mute);
+}
+
+.pd-truth-local-row[data-ok="1"] .pd-truth-local-mark { color: var(--settle); }
+.pd-truth-local-row[data-ok="0"] .pd-truth-local-mark { color: var(--umber); }
+
+.pd-truth-local-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pd-truth-local-label {
+  font-weight: 600;
+}
+
 .pd-truth-manual { margin-top: var(--gap-1); }
 .pd-truth-manual ol { padding-left: 1.2em; margin: var(--gap-1) 0 0; }
 .pd-truth-manual li { margin: 4px 0; }

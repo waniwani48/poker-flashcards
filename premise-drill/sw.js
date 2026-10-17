@@ -3,12 +3,12 @@
  * 外部（Google Fonts・GTO Wizard・Anthropic API）は触らない＝ネットワーク直通。
  * CACHE 名を上げると旧キャッシュは activate で消える。index.html の ?v= と合わせて更新する。
  */
-var V = '12';
+var V = '13';
 var CACHE = 'pd-v' + V;
 var CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/tokens.css', './css/app.css', './css/ui-home.css', './css/ui-drill.css', './css/ui-truth.css', './css/ui-map.css', './css/ui-settings.css', './css/ui-guide.css', './css/ui-memo.css',
-  './js/util.js', './js/cards.js', './js/generator.js', './js/sheet.js', './js/wizard.js', './js/gaps.js', './js/store.js', './js/judge.js', './js/memo.js',
+  './js/util.js', './js/cards.js', './js/range-data.js', './js/range.js', './js/generator.js', './js/sheet.js', './js/wizard.js', './js/gaps.js', './js/localjudge.js', './js/store.js', './js/judge.js', './js/memo.js',
   './js/ui/memo.js', './js/ui/guide.js', './js/ui/home.js', './js/ui/drill.js', './js/ui/truth.js', './js/ui/map.js', './js/ui/settings.js', './js/app.js',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-192.png', './icons/maskable-512.png', './icons/apple-touch-icon.png'
 ];

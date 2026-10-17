@@ -184,14 +184,63 @@ PD.ui.memo = (function () {
     return out;
   }
 
+  // ---- pf：レンジ表（PD.range）が埋まっていれば自動判定。無ければ従来どおり本人の ○× ----
+  function rangeApi() { return PD.range || null; }
+
+  function filledRange() {
+    var R = rangeApi();
+    if (!R || typeof R.load !== 'function' || typeof R.isFilled !== 'function') return null;
+    try {
+      var range = R.load();
+      return R.isFilled(range) ? range : null;
+    } catch (e) { return null; }
+  }
+
+  /** { ok, expect, got } ｜ null（判定しないカード・レンジ未入力） */
+  function pfResult(m, cardId) {
+    var R = rangeApi();
+    var range = filledRange();
+    if (!range || typeof R.checkPf !== 'function') return null;
+    try { return R.checkPf(range, cardId, fieldVal(m, 'value')); } catch (e) { return null; }
+  }
+
+  /** 判定しないカード（3bet 等）の参考一覧 */
+  function pfReference(cardId) {
+    var R = rangeApi();
+    var range = filledRange();
+    if (!range || typeof R.pfAnswer !== 'function') return null;
+    try {
+      var a = R.pfAnswer(range, cardId);
+      return (a && Array.isArray(a.expect) && a.expect.length) ? a : null;
+    } catch (e) { return null; }
+  }
+
+  function pfOk(m, item) {
+    var card = (item && item.card) || {};
+    var res = pfResult(m, card.id);
+    return !!(res && res.ok);
+  }
+
   function revealPf(m, cardId) {
     var raw = fieldVal(m, 'value');
     var prior = priorNote(m, cardId);
     var api = memoApi();
     var wiz = (api && typeof api.wizardPfUrl === 'function') ? api.wizardPfUrl() : null;
     var out = '<p class="pd-memo-yourinput">本人の入力：<span>' + (esc(raw) || '（未記入）') + '</span></p>';
+    var res = pfResult(m, cardId);
+    if (res) {
+      out += '<div class="pd-memo-expect"><p class="pd-small pd-mute">レンジ表の答え：</p>' +
+        '<p class="pd-mono pd-memo-expect-hands">' + esc((res.expect || []).join('・') || '—') + '</p></div>';
+      out += '<p class="pd-memo-verdict" data-ok="' + (res.ok ? '1' : '0') + '">' + (res.ok ? '○ 正解' : '× 不正解') + '</p>';
+    } else {
+      var ref = pfReference(cardId);
+      if (ref) {
+        out += '<div class="pd-memo-expect"><p class="pd-small pd-mute">参考：レンジ表で 3bet／混合にしている手（判定は本人）</p>' +
+          '<p class="pd-mono pd-memo-expect-hands">' + esc(ref.expect.join('・')) + '</p></div>';
+      }
+    }
     out += '<p class="pd-memo-prevnote pd-small pd-mute">前回のメモ：' + (prior ? esc(prior) : '未確認') + '</p>';
-    if (wiz && wiz.url) {
+    if (wiz && wiz.url && !res) {
       out += (
         '<p class="pd-memo-wizard">' +
           '<a class="pd-btn pd-btn-truth" href="' + esc(wiz.url) + '" target="_blank" rel="noopener">Wizard で確認</a>' +
@@ -325,7 +374,8 @@ PD.ui.memo = (function () {
     var card = (item && item.card) || {};
     var cardId = card.id;
     var kind = kindOf(item);
-    var bar = (kind === 'board')
+    var auto = kind === 'board' || (kind === 'text' && !!pfResult(m, cardId));
+    var bar = auto
       ? '<button type="button" class="pd-btn pd-btn-primary" data-act="auto">次へ</button>'
       : '<button type="button" class="pd-btn pd-btn-ghost" data-act="ng">× 忘れた</button>' +
         '<button type="button" class="pd-btn pd-btn-primary" data-act="ok">○ 覚えてた</button>';
@@ -465,7 +515,8 @@ PD.ui.memo = (function () {
       callIf(ctx.memoGrade, [act === 'ok']);
       callIf(ctx.memoNext, []);
     } else if (act === 'auto') {
-      callIf(ctx.memoGrade, [boardOk(m, currentItem(m))]);
+      var cur = currentItem(m);
+      callIf(ctx.memoGrade, [kindOf(cur) === 'board' ? boardOk(m, cur) : pfOk(m, cur)]);
       callIf(ctx.memoNext, []);
     } else if (act === 'to-drill') {
       callIf(ctx.memoFinish, []);

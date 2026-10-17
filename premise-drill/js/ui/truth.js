@@ -66,6 +66,37 @@ PD.ui.truth = (function () {
     return session;
   }
 
+  // ---- アプリ判定（PD.localjudge）：BB の守りレンジ表が埋まっていれば Wizard 無しで①〜⑤を判定する ----
+  var FIELD_LABEL = {
+    f1: '① サイズ→必要 fold%', f2: '② 自レンジ3バケツ%', f3: '③ trash の中でドロー持ち',
+    f4: '④ fold 組を弱い順に名指し', f5: '⑤ 自分のハンドはどこ'
+  };
+  var POS_LABEL = { 'in': 'fold 組の中', edge: '境界', above: '上' };
+  /** 判定結果（画面内キャッシュ）。entry.local には stats を除いた写しを残す（ログに保存される） */
+  function localVerdict(entry) {
+    var s = sessionFor(entry);
+    if (s.local !== undefined) return s.local;
+    var LJ = dep('localjudge', '../localjudge');
+    var R = dep('range', '../range');
+    var v = null;
+    if (LJ && typeof LJ.judge === 'function' && R && typeof R.load === 'function' && entry && entry.spot && entry.sheet) {
+      try { v = LJ.judge(entry.sheet, entry.spot, R.load()); } catch (e) { v = null; }
+    }
+    s.local = v;
+    if (v) {
+      var copy = {};
+      for (var k in v) if (Object.prototype.hasOwnProperty.call(v, k) && k !== 'stats') copy[k] = v[k];
+      entry.local = copy;
+    } else {
+      entry.local = null;
+    }
+    return v;
+  }
+  function localAvailable(entry) {
+    var v = localVerdict(entry);
+    return !!(v && v.available);
+  }
+
   // ---- 小道具 ----
   function isNum(v) { return typeof v === 'number' && isFinite(v); }
   function inRange(v, lo, hi) { return isNum(v) && v >= lo && v <= hi; }
@@ -329,13 +360,30 @@ PD.ui.truth = (function () {
     out.sizeFold = { cand: sc.cand, text: text };
     var ac = actionCandidate(entry);
     var t = (entry && entry.truth) || {};
-    if (ac.cand === null) text = '真値（自分のハンド fold%）を入れると候補が出る';
-    else text = '○候補 ' + ac.cand + ' 点：⑤=' + (ac.action || '未記入') + '、真値 fold ' + t.heroFold + '% → ' + ac.truthAct;
+    var lv = localVerdict(entry);
+    var lvOk = !!(lv && lv.available);
+    if (ac.cand !== null) {
+      text = '○候補 ' + ac.cand + ' 点：⑤=' + (ac.action || '未記入') + '、真値 fold ' + t.heroFold + '% → ' + ac.truthAct;
+    } else if (lvOk && lv.f5 && lv.f5.predicted) {
+      ac = { cand: lv.f5.ok ? 1 : 0 };
+      text = '○候補 ' + ac.cand + ' 点：⑤=' + ((lv.f5.got && lv.f5.got.action) || '未記入') + '、アプリ予測 ' + (lv.f5.predicted.action || '—') +
+        '（Wizard を見たらそちらを優先）';
+    } else {
+      text = '真値（自分のハンド fold%）を入れると候補が出る';
+    }
     out.action = { cand: ac.cand, text: text };
     var c = (entry && entry.commit) || {};
     var order = (Array.isArray(c.order) && c.order.length) ? c.order.join('→') : '未記録';
     out.procedure = { cand: null, text: '機械的な候補なし。入力順 ' + order + ' を見て本人が判定' };
-    out.drawProtect = { cand: null, text: '機械的な候補なし。③のランク列挙と④の縮め方を見て本人が判定' };
+    if (lvOk && lv.summary && lv.summary.score && isNum(lv.summary.score.draw_protect) && lv.f3) {
+      var f3 = lv.f3;
+      var ranksNg = (f3.missingRanks && f3.missingRanks.length) || (f3.extraRanks && f3.extraRanks.length);
+      var sd = (f3.got && isNum(f3.got.shiftPct) && f3.expect && isNum(f3.expect.shiftPct)) ? Math.abs(f3.got.shiftPct - f3.expect.shiftPct) : null;
+      out.drawProtect = { cand: lv.summary.score.draw_protect, text: '○候補 ' + lv.summary.score.draw_protect + ' 点：③のランク' +
+        (ranksNg ? '不一致' : '一致') + '／移る量の差 ' + (sd === null ? '—' : sd + 'pt') + '（④の縮め方は本人が判定）' };
+    } else {
+      out.drawProtect = { cand: null, text: '機械的な候補なし。③のランク列挙と④の縮め方を見て本人が判定' };
+    }
     return out;
   }
   /** 下部バーの文言と保存可否 */
@@ -417,7 +465,8 @@ PD.ui.truth = (function () {
   function validateSave(entry, mode) {
     var missing = [];
     var vt = validateTruth(entry.truth, mode);
-    if (!vt.ok) missing.push('真値');
+    // アプリ判定があれば Wizard の真値は任意（触りかけなら整えてもらう）
+    if (!vt.ok && (!localAvailable(entry) || touchedTruth(entry.truth))) missing.push('真値');
     var ss = entry.selfScore || {};
     var n = SCORE_IDS.filter(function (k) { return isNum(ss[k]); }).length;
     if (mode === 'speed') {
@@ -513,11 +562,80 @@ PD.ui.truth = (function () {
       '<button type="button" class="pd-btn pd-btn-ghost pd-truth-copy" data-copy="' + esc(board) + '">ボードをコピー</button></li>' +
       '<li>BB x → BTN の <strong>' + esc(size) + '%</strong> をタップ → BB の応答（Call／Raise／Fold の %）を読む</li></ol></details>';
   }
+  function pctText(v) { return isNum(v) ? v + '%' : '—'; }
+  function bucketsText(b) {
+    b = b || {};
+    return 'trash ' + pctText(b.trash) + '／ハイ ' + pctText(b.hi) + '／ペア以上 ' + pctText(b.pairPlus);
+  }
+  function ranksText(arr, noDraw) {
+    if (noDraw) return 'ドロー無し';
+    return (Array.isArray(arr) && arr.length) ? arr.join('・') : '無し';
+  }
+  function enoughText(v) {
+    if (v === 'yes' || v === true) return '足りる';
+    if (v === 'no' || v === false) return '足りない';
+    return '—';
+  }
+  function localRow(id, ok, got, expect, note) {
+    var mark = ok === null || ok === undefined ? '—' : (ok ? '○' : '×');
+    return '<li class="pd-truth-local-row" data-ok="' + (ok === null || ok === undefined ? '' : (ok ? '1' : '0')) + '">' +
+      '<span class="pd-truth-local-mark" aria-hidden="true">' + mark + '</span>' +
+      '<div class="pd-truth-local-body"><span class="pd-truth-local-label">' + esc(FIELD_LABEL[id]) + '</span>' +
+      '<span class="pd-small">あなた：' + esc(got) + '</span>' +
+      '<span class="pd-small">正解：' + esc(expect) + '</span>' +
+      (note ? '<span class="pd-small pd-mute">' + esc(note) + '</span>' : '') +
+      '</div></li>';
+  }
+  /** 「アプリ判定」カード。レンジ未入力なら設定への案内 */
+  function localHtml(entry) {
+    var v = localVerdict(entry);
+    var head = '<article class="pd-card pd-truth-local" data-role="local">';
+    if (!v) {
+      return head + '<h2>アプリ判定</h2><p class="pd-small pd-mute">判定モジュールが読み込まれていない。下の Wizard で真値を見る。</p></article>';
+    }
+    if (!v.available) {
+      return head + '<h2>アプリ判定</h2>' +
+        '<p class="pd-small">BB の守りレンジ表（13×13）が未入力。設定で埋めると、Wizard を開かずにここで①〜⑤を判定できる。</p>' +
+        '<button type="button" class="pd-btn pd-btn-primary" data-go="settings">設定でレンジ表を埋める</button></article>';
+    }
+    var f1 = v.f1 || {}, f2 = v.f2 || {}, f3 = v.f3 || {}, f4 = v.f4 || {}, f5 = v.f5 || {};
+    var f3got = f3.got || {}, f3exp = f3.expect || {}, f4got = f4.got || {}, f4exp = f4.expect || {};
+    var f5got = f5.got || {}, pred = f5.predicted || {};
+    var f3note = [];
+    if (f3.missingRanks && f3.missingRanks.length) f3note.push('見落とし ' + f3.missingRanks.join('・'));
+    if (f3.extraRanks && f3.extraRanks.length) f3note.push('余分 ' + f3.extraRanks.join('・'));
+    var f4note = [];
+    if (Array.isArray(f4.invalid) && f4.invalid.length) {
+      f4note.push(f4.invalid.map(function (x) { return x.hand + '（' + x.why + '）'; }).join('、'));
+    }
+    if (f4.orderOk === false) f4note.push('並びが弱い順になっていない');
+    var rows =
+      localRow('f1', f1.ok, pctText(f1.got), pctText(f1.expect) + (isNum(f1.pureAlpha) ? '（純α ' + f1.pureAlpha + '%）' : '')) +
+      localRow('f2', f2.ok, bucketsText(f2.got), bucketsText(f2.expect)) +
+      localRow('f3', f3.ok, ranksText(f3got.ranks, f3got.noDraw) + '／移る量 ' + pctText(f3got.shiftPct),
+        ranksText(f3exp.ranks, false) + '／移る量 ' + pctText(f3exp.shiftPct), f3note.join('／')) +
+      localRow('f4', f4.ok, '純air ' + pctText(f4got.pureAirPct) + '／' + enoughText(f4got.enough),
+        '純air ' + pctText(f4exp.pureAir) + '／' + enoughText(f4exp.enough), f4note.join('／')) +
+      localRow('f5', f5.ok, (POS_LABEL[f5got.position] || '—') + '／' + (f5got.action || '—'),
+        '予測：' + (POS_LABEL[pred.position] || '—') + '／' + (pred.action || '—') +
+        (isNum(pred.percentile) ? '（レンジの弱い方から ' + pred.percentile + '% 地点）' : ''),
+        '⑤は仮の序列からの予測。GTO の真値ではない');
+    var okN = (v.summary && isNum(v.summary.okCount)) ? v.summary.okCount : 0;
+    return head + '<h2>アプリ判定 <span class="pd-truth-total">' + okN + '/5</span></h2>' +
+      '<p class="pd-small pd-mute">BB の守りレンジ表とボードから機械的に計算。必要 fold% は暗記値 ' + esc(fmt(v.required)) + '%。①〜④は厳密、⑤は予測。</p>' +
+      '<ul class="pd-truth-local-rows">' + rows + '</ul></article>';
+  }
+
   function wizardHtml(entry, ctx) {
     var links = wizardLinks(entry.spot, ctx.state && ctx.state.settings);
-    return '<article class="pd-card pd-truth-wizard" data-role="wizard"><h2>真値を見る</h2>' +
-      '<p class="pd-small pd-mute">Wizard で BB の応答を見て、見た数字を下に申告する。</p>' +
-      linkHtml(links.main, true) + linkHtml(links.sub, false) + manualHtml(entry.spot) + '</article>';
+    var inner = linkHtml(links.main, true) + linkHtml(links.sub, false) + manualHtml(entry.spot);
+    if (!localAvailable(entry)) {
+      return '<article class="pd-card pd-truth-wizard" data-role="wizard"><h2>真値を見る</h2>' +
+        '<p class="pd-small pd-mute">Wizard で BB の応答を見て、見た数字を下に申告する。</p>' + inner + '</article>';
+    }
+    return '<article class="pd-card pd-truth-wizard" data-role="wizard"><details class="pd-truth-opt"><summary>Wizard で検算する（任意）</summary>' +
+      '<p class="pd-small pd-mute">アプリ判定で足りる日は開かなくていい。開いたら下の「見た数字」に入れると、⑤の採点は Wizard の値を優先する。</p>' +
+      inner + '</details></article>';
   }
 
   function numInput(name, value) {
@@ -529,8 +647,11 @@ PD.ui.truth = (function () {
     var b = t.buckets;
     var speed = mode === 'speed';
     var hs = heroSum(t);
-    return '<article class="pd-card pd-truth-values" data-role="truth"><h2>見た数字を申告</h2>' +
-      '<p class="pd-small pd-mute">本人の自己申告だけを使う（ログにのみ保存）。' + (speed ? '速度モードはスキップ可。' : '保存には必須。') + '</p>' +
+    var optional = !speed && localAvailable(entry);
+    var open = optional && touchedTruth(t);
+    return '<article class="pd-card pd-truth-values" data-role="truth"' + (optional ? ' data-optional="1"' : '') + '>' +
+      (optional ? '<details class="pd-truth-opt"' + (open ? ' open' : '') + '><summary>Wizard で見た数字を入れる（任意）</summary>' : '<h2>見た数字を申告</h2>') +
+      '<p class="pd-small pd-mute">本人の自己申告だけを使う（ログにのみ保存）。' + (speed ? '速度モードはスキップ可。' : (optional ? 'アプリ判定があるので任意。' : '保存には必須。')) + '</p>' +
       (speed ? '<label class="pd-truth-skip"><input type="checkbox" name="skip"' + (t.skip ? ' checked' : '') + '> 真値をスキップ</label>' : '') +
       '<div class="pd-truth-inputs"' + (speed && t.skip ? ' data-off="1"' : '') + '>' +
       '<label class="pd-truth-lab">レンジ全体の fold%' + numInput('rangeFoldPct', t.rangeFoldPct) + '</label>' +
@@ -545,7 +666,8 @@ PD.ui.truth = (function () {
         '<label>ペア以上%' + numInput('b_pairPlus', b.pairPlus) + '</label></div></details>' +
       '<label class="pd-truth-lab">メモ（任意）<textarea class="pd-input" name="note" rows="2">' + esc(t.note) + '</textarea></label>' +
       '</div>' +
-      '<p class="pd-truth-warn" data-role="truth-msg" aria-live="polite">' + esc(truthMsg(t, mode)) + '</p></article>';
+      '<p class="pd-truth-warn" data-role="truth-msg" aria-live="polite">' + esc(truthMsg(t, mode)) + '</p>' +
+      (optional ? '</details>' : '') + '</article>';
   }
 
   function postHtml(entry) {
@@ -692,6 +814,7 @@ PD.ui.truth = (function () {
     return '<section class="pd-truth" data-role="truth-view"' + (s.saved ? ' data-saved="1"' : '') + '>' +
       '<div data-role="outcome-slot">' + ((s.saved && s.preview) ? outcomeCardHtml(s.preview, entry) : '') + '</div>' +
       sealHtml(entry, ctx) +
+      localHtml(entry) +
       wizardHtml(entry, ctx) +
       truthHtml(entry, mode) +
       postHtml(entry) +

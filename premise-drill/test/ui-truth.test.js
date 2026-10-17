@@ -84,6 +84,11 @@ module.exports = {
     installStub(makeStub());
     store.resetAll();
     assert.strictEqual(store.loadState().settings.wizardBfacing, 'unknown', '既定の state から始める');
+    // アプリ判定（PD.localjudge）は前半では「判定なし」のスタブにし、従来の Wizard 必須の挙動を検証する。末尾で本物に戻す
+    var PDg = globalThis.PD;
+    var realLJ = PDg.localjudge;
+    PDg.localjudge = { judge: function () { return null; } };
+    try {
 
     // ---- require と公開 API：document 無しで読み込め、html(ctx) が文字列を返す ----
     assert.strictEqual(typeof truth.render, 'function');
@@ -253,5 +258,37 @@ module.exports = {
     [h, h2, h4, h6, hr].forEach(function (s) {
       assert.ok(!banned.test(s), '用語はカタカナ正典');
     });
+
+    // ---- アプリ判定（PD.localjudge をスタブ）：カード・候補・保存条件 ----
+    PDg.localjudge = { judge: function () {
+      return {
+        available: true, required: 30,
+        f1: { ok: true, expect: 30, got: 30, diff: 0, tol: 5, pureAlpha: 25 },
+        f2: { ok: false, expect: { trash: 40, hi: 20, pairPlus: 40 }, got: { trash: 50, hi: 20, pairPlus: 30 }, diff: {}, tol: 8 },
+        f3: { ok: true, expect: { shiftPct: 0, ranks: [] }, got: { shiftPct: 0, ranks: [], noDraw: true }, missingRanks: [], extraRanks: [], tol: 6 },
+        f4: { ok: false, expect: { pureAir: 35, enough: true }, got: { pureAirPct: 50, enough: 'yes', foldList: ['J2o'] }, tol: 8,
+          invalid: [{ hand: 'J2o', why: 'コールレンジに居ない' }], orderOk: true },
+        f5: { ok: true, predicted: { position: 'in', action: 'fold', percentile: 12.3, cat: 'trash' }, got: { position: 'edge', action: 'fold' }, note: '予測' },
+        stats: { total: 1 }, summary: { okCount: 3, total: 5, score: { size_fold: 2, draw_protect: 4, action: 1 } }
+      };
+    } };
+    var ctxL = ctxWith(mockEntry());
+    var hL = truth.html(ctxL);
+    assert.ok(hL.indexOf('アプリ判定') >= 0 && hL.indexOf('3/5') >= 0, 'アプリ判定カードと ○ の数');
+    assert.strictEqual((hL.match(/pd-truth-local-row" data-ok="1"/g) || []).length, 3, '○ の行が3つ');
+    assert.ok(hL.indexOf('J2o（コールレンジに居ない）') >= 0, '④の無効な手を表示');
+    assert.ok(hL.indexOf('Wizard で検算する（任意）') >= 0, 'Wizard は任意に格下げ');
+    assert.ok(/data-role="save-msg"[^>]*data-ok="0">未入力：自己採点（残り 4 項目）/.test(hL), '真値は必須でなくなる');
+    assert.ok(/data-score="drawProtect" data-val="4" aria-pressed="false" data-cand="1"/.test(hL), 'アプリ判定から drawProtect の候補');
+    assert.ok(/data-score="action" data-val="1" aria-pressed="false" data-cand="1"/.test(hL), 'アプリ判定から action の候補');
+    assert.ok(ctxL.entry.local && ctxL.entry.local.available === true && ctxL.entry.local.stats === undefined, 'entry.local に stats 抜きで残る');
+    // レンジ未入力（available:false）：案内カードと、真値が再び必須
+    PDg.localjudge = { judge: function () { return { available: false, reason: 'レンジ表が未入力' }; } };
+    var hU = truth.html(ctxWith(mockEntry()));
+    assert.ok(hU.indexOf('設定でレンジ表を埋める') >= 0, 'レンジ未入力の案内');
+    assert.ok(/data-role="save-msg"[^>]*data-ok="0">未入力：真値・/.test(hU), 'レンジ未入力なら真値は必須のまま');
+    } finally {
+      if (realLJ === undefined) { delete PDg.localjudge; } else { PDg.localjudge = realLJ; }
+    }
   }
 };

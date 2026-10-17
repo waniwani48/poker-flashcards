@@ -81,6 +81,12 @@
   margin: 0 0 var(--gap-1);
 }
 
+.pd-memo-expect-hands {
+  margin: 2px 0 var(--gap-1);
+  font-size: 18px;
+  font-weight: 600;
+}
+
 .pd-memo-expect-line .pd-small {
   margin-left: 6px;
 }

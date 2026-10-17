@@ -339,6 +339,66 @@
 }
 
 /* ---- リセット（ink の枠だけ。umber は使わない） ---- */
+/* ---- BB の守りレンジ 13×13 ---- */
+.pd-range-grid {
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  gap: 2px;
+  margin: var(--gap-1) 0;
+}
+
+.pd-range-cell {
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.85);
+  background: #2f4b63;
+  transition: filter 80ms;
+}
+
+.pd-range-cell:active { filter: brightness(1.25); }
+.pd-range-cell[data-state="call"] { background: var(--act-call); color: var(--lamp-ink); }
+.pd-range-cell[data-state="3bet"] { background: var(--act-raise); color: #fff; }
+.pd-range-cell[data-state="mix"] {
+  background: linear-gradient(135deg, var(--act-call) 0 50%, var(--act-raise) 50% 100%);
+  color: var(--lamp-ink);
+}
+
+.pd-range-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0 0 var(--gap-1);
+  color: var(--mute);
+}
+
+.pd-range-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 2px;
+  vertical-align: -1px;
+  background: #2f4b63;
+}
+
+.pd-range-legend span[data-state="call"]::before { background: var(--act-call); }
+.pd-range-legend span[data-state="3bet"]::before { background: var(--act-raise); }
+.pd-range-legend span[data-state="mix"]::before { background: linear-gradient(135deg, var(--act-call) 0 50%, var(--act-raise) 50% 100%); }
+
+@media (min-width: 600px) {
+  .pd-range-cell { font-size: 12px; }
+}
+
 .pd-settings-danger {
   margin-top: var(--gap-1);
   border-color: var(--line-strong);

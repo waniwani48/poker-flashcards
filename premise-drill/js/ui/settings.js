@@ -43,7 +43,9 @@ PD.ui.settings = (function () {
     { id: 1, label: '小数1桁' },
     { id: 2, label: '小数2桁' }
   ];
-  var CARDS = ['claude', 'wizard', 'extra', 'memo', 'data', 'reset'];
+  var CARDS = ['claude', 'range', 'wizard', 'extra', 'memo', 'data', 'reset'];
+  var RANGE_STATE_LABEL = { fold: 'フォールド', call: 'コール', '3bet': '3bet', mix: '混合' };
+  var RANGE_CLEAR_CONFIRM = 'レンジ表の自分の編集を消して、同梱の初期値に戻す。\n本当に戻す？';
   var MEMO_DECKS = [
     { id: 'alpha', label: '必要fold%（α）' },
     { id: 'eqgap', label: 'EQ差' },
@@ -428,6 +430,46 @@ PD.ui.settings = (function () {
     '</section>';
   }
 
+  // ---- BB の守りレンジ（13×13。アプリ判定と暗記 PF の正解の土台）----
+  function rangeApi() { return PD.range || null; }
+
+  function rangeStatusHTML(R, range) {
+    var sum = (R && typeof R.summary === 'function') ? R.summary(range) : null;
+    if (!sum) return '—';
+    var filled = (typeof R.isFilled === 'function') ? R.isFilled(range) : false;
+    return 'コール <b>' + esc(sum.callPct) + '%</b>（' + esc(sum.callCombos) + ' コンボ）／3bet <b>' + esc(sum.threeBetPct) + '%</b>（' +
+      esc(sum.threeBetCombos) + ' コンボ）' + (filled ? '' : '／<span class="pd-settings-pending">未入力（コール 20 セル以上で判定が有効）</span>');
+  }
+
+  function rangeCellHTML(hand, state) {
+    var st = RANGE_STATE_LABEL[state] ? state : 'fold';
+    return '<button type="button" class="pd-range-cell" data-act="range-cell" data-hand="' + esc(hand) + '" data-state="' + esc(st) +
+      '" aria-label="' + esc(hand) + ' ' + esc(RANGE_STATE_LABEL[st]) + '">' + esc(hand) + '</button>';
+  }
+
+  function cardRange(ctx) {
+    var R = rangeApi();
+    var head = '<section class="pd-card pd-settings-card" data-card="range">' + kicker('BB の守りレンジ（vs BTN 2.5bb）') + '<h2>レンジ表</h2>';
+    if (!R || !Array.isArray(R.HAND_GRID) || typeof R.load !== 'function') {
+      return head + '<p class="pd-small pd-mute">レンジモジュールが読み込まれていない。</p></section>';
+    }
+    var range = R.load();
+    var cells = R.HAND_GRID.map(function (row) {
+      return row.map(function (hand) { return rangeCellHTML(hand, (range.cells || {})[hand] || 'fold'); }).join('');
+    }).join('');
+    return head +
+      '<p class="pd-small pd-mute">タップで <b>フォールド → コール → 3bet → 混合</b> と切り替わる（即保存）。Wizard の BB 応答ノードを見ながら埋める。' +
+      'この表が前提票①〜⑤のアプリ判定と、暗記 PF 境界の正解になる。</p>' +
+      '<p class="pd-settings-status" data-role="range-status">' + rangeStatusHTML(R, range) + '</p>' +
+      '<div class="pd-range-grid" role="group" aria-label="BB の守りレンジ 13×13">' + cells + '</div>' +
+      '<p class="pd-range-legend pd-small"><span data-state="fold">フォールド</span><span data-state="call">コール</span>' +
+        '<span data-state="3bet">3bet</span><span data-state="mix">混合</span></p>' +
+      '<div class="pd-settings-row">' +
+        '<button type="button" class="pd-btn pd-btn-ghost" data-act="range-clear">自分の編集を消して初期値に戻す</button>' +
+      '</div>' +
+    '</section>';
+  }
+
   // ---- リセット ----
   function cardReset() {
     return '<section class="pd-card pd-settings-card" data-card="reset">' +
@@ -441,6 +483,7 @@ PD.ui.settings = (function () {
   function cardHTML(ctx, name) {
     switch (name) {
       case 'claude': return cardClaude(ctx);
+      case 'range': return cardRange(ctx);
       case 'wizard': return cardWizard(ctx);
       case 'extra': return cardExtra(ctx);
       case 'memo': return cardMemo(ctx);
@@ -576,6 +619,27 @@ PD.ui.settings = (function () {
     return result(true, msg, ['extra', 'data'], { added: r.added, skipped: r.skipped });
   }
 
+  function actRangeCell(ctx, hand) {
+    var R = rangeApi();
+    if (!R || typeof R.load !== 'function' || typeof R.cycle !== 'function' || typeof R.setCell !== 'function') {
+      return result(false, 'レンジモジュールが見つからない');
+    }
+    var range = R.load();
+    var cur = (range.cells || {})[hand] || 'fold';
+    var next = R.cycle(cur);
+    var updated = R.setCell(range, hand, next, new Date().toISOString());
+    var saved = (typeof R.save === 'function') ? R.save(updated) : false;
+    if (!saved) return result(false, '保存できなかった（ストレージ容量か、プライベートモード）');
+    return result(true, '', [], { hand: hand, state: next, status: rangeStatusHTML(R, updated) });
+  }
+
+  function actRangeClear(ctx) {
+    var R = rangeApi();
+    if (!R || typeof R.clear !== 'function') return result(false, 'レンジモジュールが見つからない');
+    R.clear();
+    return result(true, '初期値に戻した', ['range']);
+  }
+
   /** 確認ダイアログは render 側。ここは消すだけ（pokerApiKey は store.resetAll が残す） */
   function actReset(ctx) {
     var st = store();
@@ -604,6 +668,8 @@ PD.ui.settings = (function () {
       case 'extra-revive': return actExtraRevive(ctx, val);
       case 'memo-deck': return actMemoDeck(ctx, val);
       case 'memo-reset': return actMemoReset(ctx);
+      case 'range-cell': return actRangeCell(ctx, val);
+      case 'range-clear': return actRangeClear(ctx);
       case 'export': return actExport(ctx);
       case 'import': return actImport(ctx, val);
       case 'reset': return actReset(ctx);
@@ -813,6 +879,27 @@ PD.ui.settings = (function () {
       }
       case 'reset': onReset(el, ctx); return;
       case 'memo-reset': onMemoReset(el, ctx); return;
+      case 'range-cell': {
+        var hand = target.getAttribute('data-hand');
+        r = apply(ctx, 'range-cell', hand);
+        if (r.ok && r.data) {
+          target.setAttribute('data-state', r.data.state);
+          target.setAttribute('aria-label', hand + ' ' + (RANGE_STATE_LABEL[r.data.state] || r.data.state));
+          var st = q(el, '[data-role="range-status"]');
+          if (st) st.innerHTML = r.data.status;
+        } else {
+          toast(ctx, r.msg);
+        }
+        return;
+      }
+      case 'range-clear': {
+        var okc = (typeof root.confirm === 'function') ? root.confirm(RANGE_CLEAR_CONFIRM) : false;
+        if (!okc) return;
+        r = apply(ctx, 'range-clear');
+        if (r.ok) applyCards(el, ctx, r.cards);
+        toast(ctx, r.msg);
+        return;
+      }
       default: return;
     }
   }

@@ -296,9 +296,26 @@ PD.ui.home = (function () {
     );
   }
 
+  /** BB の守りレンジ表が未入力なら最上段で案内（埋まれば消える） */
+  function rangeNudgeHtml() {
+    var R = PD.range;
+    if (!R || typeof R.load !== 'function' || typeof R.isFilled !== 'function') return '';
+    var filled = false;
+    try { filled = R.isFilled(R.load()); } catch (e) { filled = false; }
+    if (filled) return '';
+    return (
+      '<section class="pd-card pd-home-nudge">' +
+        '<p class="pd-home-resume-title">まず BB の守りレンジ表を埋める</p>' +
+        '<p class="pd-small pd-mute">13×13 をタップで埋めると、答え合わせが Wizard を開かずにアプリ内で終わる。暗記 PF の正解にもなる。</p>' +
+        '<button type="button" class="pd-btn pd-btn-primary" data-go="settings">設定で埋める</button>' +
+      '</section>'
+    );
+  }
+
   function html(ctx) {
     return (
       '<div class="pd-home">' +
+        rangeNudgeHtml() +
         resumeHtml(ctx) +
         orderCardHtml(ctx) +
         startHtml(ctx) +

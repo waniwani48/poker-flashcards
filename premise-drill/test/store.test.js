@@ -503,6 +503,10 @@ module.exports = {
     if (globalThis.PD && globalThis.PD.memo && typeof globalThis.PD.memo.KEY === 'string') {
       expectedKeys.push(globalThis.PD.memo.KEY);
     }
+    // PD.range（レンジ表）も同様：読み込まれていれば exportJSON が pd_range_v1 を読む（SPEC-judge §3）
+    if (globalThis.PD && globalThis.PD.range && typeof globalThis.PD.range.KEY === 'string') {
+      expectedKeys.push(globalThis.PD.range.KEY);
+    }
     expectedKeys.sort();
     assert.deepStrictEqual(touched, expectedKeys, '触ったキー: ' + touched.join(','));
     for (i = 0; i < OWN_KEYS.length; i++) {
