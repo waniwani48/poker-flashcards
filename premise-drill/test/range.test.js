@@ -408,6 +408,13 @@ function body(assert, origData) {
   assert.deepStrictEqual(bd2.off, { K: 'KTo', Q: 'QTo', J: 'JTo' });
   assert.strictEqual(bd2.pocket, '22');
   assert.deepStrictEqual(bd2.threeBet, ['AA', 'KK', 'AKs', 'A5s', 'A4s'], '3bet と mix を強い順に');
+  assert.deepStrictEqual(bd2.threeBetValue, ['AA', 'KK', 'AKs'], 'value：99+／AJs+／AQ・AK／KQs');
+  assert.deepStrictEqual(bd2.threeBetBluff, ['A5s', 'A4s'], 'bluff：value 以外の 3bet/mix');
+  assert.deepStrictEqual(bd2.threeBetGroups, [{ id: 'axs', label: 'A スーテッド（低キッカー）', hands: ['A5s', 'A4s'] }], 'bluff は形ごと');
+  var pfv = R.pfAnswer(bRange, 'pf_3bet_value');
+  var pfb = R.pfAnswer(bRange, 'pf_3bet_bluff');
+  assert.ok(pfv && pfv.kind === 'list' && pfv.expect.indexOf('AA') >= 0 && pfv.expect.indexOf('A5s') < 0, 'pf_3bet_value は value だけ');
+  assert.ok(pfb && pfb.kind === 'list' && pfb.expect.indexOf('AA') < 0 && pfb.expect.indexOf('A5s') >= 0 && Array.isArray(pfb.groups), 'pf_3bet_bluff は bluff だけ＋groups');
   var bNone = R.boundaries(build(['AA', 'KK']));
   assert.strictEqual(bNone.As, null);
   assert.strictEqual(bNone.Ks, null);
@@ -425,7 +432,7 @@ function body(assert, origData) {
   assert.deepStrictEqual(R.pfAnswer(bRange, 'pf_JTs'), { expect: ['65s'], kind: 'hand' });
   assert.deepStrictEqual(R.pfAnswer(bRange, 'pf_off'), { expect: ['KTo', 'QTo', 'JTo'], kind: 'hand' });
   assert.deepStrictEqual(R.pfAnswer(bRange, 'pf_pocket'), { expect: ['22'], kind: 'hand' });
-  assert.deepStrictEqual(R.pfAnswer(bRange, 'pf_3bet_value'), { expect: ['AA', 'KK', 'AKs', 'A5s', 'A4s'], kind: 'list' });
+  assert.deepStrictEqual(R.pfAnswer(bRange, 'pf_3bet_value').expect, ['AA', 'KK', 'AKs'], 'pf_3bet_value は value だけ');
   assert.strictEqual(R.pfAnswer(bRange, 'pf_3bet_bluff').kind, 'list');
   assert.strictEqual(R.pfAnswer(bRange, 'alpha_33'), null, '未知の id は null');
 

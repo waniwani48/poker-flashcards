@@ -235,8 +235,15 @@ PD.ui.memo = (function () {
     } else {
       var ref = pfReference(cardId);
       if (ref) {
-        out += '<div class="pd-memo-expect"><p class="pd-small pd-mute">参考：レンジ表で 3bet／混合にしている手（判定は本人）</p>' +
-          '<p class="pd-mono pd-memo-expect-hands">' + esc(ref.expect.join('・')) + '</p></div>';
+        out += '<div class="pd-memo-expect"><p class="pd-small pd-mute">参考：レンジ表で ' + esc(ref.label || '3bet／混合にしている手') + '（判定は本人）</p>';
+        if (Array.isArray(ref.groups) && ref.groups.length) {
+          out += '<ul class="pd-memo-list pd-memo-groups">' + ref.groups.map(function (g) {
+            return '<li><span class="pd-small pd-mute">' + esc(g.label) + '：</span><span class="pd-mono">' + esc(g.hands.join('・')) + '</span></li>';
+          }).join('') + '</ul>';
+        } else {
+          out += '<p class="pd-mono pd-memo-expect-hands">' + esc(ref.expect.join('・')) + '</p>';
+        }
+        out += '</div>';
       }
     }
     out += '<p class="pd-memo-prevnote pd-small pd-mute">前回のメモ：' + (prior ? esc(prior) : '未確認') + '</p>';

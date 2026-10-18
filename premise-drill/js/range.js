@@ -654,6 +654,34 @@ PD.range = (function (cardsDep) {
     return (A.kind === 's' ? 0 : 1) - (B.kind === 's' ? 0 : 1);
   }
 
+  /** 3bet セルの value／bluff 分け（ヒューリスティック）：ポケット 99 以上、A＋J 以上（AJs・AQ・AK）、KQs を value。残りは bluff */
+  function isValueThreeBet(hand) {
+    var h = HAND_INFO[hand];
+    if (!h) return false;
+    if (h.kind === 'pair') return h.hi >= 9;
+    if (h.hi === 14 && h.lo >= 11) return true;
+    if (h.hi === 13 && h.lo === 12 && h.kind === 's') return true;
+    return false;
+  }
+
+  /** bluff 3bet の形。記憶用の分類：sc（スーテッドコネクター系・1ギャップまで）／axs（低キッカーの A スーテッド）／lowS（その他の低スーテッド＝相手のオープン下限）／off（オフスートの境界手）／pair（小ポケット） */
+  var BLUFF_GROUPS = [
+    { id: 'sc', label: 'スーテッドコネクター系' },
+    { id: 'axs', label: 'A スーテッド（低キッカー）' },
+    { id: 'lowS', label: '低スーテッド（相手のオープン下限）' },
+    { id: 'off', label: 'オフスートの境界手' },
+    { id: 'pair', label: '小ポケット' }
+  ];
+  function bluffGroupOf(hand) {
+    var h = HAND_INFO[hand];
+    if (!h) return 'lowS';
+    if (h.kind === 'pair') return 'pair';
+    if (h.kind === 'o') return 'off';
+    if (h.hi === 14) return 'axs';
+    if (h.hi - h.lo <= 2) return 'sc';
+    return 'lowS';
+  }
+
   function boundaries(range) {
     var rg = normalizeRange(range);
     var tb = [];
@@ -662,6 +690,15 @@ PD.range = (function (cardsDep) {
       if (st === '3bet' || st === 'mix') tb.push(HANDS[i]);
     }
     tb.sort(strengthCmp);
+    var value = [];
+    var bluff = [];
+    for (i = 0; i < tb.length; i++) (isValueThreeBet(tb[i]) ? value : bluff).push(tb[i]);
+    var groups = [];
+    for (i = 0; i < BLUFF_GROUPS.length; i++) {
+      var g = BLUFF_GROUPS[i];
+      var hands = bluff.filter(function (h) { return bluffGroupOf(h) === g.id; });
+      if (hands.length) groups.push({ id: g.id, label: g.label, hands: hands });
+    }
     return {
       As: lowestLive(rg, 'A', 's'),
       Ks: lowestLive(rg, 'K', 's'),
@@ -669,7 +706,10 @@ PD.range = (function (cardsDep) {
       sc: lowestConnector(rg),
       off: { K: lowestLive(rg, 'K', 'o'), Q: lowestLive(rg, 'Q', 'o'), J: lowestLive(rg, 'J', 'o') },
       pocket: lowestPocket(rg),
-      threeBet: tb
+      threeBet: tb,
+      threeBetValue: value,
+      threeBetBluff: bluff,
+      threeBetGroups: groups
     };
   }
 
@@ -688,8 +728,9 @@ PD.range = (function (cardsDep) {
         return { expect: [bd.off.K, bd.off.Q, bd.off.J].filter(function (h) { return !!h; }), kind: 'hand' };
       case 'pf_pocket': return one(bd.pocket);
       case 'pf_3bet_value':
+        return { expect: bd.threeBetValue.slice(), kind: 'list', label: 'value で 3bet している手' };
       case 'pf_3bet_bluff':
-        return { expect: bd.threeBet.slice(), kind: 'list' };
+        return { expect: bd.threeBetBluff.slice(), kind: 'list', label: 'bluff で 3bet している手（形ごと）', groups: bd.threeBetGroups };
       default: return null;
     }
   }
