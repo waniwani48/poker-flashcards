@@ -432,9 +432,9 @@ PD.ui.drill = (function () {
     return (
       '<p class="pd-drill-numlabel pd-small">(a) 手札に1枚あれば、ボード3枚と合わせて4枚のストレートドロー（OESD／ガット）になるランク（複数可。完成カードではない）</p>' +
       rankChips(v.drawRanks, noDraw) +
-      checkInput('f3', 'noDraw', noDraw, 'ドロー無しと宣言する') +
-      numInput('f3', 'shiftPct', v.shiftPct, { label: '(b) 守る側に移る量（レンジ全体に対する%。ドロー無しなら 0）', unit: '%' }) +
-      listBlock('f3.examples', v.examples, { label: field.compact ? '(c) 移る手の例（任意）' : '(c) 移る手の例（最低2つ。ドロー無しなら 0 可）' })
+      checkInput('f3', 'noDraw', noDraw, '1枚でのストレートドローは無い') +
+      numInput('f3', 'shiftPct', v.shiftPct, { label: '(b) 守る側に移る量（FD・バックドア含む。レンジ全体に対する%。何も無ければ 0）', unit: '%' }) +
+      listBlock('f3.examples', v.examples, { label: field.compact ? '(c) 移る手の例（任意）' : '(c) 移る手の例（最低2つ。移る量 0 なら省略可）' })
     );
   }
 

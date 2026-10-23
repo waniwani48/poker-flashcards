@@ -48,7 +48,7 @@ PD.sheet = (function () {
       note: '3betに回った上位とプリフロで降りた下位は居ない',
       hints: [
         'このボードで A や K が当たった手はどのバケツへ？',
-        'ハイカードが落ちるとヒット群が独立し、ハイカード比率が減る'
+        'アンカー：ポケット13／Aハイ23／Kハイ18／残り46。ボードの各ランクが当たる分だけペアへ移す（9・8・7 はスーコネ帯で厚い）'
       ]
     },
     {
@@ -237,10 +237,10 @@ PD.sheet = (function () {
     if (!noDraw && ranks.length === 0) return ng('③ドローのランクを選ぶか「ドロー無し」を宣言');
     if (noDraw && ranks.length > 0) return ng('③「ドロー無し」宣言とランク選択が両立している');
     if (!inRange(v.shiftPct, 0, 100)) return ng('③守る側に移る量%（レンジ全体比）を入力');
-    if (noDraw && v.shiftPct !== 0) return ng('③「ドロー無し」なら移る量は 0%');
+    // noDraw は「1枚でのストレートドローが無い」の宣言。FD・バックドアの移動量（shiftPct）は別なので 0 を強制しない
     var ex = Array.isArray(v.examples) ? v.examples : [];
     if (!allValidHands(ex)) return ng('③例のハンド名が不正（A4s／AKo／55 形式）');
-    if (!noDraw && !compact && ex.length < MIN.examples) return ng('③移る手の例を最低' + MIN.examples + 'つ');
+    if (!compact && v.shiftPct > 0 && ex.length < MIN.examples) return ng('③移る手の例を最低' + MIN.examples + 'つ（移る量 0 なら省略可）');
     return ok();
   }
 
@@ -336,7 +336,7 @@ PD.sheet = (function () {
 
   /**
    * 充足＋算術整合のみ。正誤判定はしない。
-   * f3: noDraw なら shiftPct===0 必須。f4: pureAirPct が f2.trash − f3.shiftPct と ±5 以内。
+   * f3: noDraw は(a)ストレートドローの宣言のみ（FD・BD があれば shiftPct>0 でよい）。f4: pureAirPct が f2.trash − f3.shiftPct と ±5 以内。
    * field.compact（speed）では③例は任意、④enough は自動で yes・nextLayer 省略・foldList 1〜3、⑤2枚チェック・キッカー・確信度は省略可。
    */
   function isFilled(field, values, spot) {

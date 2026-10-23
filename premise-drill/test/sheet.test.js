@@ -100,12 +100,14 @@ module.exports = {
     v.f4.nextLayer = ['A4o'];
     assert.strictEqual(sheet.isFilled(F('f4'), v, spot).ok, true, 'no で nextLayer 1件が ng');
 
-    // ---- 受入：f3 noDraw:true かつ shiftPct:10→ng、shiftPct:0→ok ----
+    // ---- 受入：f3 noDraw はストレートドローの宣言のみ。FD 等があれば shiftPct>0 でよい（例は shift>0 なら必須）----
     v = fullValues();
     v.f3 = { noDraw: true, drawRanks: [], shiftPct: 10, examples: [] };
-    assert.strictEqual(sheet.isFilled(F('f3'), v, spot).ok, false, 'noDraw+shift10 が ok');
+    assert.strictEqual(sheet.isFilled(F('f3'), v, spot).ok, false, 'noDraw+shift10 でも例が無ければ ng（FD 等を名指しする）');
+    v.f3 = { noDraw: true, drawRanks: [], shiftPct: 10, examples: ['QsTs', '65s'] };
+    assert.strictEqual(sheet.isFilled(F('f3'), v, spot).ok, true, 'noDraw でも FD 等で shift>0＋例2つは ok');
     v.f3 = { noDraw: true, drawRanks: [], shiftPct: 0, examples: [] };
-    assert.strictEqual(sheet.isFilled(F('f3'), v, spot).ok, true, 'noDraw+shift0 が ng');
+    assert.strictEqual(sheet.isFilled(F('f3'), v, spot).ok, true, 'noDraw+shift0 は例なしで ok');
     v.f3 = { noDraw: false, drawRanks: [], shiftPct: 0, examples: [] };
     assert.strictEqual(sheet.isFilled(F('f3'), v, spot).ok, false, 'ランク無し・宣言無しが ok');
     v.f3 = { noDraw: false, drawRanks: ['T'], shiftPct: 5, examples: ['T9o'] };
