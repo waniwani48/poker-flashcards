@@ -400,7 +400,7 @@ PD.ui.drill = (function () {
       var chips = (api && api.SPEED_OPTIONS && api.SPEED_OPTIONS.foldChips) || [20, 25, 30, 35, 40, 45, 50];
       return chipGroup('f1', 'foldPct', v.foldPct, chips.map(function (n) { return { v: n, label: n + '%' }; }), { label: '必要 fold%' });
     }
-    return numInput('f1', 'foldPct', v.foldPct, { label: 'このサイズに対して自レンジの何%が降りる必要があるか', unit: '%' });
+    return numInput('f1', 'foldPct', v.foldPct, { label: 'このベット額に対して、自レンジの何%まで降りてよいか（暗記値）', unit: '%' });
   }
 
   function f2Body(field, sheet) {
@@ -442,16 +442,16 @@ PD.ui.drill = (function () {
     var v = sheet.f4 || {};
     var f1 = sheet.f1 || {};
     var ref = isNum(f1.foldPct) ? '（①：' + f1.foldPct + '%）' : '';
-    var html = numInput('f4', 'pureAirPct', v.pureAirPct, { label: '(1) 純air%（レンジ全体に対する%。②trash − ③移る量 と ±5 以内）', unit: '%' });
+    var html = numInput('f4', 'pureAirPct', v.pureAirPct, { label: '(1) 純air%＝②trash − ③移る量。「ドローも何も無い手」がレンジの何%か（±5 で検算）', unit: '%' });
     if (field.compact) {
       var api = S();
       var max = (api && api.SPEED_OPTIONS && api.SPEED_OPTIONS.maxFoldList) || 3;
       html += listBlock('f4.foldList', v.foldList, { label: '(2) fold 組を弱い順に（最大' + max + 'つ）', reorder: true, max: max });
       return html;
     }
-    html += chipGroup('f4', 'enough', v.enough, [{ v: 'yes', label: '足りる' }, { v: 'no', label: '足りない' }], { label: '(2) 純air だけで必要 fold%' + ref + ' に足りる？' });
-    html += listBlock('f4.foldList', v.foldList, { label: '(3) fold 組を弱い順に名指し（最低3つ。◀▶で並べ替え）', reorder: true });
-    html += listBlock('f4.nextLayer', v.nextLayer, { label: '(4) 足りないなら、次の層から捻出する手（最低1つ）', hidden: v.enough !== 'no' });
+    html += chipGroup('f4', 'enough', v.enough, [{ v: 'yes', label: '足りる' }, { v: 'no', label: '足りない' }], { label: '(2) 純air を全部降ろすだけで、①の必要 fold%' + ref + ' に足りる？' });
+    html += listBlock('f4.foldList', v.foldList, { label: '(3) 実際に降ろす手（＝fold 組）を弱い順に名指し（最低3つ。◀▶で並べ替え）', reorder: true });
+    html += listBlock('f4.nextLayer', v.nextLayer, { label: '(4) 足りない分：次に弱い層から降ろす手を名指し（最低1つ）', hidden: v.enough !== 'no' });
     return html;
   }
 
@@ -459,14 +459,14 @@ PD.ui.drill = (function () {
     var v = sheet.f5 || {};
     var html = '';
     if (!field.compact) {
-      html += '<p class="pd-drill-numlabel pd-small">2枚で見るチェック（当てはまるものを付ける）</p><div class="pd-drill-checks">';
+      html += '<p class="pd-drill-numlabel pd-small">手札2枚に付いているもの（当てはまる物にチェック）</p><div class="pd-drill-checks">';
       HERO_CHECKS.forEach(function (c) { html += checkInput('f5', c.k, v[c.k] === true, c.label); });
       html += '</div>';
       html += textInput('f5', 'kickerNote', v.kickerNote, { label: 'キッカーメモ', placeholder: 'キッカーについて一言' });
     }
     html += chipGroup('f5', 'position', v.position, [
       { v: 'in', label: POS_LABEL.in }, { v: 'edge', label: POS_LABEL.edge }, { v: 'above', label: POS_LABEL.above }
-    ], { label: '自分のハンドは fold 組のどこ？' });
+    ], { label: '自分のハンドは、④の fold 組に対してどこに居る？' });
     html += chipGroup('f5', 'action', v.action, [
       { v: 'call', label: ACTION_LABEL.call }, { v: 'fold', label: ACTION_LABEL.fold }
     ], { label: '判定' });
