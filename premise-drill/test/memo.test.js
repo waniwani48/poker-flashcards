@@ -46,7 +46,7 @@ module.exports = {
     var d0 = memo.defaultState();
     assert.strictEqual(d0.version, 1);
     assert.deepStrictEqual(d0.cards, {});
-    assert.deepStrictEqual(d0.decks, { alpha: true, eqgap: true, pf: true, board: true });
+    assert.deepStrictEqual(d0.decks, { alpha: true, anchor: true, eqgap: true, pf: true, board: true });
     assert.strictEqual(d0.daily.done, 0);
     assert.strictEqual(d0.daily.finished, false);
 
@@ -58,28 +58,41 @@ module.exports = {
     assert.strictEqual(memo.BOARD_PER_DAY, 3);
     assert.strictEqual(memo.CARDS.filter(function (c) { return c.deck === 'alpha'; }).length, 4);
     assert.strictEqual(memo.CARDS.filter(function (c) { return c.deck === 'eqgap'; }).length, 2);
+    assert.strictEqual(memo.CARDS.filter(function (c) { return c.deck === 'anchor'; }).length, 4);
     assert.strictEqual(memo.CARDS.filter(function (c) { return c.deck === 'pf'; }).length, 8);
 
     // ---------------------------------------------------------------- todaySet（初日）
     var s1 = memo.defaultState();
     var rng = function () { return 0; };
     var set1 = memo.todaySet(s1, T0, rng);
-    var byDeck = { alpha: 0, eqgap: 0, pf: 0, board: 0 };
+    var byDeck = { alpha: 0, anchor: 0, eqgap: 0, pf: 0, board: 0 };
     set1.forEach(function (item) { byDeck[item.card.deck]++; });
     assert.strictEqual(byDeck.alpha, 4, '初日 alpha は4枚全部');
+    assert.strictEqual(byDeck.anchor, 4, '初日 anchor は4枚全部');
     assert.strictEqual(byDeck.eqgap, 2, '初日 eqgap は2枚全部');
     assert.strictEqual(byDeck.pf, 4, '初日 pf は NEW_PER_DAY=4 枚まで');
     assert.strictEqual(byDeck.board, 3, 'board は常に3枚');
-    assert.strictEqual(set1.length, 13);
+    assert.strictEqual(set1.length, 17);
 
     // deck off なら除外
     var s1b = memo.defaultState();
     s1b.decks.pf = false;
+    s1b.decks.anchor = false;
     s1b.decks.board = false;
     var set1b = memo.todaySet(s1b, T0, rng);
     assert.ok(!set1b.some(function (item) { return item.card.deck === 'pf'; }), 'pf オフは除外');
     assert.ok(!set1b.some(function (item) { return item.card.deck === 'board'; }), 'board オフは除外');
     assert.strictEqual(set1b.length, 6, 'alpha4+eqgap2のみ');
+
+    // ---------------------------------------------------------------- checkAnchor
+    assert.strictEqual(memo.checkAnchor('anchor_base', '13 23 18 46').ok, true);
+    assert.strictEqual(memo.checkAnchor('anchor_base', '13/23/18/46').ok, true, '区切りは何でもよい');
+    assert.strictEqual(memo.checkAnchor('anchor_base', '13 23 18').ok, false, '個数不足は不正解');
+    assert.strictEqual(memo.checkAnchor('anchor_base', '46 18 23 13').ok, false, '順序も見る');
+    assert.strictEqual(memo.checkAnchor('anchor_except', '9 15').ok, true);
+    assert.strictEqual(memo.checkAnchor('anchor_defend', '32 26 36').ok, true);
+    assert.strictEqual(memo.checkAnchor('alpha_33', '30'), null, 'anchor 以外は null');
+    assert.strictEqual(memo.anchorSteps().length, 3);
 
     // ---------------------------------------------------------------- grade
     var g0 = memo.defaultState();

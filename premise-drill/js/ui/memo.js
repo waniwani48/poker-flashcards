@@ -20,7 +20,7 @@ if (typeof require === 'function') {
 PD.ui.memo = (function () {
   'use strict';
 
-  var DECK_LABEL = { alpha: '必要fold%（α）', pf: 'PF境界', eqgap: 'EQ差', board: 'ボード' };
+  var DECK_LABEL = { alpha: '必要fold%（α）', anchor: '3バケツ・アンカー', pf: 'PF境界', eqgap: 'EQ差', board: 'ボード' };
   var CLS_ORDER_FALLBACK = ['dry_high', 'bw_sd', 'mid', 'low', 'paired', 'mono', 'trips'];
   var CLS_LABEL_FALLBACK = {
     dry_high: 'ドライ・ハイ', bw_sd: 'ブロードウェイSD', mid: 'ミドル', low: 'ロー',
@@ -335,8 +335,52 @@ PD.ui.memo = (function () {
     return out;
   }
 
+  // ---- anchor：数値列カードは自動判定、手順カード（lines）は手本を出して本人 ○× ----
+  function anchorResult(m, cardId) {
+    var api = memoApi();
+    if (!api || typeof api.checkAnchor !== 'function') return null;
+    try { return api.checkAnchor(cardId, fieldVal(m, 'value')); } catch (e) { return null; }
+  }
+
+  function anchorOk(m, item) {
+    var card = (item && item.card) || {};
+    var res = anchorResult(m, card.id);
+    return !!(res && res.ok);
+  }
+
+  function revealAnchorNums(m, cardId) {
+    var raw = fieldVal(m, 'value');
+    var res = anchorResult(m, cardId);
+    var out = '<p class="pd-memo-yourinput">本人の入力：<span class="pd-mono">' + (esc(raw) || '（未記入）') + '</span></p>';
+    if (res) {
+      out += '<p class="pd-memo-expect-line">暗記値：<span class="pd-mono">' + esc(res.expect.join('／')) + '</span></p>';
+      out += '<p class="pd-memo-verdict" data-ok="' + (res.ok ? '1' : '0') + '">' + (res.ok ? '○ 正解' : '× 不正解') + '</p>';
+    }
+    return out;
+  }
+
+  function revealAnchorSteps(m) {
+    var raw = fieldVal(m, 'value');
+    var lines = raw.split('\n').map(trim).filter(function (s) { return !!s; });
+    var api = memoApi();
+    var expect = (api && typeof api.anchorSteps === 'function') ? (api.anchorSteps() || []) : [];
+    function list(arr, emptyMsg) {
+      if (!arr.length) return '<p class="pd-small pd-mute">' + emptyMsg + '</p>';
+      return '<ul class="pd-memo-list">' + arr.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
+    }
+    return (
+      '<div class="pd-memo-yourinput"><p class="pd-small pd-mute">本人の入力：</p>' + list(lines, '（未記入）') + '</div>' +
+      '<div class="pd-memo-expect"><p class="pd-small pd-mute">手本：</p>' + list(expect, '（取得できません）') + '</div>'
+    );
+  }
+
+  function deckOf(item) {
+    return (item && item.card && item.card.deck) || '';
+  }
+
   function revealBody(m, item, cardId) {
     var kind = kindOf(item);
+    if (deckOf(item) === 'anchor') return kind === 'lines' ? revealAnchorSteps(m) : revealAnchorNums(m, cardId);
     if (kind === 'number') return revealAlpha(m, cardId);
     if (kind === 'lines') return revealEqgap(m, cardId);
     if (kind === 'board') return revealBoard(m, cardId, item);
@@ -381,7 +425,9 @@ PD.ui.memo = (function () {
     var card = (item && item.card) || {};
     var cardId = card.id;
     var kind = kindOf(item);
-    var auto = kind === 'board' || (kind === 'text' && !!pfResult(m, cardId));
+    var auto = kind === 'board' ||
+      (deckOf(item) === 'anchor' && kind !== 'lines') ||
+      (deckOf(item) === 'pf' && kind === 'text' && !!pfResult(m, cardId));
     var bar = auto
       ? '<button type="button" class="pd-btn pd-btn-primary" data-act="auto">次へ</button>'
       : '<button type="button" class="pd-btn pd-btn-ghost" data-act="ng">× 忘れた</button>' +
@@ -523,7 +569,8 @@ PD.ui.memo = (function () {
       callIf(ctx.memoNext, []);
     } else if (act === 'auto') {
       var cur = currentItem(m);
-      callIf(ctx.memoGrade, [kindOf(cur) === 'board' ? boardOk(m, cur) : pfOk(m, cur)]);
+      var ok2 = kindOf(cur) === 'board' ? boardOk(m, cur) : (deckOf(cur) === 'anchor' ? anchorOk(m, cur) : pfOk(m, cur));
+      callIf(ctx.memoGrade, [ok2]);
       callIf(ctx.memoNext, []);
     } else if (act === 'to-drill') {
       callIf(ctx.memoFinish, []);

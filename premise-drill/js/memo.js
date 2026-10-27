@@ -51,8 +51,22 @@ PD.memo = (function (cardsDep, wizardDep) {
   var BOARD_HINT = '②は「このランクを手札に1枚持っていれば、ボード3枚と合わせて4枚のストレートドロー（OESD かガット）になる」ランク。' +
     '完成カードではない。例：QJ9 なら T（OESD）、K と 8（ガット）。無ければ「無し」。';
 
+  /** 3バケツ・アンカー（2026-10-23 実測＝wizard-data.md）。数値列カードの正解。置き場はここ1箇所 */
+  var ANCHOR_MEMO = {
+    anchor_base: [13, 23, 18, 46],
+    anchor_except: [9, 15],
+    anchor_defend: [32, 26, 36]
+  };
+  var ANCHOR_STEPS = [
+    '①ペア以上＝ポケット13＋ボード3枚のランク密度の和',
+    '②ハイカード＝A/K が盤に無ければ 23＋18 がそのまま。片方落ちたら残り、両方で≈0',
+    '③trash＝100−①−②（直接数えない）'
+  ];
+  var ANCHOR_HINT = 'アンカー＝BB コールレンジの固定構成。どの対面でもほぼ同じ1セットで、位置で動くのは守る総量の方。';
+
   var DECKS = [
     { id: 'alpha', label: '必要fold%（α）' },
+    { id: 'anchor', label: '3バケツ・アンカー' },
     { id: 'eqgap', label: 'EQ差' },
     { id: 'pf', label: 'PF境界' },
     { id: 'board', label: 'ボード' }
@@ -64,6 +78,11 @@ PD.memo = (function (cardsDep, wizardDep) {
     { id: 'alpha_50', deck: 'alpha', kind: 'number', q: '相手が 50% ポットを打ってきた。自レンジの何%まで降りてよい？（暗記値）', hint: ALPHA_HINT },
     { id: 'alpha_75', deck: 'alpha', kind: 'number', q: '相手が 75% ポットを打ってきた。自レンジの何%まで降りてよい？（暗記値）', hint: ALPHA_HINT },
     { id: 'alpha_125', deck: 'alpha', kind: 'number', q: '相手が 125% ポットを打ってきた。自レンジの何%まで降りてよい？（暗記値）', hint: ALPHA_HINT },
+
+    { id: 'anchor_base', deck: 'anchor', kind: 'text', q: 'BB コールレンジのアンカー：ポケット／Aハイ／Kハイ／残り（Q以下）は何%？（4つ順にタイプ。例：10 20 10 60）', hint: ANCHOR_HINT },
+    { id: 'anchor_except', deck: 'anchor', kind: 'text', q: 'アンカーの例外：vs SB のポケット%／vs UTG・CO のポケット%は？（2つ順に）', hint: '99・TT が 3bet に回る対面はポケットが痩せる。狭いオープンに対しては逆に微増。' },
+    { id: 'anchor_defend', deck: 'anchor', kind: 'text', q: '守る総量：vs UTG 2.0bb／vs BTN 2.5bb／vs SB 3.0bb で自レンジの何%を守る？（3つ順に）', hint: '位置よりオープンサイズが効く。2.0bb には BTN の 2.5bb より広く守る。' },
+    { id: 'anchor_steps', deck: 'anchor', kind: 'lines', q: 'アンカー法の手順を3行で（①ペア以上／②ハイカード／③trash の出し方）', hint: ANCHOR_HINT },
 
     { id: 'eqgap_more', deck: 'eqgap', kind: 'lines', q: '暗記値より多く降りる（overfold する）スポットを全部挙げよ（1行1項目）', hint: EQGAP_HINT },
     { id: 'eqgap_alpha', deck: 'eqgap', kind: 'lines', q: '暗記値どおりでよい（overfold しない）のはどんな時か、全部挙げよ（1行1項目）', hint: EQGAP_HINT },
@@ -185,7 +204,7 @@ PD.memo = (function (cardsDep, wizardDep) {
       version: 1,
       cards: {},
       daily: { date: null, done: 0, ok: 0, ng: 0, boardOk: 0, boardN: 0, finished: false },
-      decks: { alpha: true, eqgap: true, pf: true, board: true }
+      decks: { alpha: true, anchor: true, eqgap: true, pf: true, board: true }
     };
   }
 
@@ -207,6 +226,7 @@ PD.memo = (function (cardsDep, wizardDep) {
     if (!d || typeof d !== 'object') return base;
     return {
       alpha: d.alpha !== false,
+      anchor: d.anchor !== false,
       eqgap: d.eqgap !== false,
       pf: d.pf !== false,
       board: d.board !== false
@@ -310,7 +330,7 @@ PD.memo = (function (cardsDep, wizardDep) {
     var rngFn = typeof rng === 'function' ? rng : Math.random;
     var out = [];
 
-    ['alpha', 'eqgap', 'pf'].forEach(function (deckId) {
+    ['alpha', 'anchor', 'eqgap', 'pf'].forEach(function (deckId) {
       if (decksOn[deckId] === false) return;
       var due = [];
       var neu = [];
@@ -406,7 +426,7 @@ PD.memo = (function (cardsDep, wizardDep) {
     var decksOn = s.decks || {};
     var due = 0;
     var newAvail = 0;
-    ['alpha', 'eqgap', 'pf'].forEach(function (deckId) {
+    ['alpha', 'anchor', 'eqgap', 'pf'].forEach(function (deckId) {
       if (decksOn[deckId] === false) return;
       var newCount = 0;
       CARDS.forEach(function (c) {
@@ -431,6 +451,19 @@ PD.memo = (function (cardsDep, wizardDep) {
   }
 
   // ---------------------------------------------------------------- 補助照合
+
+  /** 数値列カード（anchor_*）の照合：入力から数を順に拾って完全一致 */
+  function checkAnchor(cardId, text) {
+    var expect = ANCHOR_MEMO[cardId];
+    if (!expect) return null;
+    var nums = String(text === null || text === undefined ? '' : text).match(/\d+/g) || [];
+    if (nums.length !== expect.length) return { ok: false, expect: expect.slice(), got: nums.map(Number) };
+    var ok = true;
+    for (var i = 0; i < expect.length; i++) if (Number(nums[i]) !== expect[i]) ok = false;
+    return { ok: ok, expect: expect.slice(), got: nums.map(Number) };
+  }
+
+  function anchorSteps() { return ANCHOR_STEPS.slice(); }
 
   function checkAlpha(cardId, value) {
     var m = /^alpha_(\d+)$/.exec(String(cardId || ''));
@@ -506,6 +539,9 @@ PD.memo = (function (cardsDep, wizardDep) {
   return {
     KEY: KEY,
     ALPHA_MEMO: ALPHA_MEMO,
+    ANCHOR_MEMO: ANCHOR_MEMO,
+    checkAnchor: checkAnchor,
+    anchorSteps: anchorSteps,
     CLS_ORDER: CLS_ORDER,
     CLS_LABELS: CLS_LABELS,
     pureAlpha: pureAlpha,

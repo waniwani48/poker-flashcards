@@ -48,6 +48,7 @@ PD.ui.settings = (function () {
   var RANGE_CLEAR_CONFIRM = 'レンジ表の自分の編集を消して、同梱の初期値に戻す。\n本当に戻す？';
   var MEMO_DECKS = [
     { id: 'alpha', label: '必要fold%（α）' },
+    { id: 'anchor', label: '3バケツ・アンカー' },
     { id: 'eqgap', label: 'EQ差' },
     { id: 'pf', label: 'PF境界' },
     { id: 'board', label: 'ボード' }
