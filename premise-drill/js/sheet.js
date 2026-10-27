@@ -263,7 +263,7 @@ PD.sheet = (function () {
     if (!compact && enough === 'no') {
       var next = Array.isArray(v.nextLayer) ? v.nextLayer : [];
       if (!allValidHands(next)) return ng('④次の層のハンド名が不正');
-      if (next.length < MIN.nextLayer) return ng('④足りないなら次の層から捻出する手を最低' + MIN.nextLayer + 'つ');
+      if (next.length < MIN.nextLayer) return ng('④足りない分：次に弱い層から降ろす手を最低' + MIN.nextLayer + 'つ');
     }
     return ok();
   }

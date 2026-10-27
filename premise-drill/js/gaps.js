@@ -257,7 +257,7 @@ PD.gaps = (function () {
     var f4First = (i3 >= 0 && i4 >= 0 && i4 < i3) ||
       (typeof fieldTimes.f3 === 'number' && typeof fieldTimes.f4 === 'number' && fieldTimes.f4 < fieldTimes.f3);
     if (f4First) hit('rule', '④が③より先に完了している');
-    if (f4.enough === 'yes' && Array.isArray(f4.nextLayer) && f4.nextLayer.length) hit('rule', '④で「足りる」なのに次の層を捻出している');
+    if (f4.enough === 'yes' && Array.isArray(f4.nextLayer) && f4.nextLayer.length) hit('rule', '④で「足りる」なのに次の層から降ろす手を挙げている');
     if (spot.size === 50 && typeof f1.foldPct === 'number' && f1.foldPct <= RULE_FOLD_FLOOR_50) hit('rule', '50% なのに①が 33% 相当の値');
     if (claude && claude.villain_range_used === true) hit('rule', '相手レンジを根拠にしている（Claude）');
 
