@@ -171,3 +171,13 @@
 /* 連続日数・通算（静かな1行） */
 .pd-home-streak { margin: -2px 0 6px; }
 .pd-home-order-foot { margin: 8px 0 0; }
+.pd-home-order-more {
+  margin-left: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--truth);
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

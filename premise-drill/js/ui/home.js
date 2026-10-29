@@ -297,7 +297,8 @@ PD.ui.home = (function () {
           orderDrillRow(plan) +
           orderLiveRow(plan) +
         '</ul>' +
-        '<p class="pd-small pd-mute pd-home-order-foot">忙しい日は暗記だけで連続が続く。</p>' +
+        '<p class="pd-small pd-mute pd-home-order-foot">忙しい日は暗記だけで連続が続く。' +
+          '<button type="button" class="pd-home-order-more" data-go="guide">毎日できることの詳細</button></p>' +
       '</section>'
     );
   }
