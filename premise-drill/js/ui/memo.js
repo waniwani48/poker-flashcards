@@ -444,16 +444,21 @@ PD.ui.memo = (function () {
     );
   }
 
-  function doneHtml(m) {
+  function doneHtml(m, ctx) {
     var daily = (m && m.state && m.state.daily) || {};
     var ok = daily.ok || 0;
     var ng = daily.ng || 0;
     var boardOkN = daily.boardOk || 0;
     var boardN = daily.boardN || 0;
+    var streak = ctx && ctx.state && ctx.state.counters && ctx.state.counters.streak;
+    var streakLine = (streak && Number(streak.n) > 0)
+      ? '<p class="pd-memo-streak pd-small pd-mute">連続 <span class="pd-mono">' + Number(streak.n) + '</span> 日目</p>'
+      : '';
     return (
       '<div class="pd-memo pd-memo-done" data-phase="done">' +
         '<section class="pd-card pd-memo-summary">' +
           '<h2>今日の暗記はここまでです</h2>' +
+          streakLine +
           '<ul class="pd-memo-counts pd-mono">' +
             '<li>○ 覚えてた：' + ok + '</li>' +
             '<li>× 忘れた：' + ng + '</li>' +
@@ -484,9 +489,9 @@ PD.ui.memo = (function () {
     var m = ctx && ctx.memo;
     if (!m || !Array.isArray(m.items) || !m.items.length) return emptyHtml();
     var idx = (typeof m.idx === 'number') ? m.idx : 0;
-    if (m.phase === 'done' || idx >= m.items.length) return doneHtml(m);
+    if (m.phase === 'done' || idx >= m.items.length) return doneHtml(m, ctx);
     var item = currentItem(m);
-    if (!item) return doneHtml(m);
+    if (!item) return doneHtml(m, ctx);
     if (m.phase === 'reveal') return revealHtml(m, item);
     return askHtml(m, item);
   }

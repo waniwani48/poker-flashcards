@@ -48,6 +48,10 @@ PD.ui.home = (function () {
       var withSize = (sz === '33' || sz === '50') ? '（' + sz + '%）' : '';
       return { reason: 'srs', size: sz, label: '復習' + withSize };
     }
+    var plan = todayPlan();
+    if (plan && plan.drill && plan.drill.committedToday === 0) {
+      return { reason: 'daily', size: null, label: '今日の盤' };
+    }
     return { reason: 'random', size: null, label: 'ランダム' };
   }
 
@@ -99,7 +103,8 @@ PD.ui.home = (function () {
           '<span class="pd-home-start-arrow" aria-hidden="true">→</span>' +
         '</button>' +
         '<p class="pd-home-start-note pd-small pd-mute">' +
-          (info.reason === 'srs' ? '期日が来たセルの族から出します。' : '出題済みの族に期日のセルはありません。') +
+          (info.reason === 'srs' ? '期日が来たセルの族から出します。'
+            : (info.reason === 'daily' ? '日替わりの1問目。今日は全員この盤から始まります。' : '出題済みの族に期日のセルはありません。')) +
         '</p>' +
       '</section>'
     );
@@ -265,16 +270,34 @@ PD.ui.home = (function () {
     );
   }
 
+  /** 連続日数・通算スポットの静かな1行。記録が無ければ出さない */
+  function streakLineHtml(ctx) {
+    var c = (ctx.state && ctx.state.counters) || {};
+    var s = c.streak || {};
+    var total = (Number(c.committed) || 0) + (Number(c.speed) || 0);
+    var n = Number(s.n) || 0;
+    if (!n && !total) return '';
+    var today = todayStr();
+    var liveToday = s.last === today;
+    var parts = [];
+    if (n) parts.push('連続 <span class="pd-mono">' + n + '</span> 日' + (liveToday ? '' : '（今日はまだ）'));
+    if (total) parts.push('通算 <span class="pd-mono">' + total + '</span> スポット');
+    if ((Number(s.best) || 0) > n) parts.push('最長 <span class="pd-mono">' + s.best + '</span> 日');
+    return '<p class="pd-home-streak pd-small pd-mute">' + parts.join('　') + '</p>';
+  }
+
   function orderCardHtml(ctx) {
     var plan = todayPlan();
     return (
       '<section class="pd-card pd-home-order" aria-label="今日の順番">' +
         '<p class="pd-home-order-title pd-small pd-mute">今日の順番</p>' +
+        streakLineHtml(ctx) +
         '<ul class="pd-home-rows pd-home-order-rows">' +
           orderMemoRow(plan) +
           orderDrillRow(plan) +
           orderLiveRow(plan) +
         '</ul>' +
+        '<p class="pd-small pd-mute pd-home-order-foot">忙しい日は暗記だけで連続が続く。</p>' +
       '</section>'
     );
   }

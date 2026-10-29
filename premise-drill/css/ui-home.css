@@ -167,3 +167,7 @@
   border-radius: var(--r-sm);
   color: var(--settle);
 }
+
+/* 連続日数・通算（静かな1行） */
+.pd-home-streak { margin: -2px 0 6px; }
+.pd-home-order-foot { margin: 8px 0 0; }

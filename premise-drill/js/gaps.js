@@ -317,6 +317,7 @@ PD.gaps = (function () {
     if (typeof c.live !== 'number') c.live = 0;
     if (typeof c.speed !== 'number') c.speed = 0;
     if (!c.liveToday || typeof c.liveToday !== 'object') c.liveToday = { date: null, n: 0 };
+    if (!c.streak || typeof c.streak !== 'object') c.streak = { n: 0, last: null, best: 0 };
     return state;
   }
 

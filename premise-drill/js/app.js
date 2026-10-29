@@ -61,7 +61,7 @@ PD.app = (function () {
       },
       recurrence: {},
       familyStats: {},
-      counters: { committed: 0, live: 0, speed: 0, liveToday: { date: todayStr(), n: 0 } }
+      counters: { committed: 0, live: 0, speed: 0, liveToday: { date: todayStr(), n: 0 }, streak: { n: 0, last: null, best: 0 } }
     };
   }
 
@@ -418,6 +418,7 @@ PD.app = (function () {
     }
 
     ctx.state = nextState;
+    markActive();
     if (has(PD.store, 'saveState')) PD.store.saveState(ctx.state);
     ctx.log = has(PD.store, 'loadLog') ? (PD.store.loadLog() || []) : ctx.log.concat([entry]);
     ctx.lastOutcome = outcome;
@@ -439,10 +440,19 @@ PD.app = (function () {
       return null;
     }
     if (!ctx.state) ctx.state = fallbackState();
+    // その日の1問目は日付シードの「今日の盤」（全員同じ出題。2問目以降はランダム）
+    var today = todayStr();
+    var committedToday = 0;
+    for (var i = 0; i < ctx.log.length; i++) {
+      var e = ctx.log[i];
+      if (e && e.mode !== 'speed' && String(e.at || '').slice(0, 10) === today) committedToday++;
+    }
+    var opts = { tempo: 'slow' };
+    if (committedToday === 0) opts.seed = (parseInt(today.replace(/-/g, ''), 10) >>> 0);
     var r;
     try {
-      r = PD.gen.nextSpot(ctx.state, ctx.log, { tempo: 'slow' });
-    } catch (e) {
+      r = PD.gen.nextSpot(ctx.state, ctx.log, opts);
+    } catch (e2) {
       toast('出題を作れませんでした');
       return null;
     }
@@ -450,6 +460,7 @@ PD.app = (function () {
       toast('出題を作れませんでした');
       return null;
     }
+    if (committedToday === 0 && (!r.reason || r.reason === 'random')) r.reason = 'daily';
     start(r.spot, 'drill', 'slow', r.reason || 'random');
     return r;
   }
@@ -554,6 +565,7 @@ PD.app = (function () {
     if (has(api, 'saveState')) {
       try { api.saveState(state); } catch (e) { /* 保存できなくても進行は止めない */ }
     }
+    markActive();
   }
 
   /** 次の item へ（無ければ phase 'done'） */
@@ -573,6 +585,30 @@ PD.app = (function () {
   }
 
   /** finishDay → save → ctx.memo 破棄 → home */
+  /** 'YYYY-MM-DD' の前日（正午固定で DST の影響を受けない） */
+  function prevDayStr(day) {
+    var d = new Date(day + 'T12:00:00');
+    d.setDate(d.getDate() - 1);
+    var m = String(d.getMonth() + 1), dd = String(d.getDate());
+    return d.getFullYear() + '-' + (m.length < 2 ? '0' + m : m) + '-' + (dd.length < 2 ? '0' + dd : dd);
+  }
+
+  /** 連続日数。暗記でもドリルでも、その日最初の活動で1回だけ進める（冪等）。進んだら保存 */
+  function markActive() {
+    if (!ctx.state) ctx.state = fallbackState();
+    var c = ctx.state.counters = ctx.state.counters || {};
+    var s = c.streak;
+    if (!s || typeof s !== 'object') s = c.streak = { n: 0, last: null, best: 0 };
+    var today = todayStr();
+    if (s.last === today) return;
+    s.n = (s.last === prevDayStr(today)) ? (Number(s.n) || 0) + 1 : 1;
+    s.best = Math.max(Number(s.best) || 0, s.n);
+    s.last = today;
+    if (has(PD.store, 'saveState')) {
+      try { PD.store.saveState(ctx.state); } catch (e) { /* 保存失敗でも進行は止めない */ }
+    }
+  }
+
   function memoFinish() {
     var m = ctx.memo;
     var api = memoApi();
