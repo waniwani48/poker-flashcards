@@ -69,10 +69,10 @@ module.exports = {
       assert.strictEqual(typeof f.label, 'string');
       assert.ok(f.label.length > 0, 'label が空: ' + f.id);
     });
-    // 固定盤は全て trips でなく、クラスが既知
+    // 固定ボードは全て trips でなく、クラスが既知
     G.FALLBACK_BOARDS.forEach(function (b) {
       var c = cards.classifyBoard(b).cls;
-      assert.ok(CLS.indexOf(c) >= 0, '固定盤のクラスが不正: ' + b + ' → ' + c);
+      assert.ok(CLS.indexOf(c) >= 0, '固定ボードのクラスが不正: ' + b + ' → ' + c);
     });
 
     // ---------------------------------------------------------------- 受入: 固定 seed で同じ Spot
@@ -236,7 +236,7 @@ module.exports = {
 
     var p6 = G.parseShorthand('K75m 33 A4s');
     assert.strictEqual(p6.ok, true);
-    assert.strictEqual(p6.needSuitQuestion, false, 'モノトーン盤ではスートを揃えられないので質問しない');
+    assert.strictEqual(p6.needSuitQuestion, false, 'モノトーンのボードではスートを揃えられないので質問しない');
     assert.strictEqual(cards.handFeatures(p6.hero, p6.board).bdfd, false);
     assert.strictEqual(cards.handFeatures(p6.hero, p6.board).fd, false);
 
@@ -244,7 +244,7 @@ module.exports = {
     assert.strictEqual(p7.ok, true);
     assert.strictEqual(p7.needSuitQuestion, true, '具体ボード＋ハンド名スーテッドは質問');
     assert.strictEqual(cards.handFeatures(p7.heroOptions.same, 'Ks7d5c').bdfd, true);
-    assert.strictEqual(p7.heroOptions.other, 'Ah4h', 'other は盤に無いスート');
+    assert.strictEqual(p7.heroOptions.other, 'Ah4h', 'other はボードに無いスート');
 
     assert.strictEqual(G.parseShorthand('Ks7d 33 A4s').ok, false, '2枚のボードは不可');
     assert.strictEqual(G.parseShorthand('K75 33 A4s').ok, false, 'テクスチャ無しは不可');
@@ -255,8 +255,8 @@ module.exports = {
     assert.strictEqual(G.parseShorthand('Ks7d5c 33 Ks4s').ok, false, 'Hero がボードと重複');
     assert.strictEqual(G.parseShorthand('').ok, false);
     assert.strictEqual(G.parseShorthand(null).ok, false);
-    assert.strictEqual(G.parseShorthand('K77m 33 A4s').ok, false, 'ペア盤をモノトーンにはできない');
-    assert.strictEqual(G.parseShorthand('KK7tt 33 A4s').ok, true, 'ペア盤のツートーン');
+    assert.strictEqual(G.parseShorthand('K77m 33 A4s').ok, false, 'ペアのボードをモノトーンにはできない');
+    assert.strictEqual(G.parseShorthand('KK7tt 33 A4s').ok, true, 'ペアのボードのツートーン');
     assert.strictEqual(typeof G.parseShorthand('K75 33 A4s').err, 'string');
 
     // ---------------------------------------------------------------- 受入: spotFromManual

@@ -98,7 +98,7 @@ module.exports = {
     // ---- 2. 純粋な HTML 生成（document 無し） ----
     var hHome0 = PD.ui.home.html(ctx);
     assert.strictEqual(typeof hHome0, 'string');
-    assert.ok(hHome0.indexOf('pd-home-start') >= 0 && hHome0.indexOf('今日の盤') >= 0, 'ログ0件（今日未コミット）の Home は日替わりの「今日の盤」');
+    assert.ok(hHome0.indexOf('pd-home-start') >= 0 && hHome0.indexOf('今日のボード') >= 0, 'ログ0件（今日未コミット）の Home は日替わりの「今日のボード」');
     assert.ok(hHome0.indexOf('まだ記録がありません') >= 0, 'ログ0件は空状態');
     hasNoLabel(assert, hHome0, labels, 'Home');
     var hMap0 = PD.ui.map.html(ctx);

@@ -54,7 +54,7 @@ PD.gen = (function () {
 
   /**
    * Hero プール（境界に来やすい手のみ。w は重み）。
-   *   rule 'bdfd'   : スーテッド。ボードに1枚だけあるスートを採る（BDFD 成立）。モノトーン盤では盤に無いスート
+   *   rule 'bdfd'   : スーテッド。ボードに1枚だけあるスートを採る（BDFD 成立）。モノトーンのボードではボードに無いスート
    *   rule 'suited' : スーテッド。ボードに2枚以上あるスートは採らない（FD／フラッシュ完成を避ける）
    *   rule 'off'    : オフスート（2枚は別スート）
    *   rule 'pocket' : ポケットペア（2枚は別スート）
@@ -91,7 +91,7 @@ PD.gen = (function () {
     return out;
   })();
 
-  /** リジェクションサンプリングが上限に達したときの固定盤 */
+  /** リジェクションサンプリングが上限に達したときの固定ボード */
   var FALLBACK_BOARDS = ['Ks7d5c', 'QsJd9c', 'Ts9h6c', '8h7d4c', 'Ah9h6c'];
 
   var SUITS = 'shdc';
@@ -346,7 +346,7 @@ PD.gen = (function () {
       if (want !== 'high') return b;
       if (C.classifyBoard(b).cls === cls) return b;
     }
-    // 上限到達：固定盤から同クラスを探し、無ければ先頭
+    // 上限到達：固定ボードから同クラスを探し、無ければ先頭
     for (i = 0; i < FALLBACK_BOARDS.length; i++) {
       var fb = parseFixedBoard(FALLBACK_BOARDS[i]);
       if (fb && C.classifyBoard(fb).cls === cls) return fb;

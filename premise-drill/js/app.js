@@ -440,7 +440,7 @@ PD.app = (function () {
       return null;
     }
     if (!ctx.state) ctx.state = fallbackState();
-    // その日の1問目は日付シードの「今日の盤」（全員同じ出題。2問目以降はランダム）
+    // その日の1問目は日付シードの「今日のボード」（全員同じ出題。2問目以降はランダム）
     var today = todayStr();
     var committedToday = 0;
     for (var i = 0; i < ctx.log.length; i++) {

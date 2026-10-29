@@ -50,7 +50,7 @@ PD.ui.home = (function () {
     }
     var plan = todayPlan();
     if (plan && plan.drill && plan.drill.committedToday === 0) {
-      return { reason: 'daily', size: null, label: '今日の盤' };
+      return { reason: 'daily', size: null, label: '今日のボード' };
     }
     return { reason: 'random', size: null, label: 'ランダム' };
   }
@@ -104,7 +104,7 @@ PD.ui.home = (function () {
         '</button>' +
         '<p class="pd-home-start-note pd-small pd-mute">' +
           (info.reason === 'srs' ? '期日が来たセルの族から出します。'
-            : (info.reason === 'daily' ? '日替わりの1問目。今日は全員この盤から始まります。' : '出題済みの族に期日のセルはありません。')) +
+            : (info.reason === 'daily' ? '日替わりの1問目。今日は全員このボードから始まります。' : '出題済みの族に期日のセルはありません。')) +
         '</p>' +
       '</section>'
     );
