@@ -181,10 +181,56 @@ PD.app = (function () {
     document.addEventListener('click', function (ev) {
       var t = ev.target;
       if (!t || typeof t.closest !== 'function') return;
+      var fb = t.closest('[data-act="feedback"]');
+      if (fb) { ev.preventDefault(); openFeedback(); return; }
       var a = t.closest('[data-go]');
       if (!a) return;
       ev.preventDefault();
       go(a.getAttribute('data-go'));
+    });
+  }
+
+  // ---- 開発コメント（✎）：どの画面からでも一言書き残す。設定からまとめてコピー ----
+  function feedbackCtxInfo() {
+    var sp = (ctx.entry && ctx.entry.spot) || ctx.spot || null;
+    var card = null;
+    if (ctx.view === 'memo' && ctx.memo && Array.isArray(ctx.memo.items)) {
+      var it = ctx.memo.items[ctx.memo.idx];
+      card = (it && it.card && it.card.id) || null;
+    }
+    return { view: ctx.view, board: sp ? sp.board : null, hero: sp ? sp.hero : null, card: card };
+  }
+
+  function openFeedback() {
+    if (typeof document === 'undefined') return;
+    if (document.querySelector('.pd-fb-overlay')) return;
+    var ov = document.createElement('div');
+    ov.className = 'pd-fb-overlay';
+    ov.innerHTML =
+      '<div class="pd-fb-sheet pd-card" role="dialog" aria-label="開発コメント">' +
+        '<h2>開発コメント</h2>' +
+        '<p class="pd-small pd-mute">気づいた不具合・分かりにくい所・欲しい機能を一言。画面とボードは自動で添付。設定の「開発コメント」からまとめてコピーして Claude に貼ると修正に回る。</p>' +
+        '<textarea class="pd-input pd-fb-text" rows="4" placeholder="例：③の文言が分かりにくい"></textarea>' +
+        '<div class="pd-fb-btns">' +
+          '<button type="button" class="pd-btn pd-btn-ghost" data-fb="cancel">やめる</button>' +
+          '<button type="button" class="pd-btn pd-btn-primary" data-fb="save">保存</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    var ta = ov.querySelector('.pd-fb-text');
+    if (ta) ta.focus();
+    ov.addEventListener('click', function (ev) {
+      var t = ev.target;
+      if (t === ov) { ov.remove(); return; }
+      if (!t || typeof t.closest !== 'function') return;
+      var b = t.closest('[data-fb]');
+      if (!b) return;
+      if (b.getAttribute('data-fb') === 'save') {
+        var r = has(PD.store, 'addFeedback') ? PD.store.addFeedback(ta ? ta.value : '', feedbackCtxInfo()) : { ok: false };
+        if (!r.ok) { toast(r.msg || '保存できなかった'); return; }
+        toast('コメントを保存した（設定からまとめてコピーできる）');
+      }
+      ov.remove();
     });
   }
 

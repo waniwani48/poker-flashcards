@@ -10,7 +10,8 @@ var PD = root.PD = root.PD || {};
 PD.store = (function () {
   'use strict';
 
-  var KEYS = { state: 'pd_state_v1', log: 'pd_log_v1', model: 'pd_model', apiKey: 'pokerApiKey' };
+  var KEYS = { state: 'pd_state_v1', log: 'pd_log_v1', model: 'pd_model', apiKey: 'pokerApiKey', feedback: 'pd_feedback_v1' };
+  var FEEDBACK_CAP = 200;
   var LOG_CAP = 600;
   var DEFAULT_MODEL = 'claude-opus-5';
   var QUOTA_RETRIES = 5;       // QuotaExceeded 時の再試行回数（初回の失敗後に最大5回）
@@ -224,6 +225,48 @@ PD.store = (function () {
   // ---------------------------------------------------------------------------
 
   /** { v:1, exportedAt, state, log, memo? }。pokerApiKey と pd_model は含めない。memo は PD.memo が居れば含める */
+  // ---- 開発コメント（アプリ内で書き残し、設定からまとめてコピーして開発に渡す）----
+  function loadFeedback() {
+    var parsed = parseJSON(getItem(KEYS.feedback));
+    return Array.isArray(parsed) ? parsed : [];
+  }
+
+  /** ctxInfo = { view, board, hero, card } 省略可。戻り {ok} */
+  function addFeedback(text, ctxInfo) {
+    var t = String(text === null || text === undefined ? '' : text).trim();
+    if (!t) return { ok: false, msg: 'コメントが空' };
+    var list = loadFeedback();
+    var c = ctxInfo || {};
+    list.push({
+      id: 'fb_' + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36),
+      at: new Date().toISOString(),
+      view: c.view || null, board: c.board || null, hero: c.hero || null, card: c.card || null,
+      text: t
+    });
+    if (list.length > FEEDBACK_CAP) list = list.slice(list.length - FEEDBACK_CAP);
+    return { ok: setItemSafe(KEYS.feedback, JSON.stringify(list)) };
+  }
+
+  function removeFeedback(id) {
+    var list = loadFeedback().filter(function (f) { return f && f.id !== id; });
+    return { ok: setItemSafe(KEYS.feedback, JSON.stringify(list)) };
+  }
+
+  function clearFeedback() { removeItem(KEYS.feedback); }
+
+  /** チャットに貼る用の整形テキスト */
+  function feedbackText() {
+    var list = loadFeedback();
+    if (!list.length) return '';
+    var lines = ['premise-drill 開発コメント（' + list.length + '件）'];
+    list.forEach(function (f) {
+      var meta = [String(f.at || '').slice(0, 16).replace('T', ' '), f.view, f.board ? (f.board + (f.hero ? ' ' + f.hero : '')) : null, f.card]
+        .filter(function (x) { return !!x; }).join(' / ');
+      lines.push('- [' + meta + '] ' + f.text);
+    });
+    return lines.join('\n');
+  }
+
   function exportJSON() {
     var out = { v: 1, exportedAt: new Date().toISOString(), state: loadState(), log: loadLog() };
     var memo = root.PD && root.PD.memo;
@@ -234,6 +277,8 @@ PD.store = (function () {
     if (range && typeof range.exportState === 'function') {
       try { out.range = range.exportState(); } catch (e) { /* レンジ表が読めなければ省く */ }
     }
+    var fb = loadFeedback();
+    if (fb.length) out.feedback = fb;
     return JSON.stringify(out);
   }
 
@@ -516,6 +561,11 @@ PD.store = (function () {
     defaultState: defaultState,
     loadLog: loadLog,
     appendLog: appendLog,
+    loadFeedback: loadFeedback,
+    addFeedback: addFeedback,
+    removeFeedback: removeFeedback,
+    clearFeedback: clearFeedback,
+    feedbackText: feedbackText,
     updateLog: updateLog,
     exportJSON: exportJSON,
     importJSON: importJSON,

@@ -264,7 +264,7 @@ function run(assert) {
   assert.strictEqual(ctx.state.settings.extraFields.length, 0, 'ctx.state は既定に戻る');
   assert.strictEqual(ctx.state.settings.wizardBfacing, 'unknown', 'リセットで wizardBfacing も既定に');
   assert.strictEqual(ctx.state.settings.wizardBetDecimals, 1);
-  assert.deepStrictEqual(r.cards.slice().sort(), ['claude', 'data', 'extra', 'memo', 'range', 'reset', 'wizard'], 'リセットは全カードを作り直す');
+  assert.deepStrictEqual(r.cards.slice().sort(), ['claude', 'data', 'extra', 'feedback', 'memo', 'range', 'reset', 'wizard'], 'リセットは全カードを作り直す');
   assert.ok(/data-role="log-count">0</.test(settings.html(ctx)));
 
   r = settings.apply(ctx, 'import', text);

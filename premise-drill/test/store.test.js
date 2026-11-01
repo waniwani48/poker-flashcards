@@ -7,7 +7,7 @@
 
 var path = require('path');
 
-var ALLOWED_KEYS = ['pd_state_v1', 'pd_log_v1', 'pd_model', 'pokerApiKey'];
+var ALLOWED_KEYS = ['pd_state_v1', 'pd_log_v1', 'pd_model', 'pokerApiKey', 'pd_feedback_v1'];
 var OWN_KEYS = ['pokerSRS_v1', 'pokerJudgeModel', 'pokerMode', 'pokerStreak'];
 
 /** localStorage スタブ。quotaFails > 0 の間は setItem が QuotaExceededError を投げる（投げるたびに減る） */
@@ -91,7 +91,7 @@ module.exports = {
     var stub, r, i, log, st;
 
     // ---- 契約の定数 ----
-    assert.deepStrictEqual(store.KEYS, { state: 'pd_state_v1', log: 'pd_log_v1', model: 'pd_model', apiKey: 'pokerApiKey' });
+    assert.deepStrictEqual(store.KEYS, { state: 'pd_state_v1', log: 'pd_log_v1', model: 'pd_model', apiKey: 'pokerApiKey', feedback: 'pd_feedback_v1' });
     assert.strictEqual(store.LOG_CAP, 600);
 
     // ---- loadState：無ければ既定を生成して保存 ----

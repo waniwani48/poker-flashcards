@@ -43,7 +43,8 @@ PD.ui.settings = (function () {
     { id: 1, label: '小数1桁' },
     { id: 2, label: '小数2桁' }
   ];
-  var CARDS = ['claude', 'range', 'wizard', 'extra', 'memo', 'data', 'reset'];
+  var CARDS = ['claude', 'range', 'wizard', 'extra', 'memo', 'feedback', 'data', 'reset'];
+  var FB_CLEAR_CONFIRM = '開発コメントを全部消す。コピー済みであることを確認して。\n本当に消す？';
   var RANGE_STATE_LABEL = { fold: 'フォールド', call: 'コール', '3bet': '3bet', mix: '混合' };
   var RANGE_CLEAR_CONFIRM = 'レンジ表の自分の編集を消して、同梱の初期値に戻す。\n本当に戻す？';
   var MEMO_DECKS = [
@@ -471,6 +472,32 @@ PD.ui.settings = (function () {
     '</section>';
   }
 
+  // ---- 開発コメント（✎ で書いたもの。まとめてコピーして Claude に貼る）----
+  function cardFeedback(ctx) {
+    var st = store();
+    var list = (st && typeof st.loadFeedback === 'function') ? st.loadFeedback() : [];
+    var items = list.slice().reverse().map(function (f) {
+      var meta = [String(f.at || '').slice(5, 16).replace('T', ' '), f.view, f.board, f.card]
+        .filter(function (x) { return !!x; }).join(' / ');
+      return '<li class="pd-settings-fb-item" data-id="' + esc(f.id) + '">' +
+        '<span class="pd-settings-fb-main"><span class="pd-small pd-mute">' + esc(meta) + '</span><span>' + esc(f.text) + '</span></span>' +
+        '<button type="button" class="pd-btn pd-btn-ghost pd-settings-fb-del" data-act="fb-del" data-id="' + esc(f.id) + '" aria-label="このコメントを消す">×</button>' +
+      '</li>';
+    }).join('');
+    return '<section class="pd-card pd-settings-card" data-card="feedback">' +
+      kicker('開発コメント') +
+      '<h2>アプリへの修正メモ</h2>' +
+      '<p class="pd-small pd-mute">各画面の ✎ で書いたメモ。「まとめてコピー」して Claude のチャットに貼ると、修正に回せる。</p>' +
+      (items
+        ? '<ul class="pd-settings-fb-list">' + items + '</ul>'
+        : '<p class="pd-settings-empty pd-small pd-mute">まだ無い。右上の ✎ からどの画面でも書ける。</p>') +
+      '<div class="pd-settings-row">' +
+        '<button type="button" class="pd-btn pd-btn-truth" data-act="fb-copy"' + (items ? '' : ' disabled') + '>まとめてコピー</button>' +
+        '<button type="button" class="pd-btn pd-btn-ghost" data-act="fb-clear"' + (items ? '' : ' disabled') + '>全部消す</button>' +
+      '</div>' +
+    '</section>';
+  }
+
   // ---- リセット ----
   function cardReset() {
     return '<section class="pd-card pd-settings-card" data-card="reset">' +
@@ -488,6 +515,7 @@ PD.ui.settings = (function () {
       case 'wizard': return cardWizard(ctx);
       case 'extra': return cardExtra(ctx);
       case 'memo': return cardMemo(ctx);
+      case 'feedback': return cardFeedback(ctx);
       case 'data': return cardData(ctx);
       case 'reset': return cardReset(ctx);
       default: return '';
@@ -899,6 +927,30 @@ PD.ui.settings = (function () {
         r = apply(ctx, 'range-clear');
         if (r.ok) applyCards(el, ctx, r.cards);
         toast(ctx, r.msg);
+        return;
+      }
+      case 'fb-copy': {
+        var stc = store();
+        var text = (stc && typeof stc.feedbackText === 'function') ? stc.feedbackText() : '';
+        if (!text) { toast(ctx, 'コメントが無い'); return; }
+        copyText(text, null).then(function (ok) {
+          toast(ctx, ok ? 'コピーした。Claude のチャットに貼る' : 'コピーできなかった');
+        });
+        return;
+      }
+      case 'fb-del': {
+        var std = store();
+        if (std && typeof std.removeFeedback === 'function') std.removeFeedback(target.getAttribute('data-id'));
+        applyCards(el, ctx, ['feedback']);
+        return;
+      }
+      case 'fb-clear': {
+        var okf = (typeof root.confirm === 'function') ? root.confirm(FB_CLEAR_CONFIRM) : false;
+        if (!okf) return;
+        var stf = store();
+        if (stf && typeof stf.clearFeedback === 'function') stf.clearFeedback();
+        applyCards(el, ctx, ['feedback']);
+        toast(ctx, '開発コメントを消した');
         return;
       }
       default: return;

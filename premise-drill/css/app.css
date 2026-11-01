@@ -427,6 +427,40 @@ select.pd-input {
   background-repeat: no-repeat;
 }
 
+/* ---------- 開発コメント（✎ オーバーレイ） ---------- */
+.pd-fb-open {
+  min-width: 36px;
+  padding: 0 8px;
+  font-size: 16px;
+}
+
+.pd-fb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.pd-fb-sheet {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 8px calc(16px + env(safe-area-inset-bottom));
+  box-shadow: var(--shadow);
+}
+
+.pd-fb-text {
+  margin: var(--gap-1) 0;
+}
+
+.pd-fb-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--gap-1);
+}
+
 /* ---------- トースト ---------- */
 .pd-toast {
   position: fixed;
