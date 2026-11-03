@@ -108,17 +108,26 @@ svg {
   font-size: 18px;
   margin: 0;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .pd-nav {
   display: flex;
-  gap: 4px;
+  gap: 2px;
+  flex: none;
 }
 
 .pd-nav .pd-btn {
   min-height: 36px;
-  padding: 0 10px;
+  padding: 0 7px;
   font-size: 13px;
+  white-space: nowrap;
+}
+
+/* 390px 未満ではタイトルを少し縮めて1行に収める */
+@media (max-width: 389px) {
+  .pd-title { font-size: 16px; }
+  .pd-nav .pd-btn { padding: 0 5px; font-size: 12px; }
 }
 
 #pd-root {
@@ -428,9 +437,9 @@ select.pd-input {
 }
 
 /* ---------- 開発コメント（✎ オーバーレイ） ---------- */
-.pd-fb-open {
-  min-width: 36px;
-  padding: 0 8px;
+.pd-nav .pd-fb-open {
+  min-width: 32px;
+  padding: 0 6px;
   font-size: 16px;
 }
 
